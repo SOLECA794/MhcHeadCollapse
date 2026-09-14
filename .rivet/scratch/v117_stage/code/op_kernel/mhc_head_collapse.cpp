@@ -331,7 +331,19 @@ public:
             pipe_.InitBuffer(reduce_buf_, red_bytes);
             pipe_.InitBuffer(reduce_tmp_buf_, wf_bytes);
             // v086: whole weight matrix + base/scale cached in UB, loaded once per op
-            pipe_.InitBuffer(weight_cache_buf_, AlignBytes(n_ * nH_ * sizeof(float)));
+            // v119-fix: UB overflow guard — when the full [n, nH] weight cache would
+            // push total UB past 192KB (nH > ~4096 for n=8), fall back to a single-row
+            // streaming weight buffer (nH floats). UB math: full path needs
+            // wcache + 3*fp_bytes + xq + yq + out + red + cst; streaming drops
+            // wcache (n*nH*4) to one row (nH*4).
+            const uint64_t full_w_bytes = static_cast<uint64_t>(AlignBytes(n_ * nH_ * sizeof(float)));
+            const uint64_t base_bytes = static_cast<uint64_t>(wf_bytes) * 2U + red_bytes +
+                AlignBytes(nH_ * sizeof(DT_X)) + AlignBytes(h_ * sizeof(DT_X)) +
+                ((sizeof(DT_X) != sizeof(float)) ? (AlignBytes(nH_ * sizeof(float)) + AlignBytes(h_ * sizeof(float))) : 0U) + 64U;
+            w_stream_ = (full_w_bytes + base_bytes > 192U * 1024U);
+            pipe_.InitBuffer(weight_cache_buf_, w_stream_
+                ? static_cast<uint32_t>(AlignBytes(nH_ * sizeof(float)))
+                : static_cast<uint32_t>(full_w_bytes));
             pipe_.InitBuffer(cst_buf_, 64U);
         }
     }
@@ -339,8 +351,11 @@ public:
         const uint32_t block_idx = AscendC::GetBlockIdx();
         if (path_ == kVectorPath) {
             // v086: one-time DMA of the whole weight matrix [n, nH] (contiguous) + base/scale
+            // v119-fix: streaming mode skips the full-matrix DMA (single row fetched per gate)
             AscendC::LocalTensor<float> w_cache = weight_cache_buf_.Get<float>();
-            AscendC::DataCopy(w_cache, weight_gm_, n_ * nH_);
+            if (!w_stream_) {
+                AscendC::DataCopy(w_cache, weight_gm_, n_ * nH_);
+            }
             AscendC::LocalTensor<float> cst = cst_buf_.Get<float>();
             AscendC::DataCopy(cst, base_gm_, 8U);
             AscendC::DataCopy(cst[8], scale_gm_, 8U);
@@ -491,7 +506,16 @@ private:
         AscendC::LocalTensor<float> w_cache = weight_cache_buf_.Get<float>();
         AscendC::LocalTensor<float> cst = cst_buf_.Get<float>();
         for (uint32_t i = 0; i < n_; ++i) {
-            AscendC::Mul(work, x_float, w_cache[i * nH_], static_cast<int32_t>(nH_));
+            if (w_stream_) {
+                // v119-fix: stream one weight row per gate (UB overflow guard path).
+                // Row is re-DMAd into w_cache[0..nH) each gate, so index from 0.
+                AscendC::DataCopy(w_cache, weight_gm_[static_cast<uint64_t>(i) * nH_], nH_);
+                AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(0);
+                AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(0);
+                AscendC::Mul(work, x_float, w_cache, static_cast<int32_t>(nH_));
+            } else {
+                AscendC::Mul(work, x_float, w_cache[i * nH_], static_cast<int32_t>(nH_));
+            }
             AscendC::ReduceSum(reduced[32U * (i + 1U)], work, reduce_tmp, static_cast<int32_t>(nH_));
         }
         float gates[kSmallN];
@@ -608,6 +632,7 @@ private:
     uint32_t block_dim_ = 1;
     uint32_t path_ = 0;
     bool group_ = false;
+    bool w_stream_ = false;  // v119-fix: weight streaming mode (UB overflow guard)
     float inv_nH_ = 1.0f;
     float eps_norm_ = 1e-6f;
     float eps_hc_ = 1e-6f;

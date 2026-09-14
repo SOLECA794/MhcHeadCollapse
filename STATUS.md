@@ -19,12 +19,16 @@
 - 8.5 双环境建成：`/tmp/cann85/cann-8.5.0/`（OJ 同版本），9.0 在 `/opt/conda/Ascend/cann-9.0.0/`
 - v117 在 8.5 下编译链全通 + 正确性 7/8 PASS（详见 `.rivet/ENVIRONMENT.md §八`）
 - 361001 根因已解：**必须 export ASCEND_HOME_PATH**（conda 环境无 /etc/ascend_install.info）
+- **h=1024 UB 溢出已修复（v119-fix）**：weight 流式读 + 192KB 预算守卫，16/16 PASS 零回归
+  （F3.6；真实根因是 nH>4096 超 910B 单核 UB 192KB 上限，非 nH=1024）
+- 观测基础设施：`docs/METHODOLOGY.md` + `scripts/msprof_report.py`（已实测）
+- OJ 提交工具入仓：`cannjudge-submit-plaintext/`（含凭据，链路待首次实测）
 
 ### ○ 下一步（按优先级）
 
-1. **修 h=1024 MTE 越界 bug**（507035，详见下）——Case5 对应 shape，对拍前置
+1. ~~修 h=1024 MTE 越界 bug~~ ✅ 已修（v119-fix，F3.6，16/16 PASS）
 2. **建 ACL-event 计时 harness**：对齐 OJ 端到端口径（FACTS F2.1g），复用 `tests/mhc_bench*.cpp` 改造
-3. **shape 扫描对拍**：本地 (n,nH,outer) 计时矩阵 vs OJ 逐 case 时间
+3. **shape 扫描对拍**：本地 (n,nH,outer) 计时矩阵 vs OJ 逐 case 时间（nH>4096 已解锁）
 4. **NOP 标定五连提交**：搞清 OJ 计时口径（方法论见 `docs/METHODOLOGY.md` §三）
 5. Group sigmoid 精度 bug：先换硬件 Exp 原语 A/B（差分对照法，`docs/METHODOLOGY.md` §二）
 

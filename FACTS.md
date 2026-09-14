@@ -1023,3 +1023,30 @@ CANN 下此类越界通常静默。**当前能跑不等于安全**，换 shape �
 - ★ dhltat ladder-2026 submissions：GoogleTest + tiling_context_faker + gen/compare_data.py
   完整 UT 框架——**本地对拍 harness 的结构模板**
 - ladder-2026（算子天梯赛）:6月5题+7月6题, 含 GDN 结构 5.0 难度融合算子
+
+### F3.6 ★★★ v119-fix：大 nH UB 溢出崩溃已修复（2026-09-14，RED→GREEN 实测）
+
+**修正先前误判**：F3.3 说"nH=1024 崩溃"是参数误读——测试程序参数是 `<n> <h> <outer>`，
+崩溃场景实为 **h=1024（nH=n×h=8192）**。真实边界：nH=4096 PASS，nH≥4224 崩。
+
+**根因（两级）**：
+1. v117 逐行 PATH2 的 UB 预算：weight 全量缓存 n×nH×4（nH=4096 时 128KB）+ 其余缓冲，
+   合计在 nH≥4224 时超 910B 单核可用 UB（**256KB 物理 / 192KB 可用**，ascend-kg 硬件事实）→
+   MTE 写越界（"The write address of the MTE instruction is out of range"）
+2. 第一版修复（流式读 weight 单行）后又暴露 VEC 读越界——`w_cache[i*nH_]` 在流式模式下
+   缓冲只有 nH 元素，i≥1 时索引越界（"VEC instruction error: the ub address out of bounds"）
+
+**修复（v119-fix，`v117_stage/code/op_kernel/mhc_head_collapse.cpp` 三处）**：
+- Init：UB 预算检查 `full_w_bytes + base_bytes > 192KB` → `w_stream_=true`，weight 缓冲缩为单行
+- Process：流式模式跳过全量 weight DMA
+- ProcessVectorRow：流式分支每 gate 重读一行到 `w_cache[0..nH)`，索引从 0 起
+
+**验证（8.5 实测，16/16 PASS）**：RED 集 6 shape（8/1024/2/4/8 fp16、8/1024 fp32、
+8/528、8/768）全 PASS（误差 6e-5~1e-4）；回归 10 shape 全 PASS 且误差与修复前逐字一致
+（4/16/2 fp16 仍 8.848e-04）——group 路径/TinyH4/小 nH 零回归。
+
+**影响域**：OJ 在榜 5 case 不走此路径（Case1/2=PATH3，Case3/4/5=group 路径 nH≤1024），
+故在榜分数无影响；此修复解锁本地 shape 扫描矩阵的 nH>4096 区域（对拍前置条件）。
+
+**方法论注记**：UB 预算对账法（InitBuffer 逐项列表 vs 192KB）+ 错误类型变化链追踪
+（MTE→VEC→PASS）是本次定位的两大功臣——正是 METHODOLOGY.md 观测基础设施的实战首秀。
