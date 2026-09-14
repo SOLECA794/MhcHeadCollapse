@@ -316,3 +316,25 @@ g++ 链接 libascendcl/libnnopbase 时报 `undefined reference to hal*/drv*` 符
 
 另注意：链接失败时 g++ 可能留下**非 ELF 残骸文件**（`file` 显示 `data`），chmod +x 后报
 Exec format error——报错先 `file` 一下产物再查别的。
+
+### P23. cp -r 拷贝工程会把 build 缓存一起带来（2026-09-14）
+
+`cp -r code /tmp/vNNN` 后直接 cmake 会报
+`CMakeCache.txt directory is different` + `source does not match`——旧 cache 指向
+原路径（且可能指向另一 CANN 版本的 asc-config）。**拷贝后必须 `rm -rf build` 重建**。
+更阴险的变体：build 在别的子目录（build85/）漏删，cmake 走了但链接到旧对象。
+
+### P24. `&&` 长链静默断裂：BUILD_OK 没打但 INSTALL_OK 出现（2026-09-14）
+
+`cmake && make && make package && echo BUILD_OK; ./xx.run --install ... && echo INSTALL_OK`
+——当 cmake 失败时 `&&` 链断，但 `;` 后的安装命令照跑（装的是**旧 .run**），打出
+INSTALL_OK 造成"成功"假象。教训：**链尾回显（BUILD_OK）没出现=链条断了**，必须
+核查；关键步骤间用显式 `echo step=$?` 分隔，或干脆分命令跑。
+
+### P25. .run 安装目录的 scripts/ 是 root 属主，rm -rf 卡权限（2026-09-14）
+
+安装器在 `<inst>/vendors/custom/scripts/uninstall.sh` 写 root 文件；下次
+`rm -rf /tmp/xx_inst && ./xx.run --install-path=/tmp/xx_inst` 时 rm 报
+Permission denied 且 `&&` 断链。**解法：每次安装换全新目录名**
+（v119_inst → v119b_inst → v120_inst），别删旧的；旧目录浪费的 /tmp 空间可忽略
+（20T 盘）。若必须清理：`rm -rf` 单独跑并容忍失败（`; true`）。

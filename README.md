@@ -18,7 +18,7 @@
 | **新会话完整上手** | [`.rivet/HANDOFF.md`](.rivet/HANDOFF.md) ← 唯一权威交接文档 |
 | **配环境跑 NPU** | [`.rivet/ENVIRONMENT.md`](.rivet/ENVIRONMENT.md) ← CANN 8.5/9.0 双环境 |
 | **了解什么是真的**（避免被过时结论误导） | [`FACTS.md`](FACTS.md) ← **唯一权威事实源** |
-| **知道哪些坑已经踩过** | [`PITFALLS.md`](PITFALLS.md) |
+| **知道哪些坑已经踩过** | [`PITFALLS.md`](PITFALLS.md) + [`docs/PLAYBOOK.md`](docs/PLAYBOOK.md) 错误速查表 |
 | **知道下一步做什么** | [`EXPERIMENTS.md`](EXPERIMENTS.md) |
 | **读历史全过程** | [`迭代优化记录.md`](迭代优化记录.md) ⚠ 见下方警告 |
 
@@ -71,7 +71,8 @@ MhcHeadCollapse/（本 NPU 机器工作区，非旧 Windows 工作区）
 ├── Ascend910B硬件性能模型与延迟参考.md ← 硬件参考
 │
 ├── docs/
-│   ├── METHODOLOGY.md         ← ★ 观测基础设施方法论（msprof 显微镜/差分对照/NOP 标定，已实测）
+│   ├── METHODOLOGY.md         ← ★ 观测基础设施方法论（msprof 显微镜/差分对照/NOP 标定/TilingFunc 探测）
+│   ├── PLAYBOOK.md            ← ★ 实战手册（OJ 提交/本地全链路/错误速查/实验纪律/认识论原则）
 │   ├── OP_TEAM_DESIGN.md     ← 团队协作设计（未落地）
 │   ├── plans/                ← 计划草稿
 │   └── archive/              ← 过程性文档归档（优化全记录09-08/知识参考/方法结论/实测汇总）
