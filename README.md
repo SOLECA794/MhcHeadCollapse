@@ -71,6 +71,7 @@ MhcHeadCollapse/（本 NPU 机器工作区，非旧 Windows 工作区）
 ├── Ascend910B硬件性能模型与延迟参考.md ← 硬件参考
 │
 ├── docs/
+│   ├── METHODOLOGY.md         ← ★ 观测基础设施方法论（msprof 显微镜/差分对照/NOP 标定，已实测）
 │   ├── OP_TEAM_DESIGN.md     ← 团队协作设计（未落地）
 │   ├── plans/                ← 计划草稿
 │   └── archive/              ← 过程性文档归档（优化全记录09-08/知识参考/方法结论/实测汇总）

@@ -5,7 +5,7 @@
 > 格式：`[状态] 事项 —— 关键事实/下一步动作`
 > 状态枚举：`▶ 进行中` `○ 待办` `✅ 完成` `⛔ 阻塞`
 
-**最后更新**：2026-09-14（会话：环境迁移 + 8.5 双环境建成）
+**最后更新**：2026-09-14（会话：环境迁移 + 8.5 双环境 + 观测基础设施建成）
 
 ---
 
@@ -25,7 +25,8 @@
 1. **修 h=1024 MTE 越界 bug**（507035，详见下）——Case5 对应 shape，对拍前置
 2. **建 ACL-event 计时 harness**：对齐 OJ 端到端口径（FACTS F2.1g），复用 `tests/mhc_bench*.cpp` 改造
 3. **shape 扫描对拍**：本地 (n,nH,outer) 计时矩阵 vs OJ 逐 case 时间
-4. （可选）OJ 断言探测：`scripts/probe_oj.py sweep outer 3 1,2,4,8,16`
+4. **NOP 标定五连提交**：搞清 OJ 计时口径（方法论见 `docs/METHODOLOGY.md` §三）
+5. Group sigmoid 精度 bug：先换硬件 Exp 原语 A/B（差分对照法，`docs/METHODOLOGY.md` §二）
 
 ### ⛔ 已知 bug：v117 在 nH=1024 稳定崩溃
 
@@ -46,8 +47,12 @@ kernel 的 tiling/workspace 尺寸计算 + `plog` 报错在 `~/ascend/log/debug/
 
 ## 资产清单（本会话新增）
 
+- ★ **观测基础设施已建成并实测**（`docs/METHODOLOGY.md` + `scripts/msprof_report.py`）：
+  msprof 显微镜一次采集即产出瓶颈分项（实测 v117 8/512：scalar 34.4% ⚠️ / mte2 34.0% / vec 27.1%，
+  与 FACTS 历史结论互印证）。**今后每次优化先跑显微镜再动手**
 - 参考实现库：`.rivet/scratch/cann-ops-competitions/`（官方赛事高分开源，165M）
   - ★ Tangefly GeluV2：sigmoid `x/(1+exp(-inner))` 除法形式 + Mins 钳制（修 Group 精度 bug 首选参考）
   - ★ dhltat submissions：GoogleTest + tiling_context_faker UT 框架（对拍 harness 模板）
 - ascend-kg 已接入（`.rivet/skills/ascend-kg/` + key 在 ~/.bashrc）
 - 8.5 安装包留存：`/tmp/cann85-pkg/`（1.1GB；/tmp 可能被清，重置后从 OBS 重下，URL 见 ENVIRONMENT.md）
+- `建议分析.md`：三短板破局方案（本文档体系的方法论源头，可信性已验证——见 METHODOLOGY.md 验证记录）
