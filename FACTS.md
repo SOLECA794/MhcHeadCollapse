@@ -1168,3 +1168,18 @@ A/B 结果：v120 12.70μs vs v119 11.13μs（+1.57μs 反而更慢），正确�
 指令**（含 TilingData 读取、循环控制、ScalarSigmoid/ScalarRsqrt），不是并行度。
 ③ vec 只 9.5% 说明向量化已部分吃满但 scalar 是拖累——**削标量是 Case5 主攻**
 （顺延建议分析.md §一 的"精简 TilingData/标量展开"路径）。
+
+### F3.11 ★★★ v121 向量 sigmoid 批处理——Case5 OJ 8.58→7.94μs（2026-09-14，全链路闭环）
+
+**改动**（group 路径 phase 3，单处）：n 次 `ScalarSigmoid`（各含 ~10 条标量乘加的
+泰勒 exp）→ gate 打包进 UB 后**1 次向量 `Exp`**（Muls 取负 + Exp + 标量读回）。
+
+**验证链（本地→显微镜→OJ 三级）**：
+- 正确性：3 case shape 全 PASS（误差 2.4e-4 与基线一致）
+- 本地 A/B：Case5 shape streamed 11.13→10.63μs（-4.4%）
+- msprof：scalar 40.3%→34.8%（-5.5pp 机制验证）⚠ mte2 33%→39.9% 成新第一瓶颈
+- **OJ（提交 6aa7ea06）：5/5 Pass，Case5 8.58→7.94μs（-0.64），Case3 4.46→4.22**
+  （Case1/2 波动在噪声内；F3.10 方向判定兑现）
+
+**下一瓶颈（msprof 实测）**：mte2 39.9% 已超 scalar——Case5 后续优化主攻
+**搬运**（对齐/双缓冲/蹭 L2），符合 F2.1q 的 mte2 双峰历史判断。

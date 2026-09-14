@@ -437,14 +437,24 @@ private:
             }
         }
 
-        // 3) scalar phase for the whole group (first GetValue drains the vector pipe once)
+        // 3) gates: vector Exp batch (v121: replaces n_*cnt ScalarSigmoid calls with
+        //    1 vector Exp per row — cuts scalar instructions ~8x for n=8)
         float gates[kGroupRows][kSmallN];
+        AscendC::LocalTensor<float> gate_buf = reduce_tmp_buf_.Get<float>(); // reuse tmp
         for (uint32_t j = 0; j < cnt; ++j) {
             const uint32_t rb = j * (n_ + 1U) * 32U;
             const float rms_inv = ScalarRsqrt(red[rb].GetValue(0) * inv_nH_ + eps_norm_);
+            // Pack n gate values into gate_buf[0..n) for vector Exp
             for (uint32_t i = 0; i < n_; ++i) {
-                const float gate = red[rb + 32U * (i + 1U)].GetValue(0) * rms_inv * hc_scale + cst.GetValue(i);
-                gates[j][i] = ScalarSigmoid(gate) + eps_hc_;
+                gate_buf.SetValue(i, red[rb + 32U * (i + 1U)].GetValue(0) * rms_inv * hc_scale + cst.GetValue(i));
+            }
+            // sigmoid(x) = 1/(1+exp(-x)); use vector Exp on negated gates
+            AscendC::Muls(gate_buf, gate_buf, -1.0f, n_);
+            AscendC::Exp(gate_buf, gate_buf, static_cast<int32_t>(n_));
+            // Read back n results (n GetValue calls, but Exp was 1 vector instruction)
+            for (uint32_t i = 0; i < n_; ++i) {
+                const float e = gate_buf.GetValue(i);
+                gates[j][i] = 1.0f / (1.0f + e) + eps_hc_;
             }
         }
 
