@@ -980,3 +980,46 @@ CANN 下此类越界通常静默。**当前能跑不等于安全**，换 shape �
 - F2.6 的带宽推算（200GB/s）是**估算**，未经实测标定。
 - F2.2 的结论依赖"探针生效"这一文档记载；探针的实际运行日志未在仓库中找到。
 - F2.10/F2.11/F2.12 来自静态阅读，未编译验证。
+
+---
+
+## §N 2026-09-14 环境迁移新增事实（notebook NPU 实测）
+
+> 本节由 2026-09-14 会话在 910B4 本机实测验证，证据均为可复现命令。
+
+### F3.1 ★★★ 361001 = ASCEND_HOME_PATH 缺失（根因级，双版本验证）
+
+- 现象：`GetWorkspaceSize failed: 361001`（ACLNN_ERR_RUNTIME_ERROR）
+- 根因：conda 环境无 `/etc/ascend_install.info`，runtime 定位不到 CANN 根 → 算子元数据加载失败
+- 修复：`export ASCEND_HOME_PATH` + `ASCEND_AICPU_PATH` + `ASCEND_OPP_PATH`（详见 PITFALLS P20）
+- 验证：8.5 和 9.0 修复前同挂、修复后立即 PASS（7/8 shape）
+
+### F3.2 ★★ 本地双环境建成：CANN 8.5（OJ 同版本）+ 9.0
+
+- 8.5：`/tmp/cann85/cann-8.5.0/`（OBS 官方源 toolkit run 包，--quiet 安装）
+- 9.0：`/opt/conda/Ascend/cann-9.0.0/`（conda 打包版，预装）
+- OJ 赛事口径 8.5 的硬证据：cann-ops-competitions 仓 S8 赛事 README 明确"CANN版本要求：社区版8.5.0"
+- **后续优化默认在 8.5 上做**（对齐 OJ 编译行为）
+
+### F3.3 ★★★ v117 在 nH=1024 稳定崩溃（MTE 写越界，非环境问题）
+
+- 现象：n=8/nH=1024/任意 outer/fp16 → `aclrtSynchronizeStream failed: 507035`（vector core exception）
+- 设备侧报文：`The write address of the MTE instruction is out of range`（AIV core 42, MTE 越界）
+- 8.5/9.0 双版本复现，3 次重跑 + 2 个 outer 变体全挂 → 确定性 bug
+- 历史掩盖原因：verify.sh 的 9 组测试**从未覆盖 h=1024**
+- **与 OJ Case5（n=8/nH=1024）直接相关**——此 bug 可能与 Case5 性能问题同源，高优先排查
+
+### F3.4 ★★ OJ 计分公式再确认 + CANN 版本事实
+
+- 计分：`100/(1+log₁.₅(t/T))`，总分=5 case 均值（此前已实测验证，差 0.05）
+- 赛事 CANN 版本：8.5（S8 README 硬证据 + 用户确认）
+- 本地 9.0 数据只做 A/B 相对比较；绝对值对齐需 8.5（现已具备）
+
+### F3.5 ★ 参考实现资产（cann-ops-competitions 官方仓，已克隆）
+
+- 位置：`.rivet/scratch/cann-ops-competitions/`（165M 浅克隆）
+- ★ Tangefly GeluV2 kernel：sigmoid 除法形式 `x/(1+exp(-inner))` +
+  `Mins(x²,100)` 钳制，全向量原语无标量循环——**修 Group 路径 sigmoid 精度 bug（3.203e-03）首选参考**
+- ★ dhltat ladder-2026 submissions：GoogleTest + tiling_context_faker + gen/compare_data.py
+  完整 UT 框架——**本地对拍 harness 的结构模板**
+- ladder-2026（算子天梯赛）:6月5题+7月6题, 含 GDN 结构 5.0 难度融合算子

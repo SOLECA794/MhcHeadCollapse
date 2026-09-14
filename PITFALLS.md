@@ -284,3 +284,35 @@ pwsh -File D:\Desktop\OP-Learning\Ascendtomgit-devspace-tools\Connect-AtomGitDe
 - **无 `.gitignore`** → `__pycache__/`、`build_*/` 等会混入提交
 
 **正确做法**：提交前看清 `git status`，不要把产物目录带进去。
+
+### P20. 361001 报错的真凶是环境变量缺失（2026-09-14，双 CANN 版本验证）
+
+`GetWorkspaceSize failed: 361001` 与 CANN 版本无关——根因是 **`ASCEND_HOME_PATH` 未导出**。
+notebook conda 环境没有 `/etc/ascend_install.info`，runtime 定位不到 CANN 根，算子元数据加载失败。
+只设 `LD_LIBRARY_PATH` + `ASCEND_OPP_PATH` **不够**。修复（8.5/9.0 双双实测 PASS）：
+
+```bash
+export ASCEND_HOME_PATH=<CANN根>   # 8.5: /tmp/cann85/cann-8.5.0；9.0: /opt/conda/Ascend/cann-9.0.0
+export ASCEND_AICPU_PATH=<同上>
+export ASCEND_OPP_PATH=<CANN根>/opp
+```
+
+诊断路径：`ASCEND_GLOBAL_LOG_LEVEL=0` 重跑，看 `~/ascend/log/debug/plog/*.log` 里的
+`can not get env [ASCEND_HOME_PATH]`。
+
+### P21. 8.5 toolkit 安装器交互式 EULA 会假死（2026-09-14）
+
+`--install-path` 安装时不带 `--quiet`，安装器打完 EULA 后等待 stdin，后台跑表现为"exit 0 但无产物"。
+**必须加 `--quiet`**（隐含接受 EULA）。官方直链：OBS `ascend-repo.obs.cn-east-2.myhuaweicloud.com/CANN/CANN%208.5.0/`。
+
+### P22. 链接 CANN 库的测试程序需要 rpath-link 三件套（2026-09-14）
+
+g++ 链接 libascendcl/libnnopbase 时报 `undefined reference to hal*/drv*` 符号——不是缺库，
+是 ld 找不到 driver 侧依赖链。必须同时给三个 rpath-link：
+
+```bash
+-Wl,-rpath-link,<cann>/aarch64-linux/lib64 -Wl,-rpath-link,/usr/local/Ascend/driver/lib64/driver -Wl,-rpath-link,/usr/local/Ascend/driver/lib64/common
+```
+
+另注意：链接失败时 g++ 可能留下**非 ELF 残骸文件**（`file` 显示 `data`），chmod +x 后报
+Exec format error——报错先 `file` 一下产物再查别的。

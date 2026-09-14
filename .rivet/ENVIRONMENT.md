@@ -80,14 +80,62 @@ export ASCEND_OPP_PATH=$ASCEND_HOME_PATH/opp
 - 本地**无** versions/ 与 tests/ 目录（旧 Windows 工作区的 142 个版本目录未带过来）
 - 跨会话记忆库 `.rivet/knowledge/memory-index.sqlite` 在此环境**表为空**（旧记录未同步）——项目事实以根目录 md 文档为准（FACTS.md 983 行是单一事实源）
 
-## 六、其他坑（继承自旧环境记忆，仍有效）
+## 六、昇腾知识图谱（ascend-kg）已接入
+
+- Skill 位置：`.rivet/skills/ascend-kg/`（SKILL.md + agents + engine + references，来源 https://gitcode.com/agent0/kg-tools）
+- API Key：已写入 `~/.bashrc`（`ASCEND_KG_API_KEY`，当前用内置测试 key，共享 5 RPS；正式使用去 https://ascend.wiki/register 免费申请专属 key）
+- 调用方式（实测 200 OK）：`curl -s --compressed -X POST https://ascend.wiki/search -H "X-API-Key: $ASCEND_KG_API_KEY" -H "Content-Type: application/json" -d '{"query":"...","top_k":5}'`
+- 评分阈值：>0.83 黄金命中（`/source` 取全文）；0.70-0.83 模糊（改写 query）；<0.70 换路径
+- 验证记录：2026-09-14 查询 "aclnnGetWorkspaceSize 361001 error custom operator" 命中 5 条，最高 0.94（`.rivet/scratch/kg-verify2.json`）
+- 亦可用 skill 工具直接加载：`skill(name="ascend-kg")`
+
+## 七、其他坑（继承自旧环境记忆，仍有效）
 
 - msprof 单次采样是热身曲线切片：NPU 频率 800→1650MHz 热身约 25 次调用（2~3 倍时间差）；对比实验必须 ≥8 次采样取稳态/中位
 - CANNJudge 平台时间单位标注 ms 实为 μs
 - worker 产出的实验数据可能编造——进 FACTS 的数字必须主会话手跑或核验产物
 - 本地 streamed 口径含 ~4.4μs 主机底噪——本地绝对值只做 A/B 相对比较，不可直接对标 OJ 分数（除非先复刻 OJ 计时口径）
 
-## 七、下一步（用户核心目标：对拍测真实 case 形状）
+## 八、CANN 8.5 双环境（2026-09-14 建成，与 9.0 并存）
+
+**8.5 已装在 `/tmp/cann85/cann-8.5.0/`**（OBS 官方源下载 toolkit run 包 + `--quiet` 安装；OJ 赛题口径就是 8.5，后续优化工作默认在 8.5 上做）。
+
+安装包留存：`/tmp/cann85-pkg/Ascend-cann-toolkit_8.5.0_linux-aarch64.run`（1.1GB，机器重置后可直接重装）。
+
+⚠ **/tmp 是共享盘（20T），notebook 环境重置后 /tmp 可能清空**——重要产物勿只存 /tmp。
+
+### 8.5 环境一键初始化（复制即用）
+
+```bash
+export ASCEND_HOME_PATH=/tmp/cann85/cann-8.5.0
+export ASCEND_AICPU_PATH=/tmp/cann85/cann-8.5.0
+export ASCEND_OPP_PATH=/tmp/cann85/cann-8.5.0/opp
+export ASCEND_CUSTOM_OPP_PATH=/tmp/v117_inst85/vendors/custom   # 8.5 编译安装的算子包
+export LD_LIBRARY_PATH=/tmp/cann85/cann-8.5.0/aarch64-linux/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/tmp/v117_inst85/vendors/custom/op_api/lib:$LD_LIBRARY_PATH
+```
+
+### 9.0 环境（conda 版，对照用）
+
+```bash
+export ASCEND_HOME_PATH=/opt/conda/Ascend/cann-9.0.0
+export ASCEND_AICPU_PATH=/opt/conda/Ascend/cann-9.0.0
+export ASCEND_OPP_PATH=/opt/conda/Ascend/cann-9.0.0/opp
+export ASCEND_CUSTOM_OPP_PATH=/tmp/v117_inst/vendors/custom
+export LD_LIBRARY_PATH=/opt/conda/Ascend/cann-9.0.0/aarch64-linux/lib64:/usr/local/Ascend/driver/lib64/common:/usr/local/Ascend/driver/lib64/driver:/tmp/v117_inst/vendors/custom/op_api/lib:$LD_LIBRARY_PATH
+```
+
+### ★★★ 361001 根因（已解，两版本通用）
+
+`GetWorkspaceSize failed: 361001` 的根因是 **`ASCEND_HOME_PATH` 未设置**——conda 打包环境没有 `/etc/ascend_install.info`，runtime 无法定位 CANN 根，算子元数据加载失败。**只设 LD_LIBRARY_PATH 和 ASCEND_OPP_PATH 不够，必须设 ASCEND_HOME_PATH**（最好连 ASCEND_AICPU_PATH 一起）。证据：debug plog（`~/ascend/log/debug/plog/`）中反复出现 `can not get env [ASCEND_HOME_PATH]`；补上后立即 PASS。
+
+### 8.5 编译验证记录（2026-09-14）
+
+- v117 编译链全通：`build85/` cmake→make→binary 全绿
+- 正确性 7/8 PASS：4/16/2、4/16/3、4/16/4、8/512/2、8/512/8 (fp16) + 4/16/2 (fp32) 全过，误差 8.8e-4~9.8e-4（fp16 容差内）与 v116 基线量级一致
+- 唯一失败：8/1024/2 fp16 报 507035（stream 同步失败）——**9.0 也同样挂**，非 8.5 特有；NPU 上有 5 个共存 python3 进程，疑似资源冲突（AIV 占用），待独占窗口复测
+- 8.5 编译产物：`v117_stage/code/build85/`；测试程序 `tests_bin/mhc_correctness85`（链接时需 `-Wl,-rpath-link` 指向 cann85 lib64 和 driver lib64）
+
+## 九、下一步（用户核心目标：对拍测真实 case 形状）
 
 1. 从 `v117_stage` 恢复代码到 `code/`，用本机 CANN 9.0.0 跑通编译 + 正确性测试
 2. 本地建 ACL-event 计时 harness（对齐 OJ 端到端口径）
