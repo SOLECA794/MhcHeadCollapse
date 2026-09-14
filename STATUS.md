@@ -27,8 +27,8 @@
 ### ○ 下一步（按优先级）
 
 1. ~~修 h=1024 MTE 越界 bug~~ ✅ 已修（v119-fix，F3.6，16/16 PASS）
-2. **建 ACL-event 计时 harness**：对齐 OJ 端到端口径（FACTS F2.1g），复用 `tests/mhc_bench*.cpp` 改造
-3. **shape 扫描对拍**：本地 (n,nH,outer) 计时矩阵 vs OJ 逐 case 时间（nH>4096 已解锁）
+2. ~~建 ACL-event 计时 harness~~ ✅ 已建成（F3.7：mhc_shape_bench 双口径，17 shape 矩阵，**outer=4 发现单核瓶颈**）
+3. **shape 对拍分析**：矩阵数据已有（shape_scan_v119_8.5.tsv），待 NOP 标定锁口径系数后拟合 OJ 逐 case 时间
 4. **NOP 标定五连提交**：搞清 OJ 计时口径（方法论见 `docs/METHODOLOGY.md` §三）
 5. Group sigmoid 精度 bug：先换硬件 Exp 原语 A/B（差分对照法，`docs/METHODOLOGY.md` §二）
 

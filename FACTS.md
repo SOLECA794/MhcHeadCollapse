@@ -1050,3 +1050,27 @@ CANN 下此类越界通常静默。**当前能跑不等于安全**，换 shape �
 
 **方法论注记**：UB 预算对账法（InitBuffer 逐项列表 vs 192KB）+ 错误类型变化链追踪
 （MTE→VEC→PASS）是本次定位的两大功臣——正是 METHODOLOGY.md 观测基础设施的实战首秀。
+
+### F3.7 ★★★ shape 扫描矩阵 v1（v119-fix @ 8.5，2026-09-14）
+
+**Harness**：`.rivet/scratch/v117_stage/tests/mhc_shape_bench.cpp`（ACL-event 双口径：
+percall/streamed，热身 25 次；数据 `.rivet/scratch/shape_scan_v119_8.5.tsv`）
+
+**关键数字（streamed med μs，20 samples/shape）**：
+- n=4/h=4：outer=1→5.90, 2→6.51, 3→7.60, 4→8.61, 8→8.58
+- n=8/h=64：outer=1→8.88, 2→8.33, 4→**11.96**, 8→10.05, 16→10.82, 32→9.83
+- n=8/h=128：outer=1→9.60, 2→8.60, 4→**13.05**, 8→10.49, 16→11.61, 32→11.13
+
+**发现（三个）**：
+1. **outer=4 双峰异常（稳定慢 2~3μs）**：outer=4 比 outer=8 还慢且 min≈med（稳定非抖动）。
+   恰在 block_dim 临界（outer≤4→1 核）：单核串行扛 4 行组路径。**若 OJ case 的 outer=4，
+   这里就是直接可优化点**（block_dim 公式改 outer<4→outer 而非 ≤4→1）。
+2. 本地 streamed 与 OJ 数字（4.70-8.64）仍有 2-4μs 系统差——口径未对齐的又一证据，
+   NOP 标定（METHODOLOGY §三）是对拍可信的前置。
+3. min 与 med 差 ~1μs 且方向一致——streamed 口径本身也有热身尾巴，对拍用 med。
+
+**percall 口径首跑**（n=8/h=128/outer=2）：med=24.3 vs streamed 9.07——percall 含
+sync 开销 ~15μs（远大于旧环境 4.4μs 记录），本机 host 更快/驱动路径不同。
+
+**对拍下一步**：①NOP 标定锁口径系数 ②outer=4 异常点用 msprof 显微镜看分项
+③结合 OJ best_time=[2.12,2.12,2.48,2.48,4.36] 反推（若本地-OJ 线性系数成立）。

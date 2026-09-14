@@ -1,0 +1,18 @@
+# shape scan v119-fix @ CANN8.5 910B4  2026-09-14 10:54:11
+RESULT n=4 h=4 outer=1 dtype=fp16 mode=streamed med=5.898 min=5.148 p90=6.786 nsamp=20
+RESULT n=4 h=4 outer=2 dtype=fp16 mode=streamed med=6.510 min=5.994 p90=7.882 nsamp=20
+RESULT n=4 h=4 outer=3 dtype=fp16 mode=streamed med=7.603 min=6.398 p90=9.066 nsamp=20
+RESULT n=4 h=4 outer=4 dtype=fp16 mode=streamed med=8.606 min=8.222 p90=10.188 nsamp=20
+RESULT n=4 h=4 outer=8 dtype=fp16 mode=streamed med=8.575 min=7.752 p90=10.900 nsamp=20
+RESULT n=8 h=64 outer=1 dtype=fp16 mode=streamed med=8.883 min=8.064 p90=10.672 nsamp=20
+RESULT n=8 h=64 outer=2 dtype=fp16 mode=streamed med=8.332 min=6.964 p90=9.936 nsamp=20
+RESULT n=8 h=64 outer=4 dtype=fp16 mode=streamed med=11.958 min=10.896 p90=13.634 nsamp=20
+RESULT n=8 h=64 outer=8 dtype=fp16 mode=streamed med=10.054 min=8.404 p90=10.134 nsamp=20
+RESULT n=8 h=64 outer=16 dtype=fp16 mode=streamed med=10.816 min=9.402 p90=11.218 nsamp=20
+RESULT n=8 h=64 outer=32 dtype=fp16 mode=streamed med=9.827 min=9.380 p90=11.480 nsamp=20
+RESULT n=8 h=128 outer=1 dtype=fp16 mode=streamed med=9.595 min=8.514 p90=11.498 nsamp=20
+RESULT n=8 h=128 outer=2 dtype=fp16 mode=streamed med=8.602 min=7.984 p90=10.278 nsamp=20
+RESULT n=8 h=128 outer=4 dtype=fp16 mode=streamed med=13.050 min=12.932 p90=14.366 nsamp=20
+RESULT n=8 h=128 outer=8 dtype=fp16 mode=streamed med=10.494 min=9.060 p90=10.764 nsamp=20
+RESULT n=8 h=128 outer=16 dtype=fp16 mode=streamed med=11.610 min=10.708 p90=11.704 nsamp=20
+RESULT n=8 h=128 outer=32 dtype=fp16 mode=streamed med=11.126 min=10.174 p90=12.066 nsamp=20
