@@ -1104,3 +1104,39 @@ Case3/4/5 的 OJ 时间可直接用本地 kernel 时间 + 常数偏移拟合—�
 
 **方法论修正**：NOP 标定的插入点必须覆盖**所有 kernel 类**（TinyH4 类漏插导致 Case1/2
 标定盲区）——METHODOLOGY.md §三已补记。
+
+### F3.9 ★★★★ 全部 5 个 OJ case 的真实 shape 实测钉死（2026-09-14，TilingFunc 断言探测）
+
+**方法**：TilingFunc 注入 `if (outer != V) return GRAPH_FAILED`（TilingFunc 在每次
+aclnnGetWorkspaceSize 都执行，断言失败→该 case RE；Pass=outer==V）。
+⚠ InferShape 注入**无效**（outer=999 全 Pass 证明平台不走 InferShape——v081 历史探针
+若注在 InferShape 则其结论需复核；本次探测全部用 TilingFunc 版，工具 scripts/probe_oj_v2.py）。
+
+**最终 shape 表（OJ 权威，8 发探测实测）**：
+| Case | n | nH | outer | 执行路径 | v119 OJ 时间 |
+|---|---|---|---|---|---|
+| 1 | 4 | 16 | **2** | TinyH4 | 4.86μs |
+| 2 | 4 | 16 | **2** | TinyH4 | 5.68μs |
+| 3 | 8 | 512 | **8** | PATH2 group | 4.46μs |
+| 4 | 8 | 512 | **8** | PATH2 group | 4.34μs |
+| 5 | 8 | 1024 | **32** | PATH2 group | 8.58μs |
+
+**探测记录**（提交 ID → 结果）：
+- outer=2 → C1/C2 Pass，C3/4/5 RE ⇒ C1=C2=2（Case1 候选{2,3,4}收窄为 2）
+- outer=8 → C3/C4 Pass ⇒ C3=C4=8
+- outer=32 → C5 Pass ⇒ C5=32
+- outer∈{1,4,16} 全 RE（排除）；999 全 RE（机制有效性对照）
+
+**重大修正与推论**：
+1. **Case1/Case2 完全同 shape**（n=4/nH=16/outer=2）——OJ 时间差（4.86 vs 5.68）
+   纯属评测噪声/顺序效应，非 shape 差异。F2.2 表的 Case1 outer=1 记载错误。
+2. **对拍拟合模型被否定**（拟合预测 C3/C4 outer∈{1,2}、C5=4，实测 8/8/32）——
+   本地 streamed 矩阵与 OJ 时间的关系不是"减常数"：本地 outer=8 实测 10.05/10.49μs
+   vs OJ 4.46/8.58μs，底噪差在 h=64 与 h=128 间不同（~5.6 vs ~1.9μs），**OJ 机器
+   的 host 开销或调度与本机系统性不同**。对拍必须走"相对比较+OJ 直测"而非绝对拟合。
+3. **Case5 outer=32 的优化含义**：32 行 × 20 核上限——block_dim=min(32,20)=20，
+   每核 1~2 行。F3.7 的 outer=4 单核瓶颈对在榜 case **无影响**（outer=4 已排除）。
+   Case5 的 8.58μs vs best 4.36μs（1.97×）差距在 group 路径每核 2 行的负载不均
+   （20 核分 32 行：12 核 2 行 + 8 核 1 行）——**负载均衡是 Case5 优化主攻方向**。
+4. n=4/nH=16 但 outer=2：TinyH4 路径处理 2 行。Case1/2 的 4.86/5.68 vs best 2.12
+   （2.3~2.7×）——TinyH4 的标量地板（F2.1p 的 3.9μs 不可削）仍是主因。
