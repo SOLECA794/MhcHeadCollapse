@@ -1,0 +1,7 @@
+
+__pycache__/
+*.pyc
+*.zip
+private.pem
+public.pem
+project.zip
