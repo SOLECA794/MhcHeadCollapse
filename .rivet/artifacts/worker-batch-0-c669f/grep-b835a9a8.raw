@@ -1,0 +1,87 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:75:  | Case1 | 8213 | `[1, 1, 16]` | FP16 | 4 | 4 | 16 | PATH3 | 2.94ms | 4.48ms |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:97:  | 4 | lix123 | 43.16 | Pass | 2.94ms | 2.44ms | 3.24ms | 3.30ms | 5.46ms |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:131:  | `v020_tiny_h4_reg_weight_fastmath` | `v017_tiny_h4_plus_vector` | 平台测试完成（单点新高） | 2 步牛顿 rsqrt + 5 阶 Horner exp（测试点 2 达 5.42us） |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:132:  | `v021_tiny_h4_monolithic_zero_spill` | `v020_tiny_h4_reg_weight_fastmath` | 平台测试完成（7.00/6.08us） | 单体平铺内联，定位多维 TilingKey 带来的 Launch 开销 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:133:  | `v022_single_tpl_key_minimal_launch` | `v016_tiny_h4_unrolled` | 平台测试完成（单点新高） | 回归 1D TilingKey，测试点 2 刷新至 5.20us（快 0.64us） |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:135:  | `v024_tiny_h4_burst_prefetch_pure_scalar` | `v022_single_tpl_key_minimal_launch` | 平台测试完成（5.66/6.48us） | 连续突发预取数组分配在栈内存，多行出现重复栈访存 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:136:  | `v025_vector_ub_hard_sync` | `v023_direct_ub_vector_nosync` | 平台测试完成（5.12us 新高） | 硬件 HardEvent 精确同步，测试点 2 创 5.12us 新纪录 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:137:  | `v026_vector_ub_bulk_preload` | `v025_vector_ub_hard_sync` | 平台测试完成（5.68/5.12us） | 全量预载入使测试点 1 提升 0.82us，但行内仍有 5 次同步等待 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:138:  | `v027_vector_ub_fused_stream_single_sync` | `v026_vector_ub_bulk_preload` | 平台测试完成（4.92us 破 5us） | 5 向量融合流 + 单次硬件屏障，测试点 2 首破 5us（4.92us） |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:140:  | `v029_vector_ub_dual_event_unrolled` | `v027_vector_ub_fused_stream_single_sync` | 平台测试完成（4.96us 新高） | 消除非对齐异常，测试点 1 首次突破 5us 达到 4.96us（个人最佳） |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:141:  | `v030_vector_ub_global_single_sync` | `v029_vector_ub_dual_event_unrolled` | 平台测试完成（4.94us 新高） | 全局单次 V_S 屏障，测试点 1 达 4.94us，测试点 2 达 5.34us |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:142:  | `v031_all_dma_ub_zero_scalar_gm` | `v030_vector_ub_global_single_sync` | 平台测试完成（4.18us 大突破） | 全输入 DMA 预载入 + 标量 0 GM 访问，测试点 1 暴降至 4.18us（创纪录） |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:143:  | `v032_pure_unrolled_compile_time_offsets` | `v031_all_dma_ub_zero_scalar_gm` | 平台测试完成（5.26us 负优化） | 裸指针写 GM 与紧缩 UB 布局引发 ICache 膨胀与总线同步开销 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:144:  | `v033_async_desc_tiling_unrolled_stream` | `v031_all_dma_ub_zero_scalar_gm` | 平台测试完成（5.34/5.12us） | 验证了稳定通过，但尚未消除 Cube 核下发与 TPipe 内置常量折叠开销 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:145:  | `v034_aiv_only_tpipe_external_fused` | `v031_all_dma_ub_zero_scalar_gm` | 平台测试完成（4.92us 平最佳） | 测试点 2 达 4.92us（平历史最佳），但 KERNEL_TYPE_AIV_ONLY 触发动态绑定开销 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:146:  | `v035_flat_direct_passthrough` | `v031_all_dma_ub_zero_scalar_gm` | 平台测试完成（4.92us 稳定） | 测试点 2 稳定 4.92us，测试点 1 受 Host Tiling 修改影响耗时 5.94us |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:147:  | `v036_reduce_datablock_fast_sum` | `v031_all_dma_ub_zero_scalar_gm` | 平台测试完成（4.80us 创新高） | 测试点 2 降至 4.80us（历史突破新高），测试点 1 稳健恢复至 5.54us |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:148:  | `v037_compact_tiling_fast_rcp` | `v036_reduce_datablock_fast_sum` | 平台测试完成（4.76us 破纪录） | 测试点 2 再次刷新纪录至 4.76us，TilingData 24B 紧凑化收益显著 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:152:  | `v041_fp16_specialized_fast_stream` | `v040_probe_dtype_matrix` | 平台测试完成（点1达4.44us突破） | 测试点 1 耗时大幅暴降至 4.44us，四路 DMA 并发预载入效果显著 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:153:  | `v042_quad_vector_stream_fused` | `v041_fp16_specialized_fast_stream` | 平台测试完成（点2达4.44us破纪录） | 测试点 2 从 4.76us 刷新至 4.44us 个人历史新高！ |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:154:  | `v043_ultra_compact_static_direct` | `v042_quad_vector_stream_fused` | 平台测试完成（4.62us 稳定） | 8 字节 TilingData 验证稳定通过，常量全内联消除运行时访存 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:155:  | `v044_packed_64bit_gm_store` | `v043_ultra_compact_static_direct` | 平台测试完成（4.38us 创新纪录） | 测试点 2 刷新纪录至 4.38us，64 位合并写入有效消除 HBM 握手 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:156:  | `v045_branchless_fast_pipeline` | `v044_packed_64bit_gm_store` | 平台测试完成（4.60us 稳定） | 无分支 Horner Exp 验证稳定通过，全流水平滑执行 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:157:  | `v046_pure_scalar_nano_stream` | `v045_branchless_fast_pipeline` | 平台测试完成（5.02us / 6.10us） | 证实纯标量访存循环在无硬件向量并行下延迟偏高，仍需向量单元加速 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:158:  | `v047_aiv_only_minimal_launch` | `v044_packed_64bit_gm_store` | 平台测试完成（4.86us / 5.56us） | 实测证实AIV_ONLY声明在当前910B环境下对小算子无明显增益 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:160:  | `v049_compact_ub_fused_stream` | `v044_packed_64bit_gm_store` | 待上传评测/单块共享Scratch极简UB | 共享单块32B归约缓存，UB总空间缩减至1856B，超轻量InferShape与4.38us最佳流水线 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:161:  | `v050_fused_vector_collapse` | `v044_packed_64bit_gm_store` | 平台测试完成（4.84us / 6.02us） | 验证 32B 对齐折半 Add 方案稳定正确，但标量 16 次 UB 读入仍构成延迟瓶颈 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:162:  | `v051_register_unroll_fused` | `v050_fused_vector_collapse` | 平台测试完成（WA 50% / 点1 5.28us） | 证实64位宽字寄存器解包逻辑正确；点2因Host简化三元表达式误判导致WA |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:163:  | `v052_stable_packed_record` | `v051_register_unroll_fused` | 平台测试完成（6.14us / 4.96us） | 成功修复Host多维outer循环，5/5 Pass满分通过 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:164:  | `v053_fusion_v031_v044` | `v031_all_dma_ub_zero_scalar_gm` + `v044_packed_64bit_gm_store` | 平台测试完成（4.28us / 5.70us） | 测试点 1 飙出 4.28us 逼近全历史纪录，融合架构稳健满分通过 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:165:  | `v054_pure_register_nano_engine` | `v046_pure_scalar_nano_stream` + `v044_packed_64bit_gm_store` | 平台测试完成（6.32us / 7.20us） | 证实标量核心寄存器溢出(Spill)严重延迟偏高，确立Vector SIMD才是最优硬件路径 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:166:  | `v055_pure_vector_closed_loop` | `v053_fusion_v031_v044` | 平台测试完成（4.50us / 5.46us） | 稳健达成4.50us高精度基线，5/5 Pass满分通过 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:321:  - 性能基准：同一服务器、非零门控、`outer=2, n=4, H=1024`、200 次设备事件平均，v009 为 `293382us`，v010 为 `587.042us`，约 `500x`。该 Shape 并非平台公开测试点，只可用于证明相对优化；最终成绩以平台重测为准。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:336:  - 性能取舍：服务器事件基准中 `H=16` 从 v010 的 `9.0725us` 降至 `6.8122us`；但 `H=4` 略慢，`H=1024` 从 `587.042us` 变为 `752.03us`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:343:  - 分流基准：同一服务器、`outer=2,n=4` 的设备事件平均为 `H=4: 5.1543us`、`H=16: 6.8445us`、`H=1024: 585.347us`。其中中等 H 使用标量路径，大 H 使用 UB 路径。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:344:  - 平台结果：两个测试点均通过、错误占比 0；耗时分别为 `7.36us` 和 `6.92us`，最优为 `5.76us` 和 `5.90us`。相较 v010 的 `6.20us/7.14us`，测试点 1 回退 `1.16us`，测试点 2 改善 `0.22us`，总耗时回退，因此不再作为首选。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:355:  - 性能：同机 `outer=2,n=4` 下，H=`4/8/16/32/64/128/256/1024` 分别约为 `4.10/4.41/6.75/11.49/20.92/39.72/99.02/586.02us`。编译期 scalar 路径相较 v013 的运行时路径继续降低固定开销，H=4/1024 保持 UB 路径性能。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:356:  - 平台结果：两个测试点均通过、错误占比 0；耗时分别为 `7.26us` 和 `6.74us`，最优为 `5.76us` 和 `5.90us`。相较 v013 仅改善 `0.10us/0.18us`，证明消除一次运行时分支不是主要性能瓶颈。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:367:  - H=16 三类型性能：同一 `outer=2,n=4` runner 下，FP32/FP16/BF16 约为 `4.58/4.46/4.44us`；v014 对应约为 `6.84/7.33/9.44us`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:368:  - FP32 H 扫描：H=`4/8/16/32/64/128/256/1024` 分别约为 `4.14/4.57/4.57/4.62/4.70/4.91/5.24/7.29us`。H=4 使用回退路径；H=1024 相较 v014 的 `586.02us` 约提升 `80x`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:369:  - 其他 n：`n=2,H=16` 为 `3.38us`，最大误差 `1.49012e-07`；`n=8,H=16` 为 `7.02us`，最大误差 `2.38419e-07`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:383:  - H=4 性能：同机 FP32 设备事件平均，`outer=1` 稳定约 `2.70us`，相对 v015 的约 `3.04us` 改善约 11%；`outer=2` 稳定约 `2.92us`，相对 v015 的约 `4.14us` 改善约 29%。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:384:  - 已知回退：为缩小固定代码面，v016 移除了 v015 的向量通用路径，`outer=2,n=4,H=16` 由约 `4.58us` 回退到 `9.34us`。因此 v016 是基于平台反馈选择的 H=4 首选冲分版，而不是通用 Shape 的替代版本。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:386:  - 平台结果：两个测试点均通过、错误占比 0，耗时为 `5.44us/5.72us`。相较 v015 的 `6.82us/7.46us` 分别改善 `1.38us/1.74us`，约为 `20.2%/23.3%`；提交时两个测试点均刷新平台最优。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:395:  - 性能：H=4 `outer=2` 稳定约 `2.89..2.96us`，保持 v016 的主要收益；H=4 `outer=1` 稳定约 `2.96us`，受更大对象影响，慢于 v016 的 `2.70us
+... (truncated, use offset/limit for more specific ranges)
+ators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:678:  - 平台结果：两个测试点均通过（2/2 Pass，错误占比 0.00%），耗时分别为 `5.34us` 与 `5.12us`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:687:  - 优化目标：使能 **`KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY)`（消除 Cube 核启动头开销）+ `TPipe` 外置（激活毕昇编译器标量常量折叠）+ v031 验证最佳的全量 DMA 与 5 向量融合流**，全力冲刺 **2.18μs / 2.62μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:703:  - 平台结果：两个测试点均通过（2/2 Pass，错误占比 0.00%），耗时分别为 `6.04us` 与 `4.92us`（测试点 2 追平 4.92us 历史最佳纪录）。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:705:    1. 测试点 2 成功刷新回 **4.92us** 历史最佳水平，验证了 TPipe 外置对标量常量折叠的加速效果；
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:706:    2. 但测试点 1 耗时出现波动（6.04us），归因于 `KERNEL_TYPE_AIV_ONLY` 在 CANN 8.0 运行时触发了额外的动态核绑定校验；且 C++ 类包装的多级参数传递在纳秒级计算中仍占比例。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:711:  - 优化目标：实现 **彻底去 C++ 类封装（Zero Class Abstraction）+ 核函数扁平单流直通 + 局部栈 TPipe 内联 + v031 验证最佳的全量 DMA 与 5 向量融合流**，全力冲刺 **2.18μs / 2.62μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:727:  - 平台结果：两个测试点均通过（2/2 Pass，错误占比 0.00%），耗时分别为 `5.94us` 与 `4.92us`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:729:    1. 测试点 2 持续稳定在 **4.92us**（追平历史最佳）；
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:730:    2. 但测试点 1 用时在 5.94us，对比 v031（4.18us）的差异发现：Host 侧从 `GetRequiredInputTensor(0)` 改为 `GetInputDesc(0)` 导致 CANN 运行时的 Tiling 反射分支开销增加，必须精准恢复 v031 经过实测验证的 Host 侧 Tiling 逻辑。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:735:  - 优化目标：使能 **v031 经实测验证的 4.18us 最佳 Host Tiling 结构 + 100% 精度保证的 5 向量融合流 + 单次 V_S 硬件屏障 + 标量 0 GM 访问**，全力冲刺 **2.18μs / 2.62μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:739:       - 使用实测取得 4.18us 的标准 Host Tiling 代码，确保 CANN 框架以最快速度解析与下发；
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:748:  - 平台结果：两个测试点均通过（2/2 Pass，错误占比 0.00%），耗时分别为 `5.54us` 与 **`4.80us`**（测试点 2 **创下 4.80us 历史新高纪录**！）。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:750:    1. 测试点 2 成功从 4.92us 进一步突破至 **4.80us**，证明恢复最佳 Host Tiling 结构与 v031 极致架构的结合发挥了巨大威能；
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:756:  - 优化目标：进一步压缩 **`MhcHeadCollapseTilingData` 结构体至 24 字节（严格 8 字节对齐）**，减少 Host-to-Device 传参开销与 AI Core 栈帧搬运延迟，全力冲刺 **2.18μs / 2.62μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:762:    2. **完全继承 v036 创下 4.80us 历史新高的极致计算架构**：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:770:  - 平台结果：两个测试点均通过（2/2 Pass，错误占比 0.00%），耗时分别为 `5.70us` 与 **`4.76us`**（测试点 2 **再次刷新历史纪录至 4.76us**！）。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:772:    1. 测试点 2 进一步压缩至 **4.76us**，验证了 TilingData 24 字节紧凑化对减少调度延迟的直接效果；
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:824:  - 平台结果：两个测试点均通过（2/2 Pass，错误占比 0.00%），耗时分别为 `5.40us` 与 `4.84us`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:834:  - 优化目标：使能 **针对 Float16 专用的四路 DMA 并发预载入（1 个 MTE2_V 屏障）+ 单向量 Cast 流水线 + 24 字节紧凑 TilingData + 5 向量融合流**，全力冲刺 **2.18μs / 2.62μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:842:    3. **完全保留经验证的 4.76us 最佳内核**：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:849:  - 平台结果：两个测试点均通过（2/2 Pass，错误占比 0.00%），耗时分别为 **`4.44us`** 与 `5.80us`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:851:    1. 测试点 1 从 5.40us 大幅暴降至 **4.44us**，验证了四路 DMA 并发批量下发与单屏障同步对减少启动延迟的巨大收益；
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:857:  - 优化目标：使能 **四路 Gate 向量融合计算 + 极致精简指令发射**，全力冲刺 **2.18μs / 2.62μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:864:  - 平台结果：两个测试点均通过（2/2 Pass，错误占比 0.00%），耗时分别为 `5.60us` 与 **`4.44us`**（测试点 2 刷新个人历史最高纪录至 **4.44us**！）。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:866:    1. 测试点 2 从 4.76us 进一步压缩至 **4.44us**，验证了向量流水线指令优化的有效性；
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:867:    2. 算子纯硬件执行仅耗时 ~0.15us，瓶颈集中在 Host Tiling 打包与 Kernel 入口分支开销。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:872:  - 优化目标：使能 **8 字节极限 TilingData（1 个 64-bit 寄存器）+ 常量编译期完全内联 + Kernel 入口零分支直通**，全力冲刺 **2.18μs / 2.62μs** 榜首。
+
+hash_edit 锚点（Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md）：
+  L75:6bc868e9
+  L97:0bc4c715
+  L131:25b32abc
+  L132:291d4e60
+  L133:710af224
+  L135:7ce6ec99
+  L136:796bcec8
+  L137:5cfd0fea
+  L138:95c60b37
+  L140:a90719af
+── 寻迹（grep）

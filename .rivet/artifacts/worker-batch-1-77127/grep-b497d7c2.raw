@@ -1,0 +1,62 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:    2│ 
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:    3│ This is the technical user guide for an attended CATLASS operator-migration campaign from
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:>   4│ `CATLASS_ARCH=2201` (AtlasA2/A3, `Arch::AtlasA2`) to `CATLASS_ARCH=3510` (Ascend950/A5,
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:    5│ `Arch::Ascend950`). The workflow preserves the operator contract, records a successful target
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:    6│ compile separately from device accuracy, and can then screen and apply one specific non-TLA
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:  ...
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:  209│ 
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:  210│ Every reachable side requires non-empty `arch`, `soc`, `host`, and `device`. `arch` is exactly
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:> 211│ `2201` for `a2` or `3510` for `a5`. Its `soc` must identify the same family: `910`, `Atlas A2`,
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:> 212│ `Atlas A3`, or `2201` for `a2`; `950`, `Ascend950`, `A5`, or `3510` for `a5`. `device` records the
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:  213│ measured device identity or selector observed at FRAME, not an arbitrary selector; `prove` never
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.md:  214│ infers or relabels any part of that identity.
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:    2│ 
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:    3│ 本文是 CATLASS 算子迁移活动（campaign）的技术使用指南：在人工参与决策下，将算子从
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:>   4│ `CATLASS_ARCH=2201`（AtlasA2/A3，`Arch::AtlasA2`）迁移到 `CATLASS_ARCH=3510`（Ascend950/A5，
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:    5│ `Arch::Ascend950`）。该工作流保持算子契约不变，将目标平台编译成功与上板精度分开记录，随后还可以
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:    6│ 筛查并应用一项特定的非 TLA `L0C→UB` 数据通路改写。
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:  ...
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:  192│ ```
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:  193│ 
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:> 194│ 每个可达侧都要求非空的 `arch`、`soc`、`host` 与 `device`。`arch` 对 `a2` 恰为 `2201`，对 `a5`
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:> 195│ 恰为 `3510`。`soc` 必须标识同一产品系列：`a2` 为 `910`、`Atlas A2`、`Atlas A3` 或 `2201`；
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:  196│ `a5` 为 `950`、`Ascend950`、`A5` 或 `3510`。`device` 记录的是 FRAME 阶段实际观测到的设备标识
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/README.zh.md:  197│ 或选择器，而不是任意填写的选择器；`prove` 绝不推断或改写该标识的任何部分。
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/01-frame.md:  171│ `reachable` is a JSON boolean. `a2` denotes the source architecture and `a5` the target architecture.
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/01-frame.md:  172│ For every reachable side, `arch`, `soc`, `host`, and `device` are required non-empty strings.
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/01-frame.md:> 173│ `arch` is exactly `2201` for `a2` and `3510` for `a5`. `soc` must identify the declared side's
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/01-frame.md:> 174│ family: `910`, `Atlas A2`, `Atlas A3`, or `2201` for `a2`; `950`, `Ascend950`, `A5`, or `3510` for
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/01-frame.md:  175│ `a5`. `device` records the measured device identity or selector observed at FRAME, not an arbitrary
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/01-frame.md:  176│ selector. This identity is a FRAME measurement, not a device-run inference; an `a5` declaration for
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/06-prove.md:   37│ `arch: "3510"`, a non-empty host and device selector, and an SoC that identifies the A5 family
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/06-prove.md:   38│ (`950`, `Ascend950`, `A5`, or `3510`). A 910-family declaration, including `910B`, is A2-family
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/06-prove.md:>  39│ and is rejected rather than relabeled as an A5 run. The matching `a2` binding is `arch: "2201"` and
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/06-prove.md:>  40│ an SoC identifying `910`, `Atlas A2`, `Atlas A3`, or `2201`.
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/06-prove.md:   41│ 
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/06-prove.md:   42│ `prove`, both gates, and optimization checks load that declaration strictly. Only `status` and `report`
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/09-hazards.md:   42│ | `LoadData` | the Ascend 950 type list in the `LoadData` API does not include `int4b_t` | do not preserve an s4 `LoadData` path into the 3510 Cube pipeline |
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/09-hazards.md:   43│ | `LoadDataWithTranspose` | the Ascend 950 type list in that API does not include `int4b_t` | do not preserve an s4 transpose-load path into the 3510 Cube pipeline |
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/09-hazards.md:>  44│ | `Mmad` | the 2201→3510 compatibility guide says Cube does not support s4 | `int4b_t` is not a legal direct Cube operand on 3510 |
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/09-hazards.md:   45│ 
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/09-hazards.md:>  46│ **Refusal:** a unit whose Cube operands remain `AscendC::int4b_t` is not a direct 2201→3510 migration. Do not reinterpret the operand, alter the golden, or claim that an s4 Cube path will be made to work.
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/09-hazards.md:   47│ 
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/references/09-hazards.md:   48│ **Narrow stored-s4 exception:** s4 may remain an externally stored representation when the Cube operands are no longer s4. The pinned asc-devkit basic-API migration guide gives the target-native compatibility sequence: a CV-fused Vector Core step casts stored `int4b_t` to `int8_t`, saves the converted result in new GM storage, then stages it through UB/L1 for an `int8_t` Mmad. This is a **stored-int4 → Vector-Cast-to-int8 → Cube-int8** pipeline, not direct s4 Cube support.
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1288│ # The architecture every unit in this workflow migrates *to*. It is the one arch value the
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1289│ # engine may name, because it is what the skill is for -- every other target-specific fact is
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py:>1290│ # discovered into profile.json. `2201` is the source side and appears only in access.json.
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1291│ TARGET_ARCH = "3510"
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1292│ 
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py:  ...
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1294│ # reinterpret. The architecture tags are deliberately strings because they are the exact values
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1295│ # carried into the proof witness and report.
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py:>1296│ ACCESS_ARCH = {"a2": "2201", "a5": "3510"}
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1297│ SOC_FAMILY_MARKERS = {
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py:>1298│     "a2": ("910", "atlas a2", "atlasa2", "atlas a3", "atlasa3", "2201"),
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1299│     "a5": ("950", "ascend950", "a5", "3510"),
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1300│ }
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py:  ...
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1383│ def access_for_arch(access, arch):
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py: 1384│     """Which declared side serves a target architecture. `arch` is the profile's own value."""
+Ascend/catlass/.agents/skills/catlass-ascend950-migration/scripts/mig.py:>1385│     return access.get("a2" if str(arch) == "2201" else "a5")
+── 寻迹（grep）

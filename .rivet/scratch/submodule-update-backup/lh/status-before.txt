@@ -1,0 +1,70 @@
+ M .gitignore
+ M README.md
+ M docs/CANNLab_course_development_guide.md
+ M quick_start/README.md
+ M quick_start/cann_basics/03_what_is_cann.ipynb
+ M quick_start/cann_basics/04_npu_practice.ipynb
+ D quick_start/cann_basics/05_course_summary.ipynb
+ M quick_start/cann_basics/answer/grade_04.py
+ M quick_start/cann_basics/slides/artificial_intelligence_basics.pptx
+ M quick_start/cann_basics/slides/artificial_intelligence_basics_light.pptx
+ M skills/cannjudge-submit/README.md
+ M skills/cannjudge-submit/SKILL.md
+ M skills/cannjudge-submit/cannjudge_cli.py
+ M skills/cannjudge-submit/encrypt_password.py
+ M skills/cannjudge-submit/example.py
+ M skills/cannjudge-submit/generate_key.py
+ M standard_course/README.md
+ M tutorials/CANNBot/README.md
+ M tutorials/README.md
+ M tutorials/TorchAir_development/01_basic_concepts/01.02_torch_compile_intro.ipynb
+ M tutorials/TorchAir_development/README.md
+ M tutorials/ge_development/README.md
+ M tutorials/llm_inference/README.md
+ M tutorials/pypto_development/README.md
+?? .gitattributes
+?? contrib/tutorials/ai_computing_embedded_system/
+?? contrib/tutorials/ai_security_nuist/
+?? contrib/tutorials/ascend_ai_lab/
+?? contrib/tutorials/ascend_multimodal_practice/
+?? contrib/tutorials/computer_composition_and_architecture/
+?? contrib/tutorials/data_structures_compute/
+?? contrib/tutorials/machine_learning_system/
+?? contrib/tutorials/nearlink_sdr_sim/
+?? contrib/tutorials/operator_development_and_application/
+?? contrib/tutorials/parallel_programming_principles_and_practice/
+?? contrib/tutorials/pyasc_compiler_development/
+?? contrib/tutorials/qwen_ops/
+?? docs/images/CANNLab_course_development_guide/vscode_reload_window.png
+?? docs/images/CANNLab_course_development_guide/vscode_select_kernel_1.png
+?? docs/images/CANNLab_course_development_guide/vscode_select_kernel_2.png
+?? docs/images/CANNLab_course_development_guide/vscode_settings_1.png
+?? docs/images/CANNLab_course_development_guide/vscode_settings_2.png
+?? docs/images/CANNLab_course_development_guide/vscode_settings_3.png
+?? docs/images/CANNLab_course_development_guide/webide_select_kernel_1.png
+?? docs/images/CANNLab_course_development_guide/webide_select_kernel_2.png
+?? docs/images/CANNLab_course_development_guide/webide_settings_1.png
+?? docs/images/CANNLab_course_development_guide/webide_settings_2.png
+?? docs/images/CANNLab_course_development_guide/webide_settings_3.png
+?? docs/images/CANNLab_course_development_guide/webide_settings_4.png
+?? quick_start/cann_basics/04_npu_practice_appendix.md
+?? quick_start/cann_basics/images/lena.jpg
+?? quick_start/git_basics/
+?? skills/cannjudge-submit/login.sh
+?? skills/cannjudge-submit/project_files.py
+?? skills/cannjudge-submit/references/
+?? skills/cannjudge-submit/requirements.txt
+?? skills/cannjudge-submit/session_store.py
+?? skills/cannjudge-submit/tests/
+?? standard_course/00_atomic_courses/
+?? standard_course/01_bootcamp/
+?? standard_course/02_traditional_courses/
+?? standard_course/03_new_courses/
+?? standard_course/04_new_books/
+?? tutorials/TorchAir_development/03_common_features/
+?? tutorials/TorchAir_development/04_advanced_features/
+?? tutorials/autofusion_development/02_autofusion_principles/
+?? tutorials/ge_development/03_graph_compilation/
+?? tutorials/ge_development/04_model_execution_optimization/
+?? tutorials/llm_inference/qwen3_1.7B/
+?? tutorials/pypto_development/05_ai_agent_operator_development/

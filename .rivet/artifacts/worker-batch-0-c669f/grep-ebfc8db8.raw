@@ -1,0 +1,62 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:    2│ // v093: v090 PATH3 fix + UB indexing (rr->r, z_vec offset corrected)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:    3│ // v080: v017 verified multi-path kernel + v079 UB+DMA TinyH4 + v057 host (dynamic block_dim)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:>   4│ // CRITICAL: file-level pragma REQUIRED for DataCopy in Process() on CANN 8.5.0
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:    5│ #pragma GCC optimize("O3,fast-math,unroll-loops")
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:    6│ #include "kernel_operator.h"
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  108│     }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  109│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 110│     __aicore__ inline void Process() {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  111│         AscendC::LocalTensor<float> mem = ub_buf_.Get<float>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  112│         AscendC::LocalTensor<float> w_ub = mem;                     // 64 floats [0..63]
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  123│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  124│         // 1. DMA bulk prefetch (weight/base/scale once, reused across batches)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 125│         AscendC::DataCopy(w_ub, weight_gm_, 64);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 126│         AscendC::DataCopy(base_ub, base_gm_, 8);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 127│         AscendC::DataCopy(scale_ub, scale_gm_, 8);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  128│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  129│         const float base0v = base_ub.GetValue(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  137│             const uint32_t total_x = rows * 16U;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  138│             if constexpr (sizeof(DT_X) == sizeof(float)) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 139│                 AscendC::DataCopy(x_float, x_gm_[batch * 16U], total_x);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 140│                 AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 141│                 AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  142│             } else {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 143│                 AscendC::DataCopy(x_raw, x_gm_[batch * 16U], total_x);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 144│                 AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 145│                 AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  146│                 AscendC::Cast(x_float, x_raw, AscendC::RoundMode::CAST_NONE, total_x);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  147│             }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  171│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  172│             // 4. Single hard sync per batch
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 173│             AscendC::SetFlag<AscendC::HardEvent::V_S>(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 174│             AscendC::WaitFlag<AscendC::HardEvent::V_S>(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  175│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  176│             // 5. Stage z for ALL rows (scalar), one vector sigmoid pass, then fold (v089)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  198│             AscendC::Adds(z_vec, z_vec, 1.0f, rows * 4U);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  199│             AscendC::Reciprocal(z_vec, z_vec, rows * 4U);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 200│             AscendC::SetFlag<AscendC::HardEvent::V_S>(1);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 201│             AscendC::WaitFlag<AscendC::HardEvent::V_S>(1);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  202│             for (uint32_t r = 0; r < rows; ++r) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  203│                 const uint32_t row = batch + r;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  295│             pipe_.InitBuffer(reduce_tmp_buf_, AlignBytes(nH_ * sizeof(float)));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  296│             // v086: whole weight matrix + base/scale cached in UB, loaded once per op
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 297│             pipe_.InitBuffer(weight_cache_buf_, AlignBytes(n_ * nH_ * sizeof(float)));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  298│             pipe_.InitBuffer(cst_buf_, 64U);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  299│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  300│     }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 301│     __aicore__ inline void Process() {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  302│         const uint32_t block_idx = AscendC::GetBlockIdx();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  303│         if (path_ == kVectorPath) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  304│             // v086: one-time DMA of the whole weight matrix [n, nH] (contiguous) + base/scale
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 305│             AscendC::LocalTensor<float> w_cache = weight_cache_buf_.Get<float>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 306│             AscendC::DataCopy(w_cache, weight_gm_, n_ * nH_);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:  307│             AscendC::LocalTensor<float> cst = cst_buf_.Get<float>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp:> 308│             AscendC::DataCopy(cst, base_gm_, 8U);
+── 寻迹（grep）

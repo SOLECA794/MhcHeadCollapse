@@ -1,0 +1,50 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/catlass/README.md:   19│ ## Latest News
+Ascend/catlass/README.md:   20│ 
+Ascend/catlass/README.md:>  21│ - [2026/08] [v2.0.0](https://gitcode.com/cann/catlass/releases/v2.0.0) 发布：正式上线[**CATLASS DSL**](https://gitcode.com/cann/catlass/blob/v2.0.0/python/tla_dsl/README.md)支持Pythonic Kernel，原生支持Tile编程。基于 MLIR 编译栈与 AscendNPU-IR 工具链，将 Python 描述自动转换为高性能可执行 Kernel，相比 CATLASS C++ 编译时间缩短 80%+，代码开发更简洁，高性能表现一致，并提供 **8 个端到端样例**，覆盖矩阵乘（[Basic Mmad](https://gitcode.com/cann/catlass/blob/v2.0.0/python/tla_dsl/examples/end_to_end/basic_mmad/README.md)、[StreamK](https://gitcode.com/cann/catlass/blob/v2.0.0/python/tla_dsl/examples/end_to_end/basic_mmad_streamk/README.md)、[Multi Core SplitK](https://gitcode.com/cann/catlass/blob/v2.0.0/python/tla_dsl/examples/end_to_end/multi_core_splitk_matmul/README.md)、[Batched](https://gitcode.com/cann/catlass/blob/v2.0.0/python/tla_dsl/examples/end_to_end/batched_matmul/README.md)、[Grouped Matmul](https://gitcode.com/cann/catlass/blob/v2.0.0/python/tla_dsl/examples/end_to_end/grouped_matmul_slice_m/README.md) 等）、注意力（[Flash Attention Infer](https://gitcode.com/cann/catlass/blob/v2.0.0/python/tla_dsl/examples/end_to_end/flash_attention_infer/README.md)）等场景；新增 [catlass\_cppgen 代码生成框架](https://gitcode.com/cann/catlass/blob/v2.0.0/python/catlass_cppgen/README.md)，支持自动生成 C++ 核函数代码；新增**Ascend950**算子样例6个（如[Svd Quant Matmul](https://gitcode.com/cann/catlass/blob/v2.0.0/examples/61_ascend950_svd_quant_matmul/README.md)、[A8W4 Grouped MX Matmul](https://gitcode.com/cann/catlass/blob/v2.0.0/examples/74_ascend950_weight_quant_a8w4_grouped_mx_matmul/README.md)等）、AtlasA2算子样例3个（[Symm](https://gitcode.com/cann/catlass/blob/v2.0.0/examples/75_symm/README.md)、[Trmm](https://gitcode.com/cann/catlass/blob/v2.0.0/examples/76_trmm/README.md)、[Planar Complex Matmul](https://gitcode.com/cann/catlass/blob/v2.0.0/examples/77_planar_complex_matmul/README.md)）。
+Ascend/catlass/README.md:   22│ 
+Ascend/catlass/README.md:   23│ - [2026/06] [v1.6.0](https://gitcode.com/cann/catlass/releases/v1.6.0) 发布：新增 [**MXFP8 / MXFP4 量化模板**](https://gitcode.com/cann/catlass/blob/v1.6.0/examples/53_ascend950_fp8_mx_matmul/README.md)、[**EVG 声明式后处理框架**](https://gitcode.com/cann/catlass/blob/v1.6.0/examples/64_ascend950_matmul_evg/README.md)、[**基于 Mutex 同步原语的 BlockMmad**](https://gitcode.com/cann/catlass/blob/v1.6.0/include/catlass/gemm/block/block_mmad_pingpong_mutex_tla.hpp)；新增 [Ascend950 Tile 层组件](https://gitcode.com/cann/catlass/tree/v1.6.0/include/catlass/gemm/tile/ascend950) 及全量 [单元测试](https://gitcode.com/cann/catlass/blob/v1.6.0/tests/unittest/catlass/gemm/tile/README.md)；新增 [算子级测试框架（optest）](https://gitcode.com/cann/catlass/blob/v1.6.0/tests/optest/README.md)；新增 16 个**Ascend950**算子样例（如 [StreamK Matmul](https://gitcode.com/cann/catlass/blob/v1.6.0/examples/66_ascend950_streamk_matmul/README.md)、[Flash Attention Chunk Prefill](https://gitcode.com/cann/catlass/blob/v1.6.0/examples/70_ascend950_flash_attention_chunk_prefill/README.md)、[Conv2d](https://gitcode.com/cann/catlass/blob/v1.6.0/examples/56_ascend950_basic_conv2d_tla/README.md) 等）。
+Ascend/catlass/README.md:  ...
+Ascend/catlass/README.md:   34│ - [2025/12] [v1.3.0](https://gitcode.com/cann/catlass/releases/v1.3.0)发布，支持[`FixPipe`随路量化](https://gitcode.com/cann/catlass/tree/v1.3.0/include/catlass/gemm/tile/tile_copy.hpp#L373)，[Matmul泛化工程](https://gitcode.com/cann/catlass/tree/v1.3.0/examples/102_dynamic_optimized_matmul/README.md)新增多个模板，并新增[INT4反量化](https://gitcode.com/cann/catlass/tree/v1.3.0/examples/32_w4a8_matmul/README.md)、[2D卷积](https://gitcode.com/cann/catlass/tree/v1.3.0/examples/33_basic_conv2d/README.md)等示例
+Ascend/catlass/README.md:   35│ 
+Ascend/catlass/README.md:>  36│ - [2025/10] [v1.2.0](https://gitcode.com/cann/catlass/releases/v1.2.0)发布，新增[Matmul算子泛化](https://gitcode.com/cann/catlass/tree/v1.2.0/examples/102_dynamic_optimized_matmul/README.md)等示例
+Ascend/catlass/README.md:   37│ 
+Ascend/catlass/README.md:   38│ - [2025/09] CATLASS模板库正式开源
+Ascend/catlass/README.md:  ...
+Ascend/catlass/README.md:   46│ ## 📌 简介
+Ascend/catlass/README.md:   47│ 
+Ascend/catlass/README.md:>  48│ CATLASS(**CA**NN **T**emplates for **L**inear **A**lgebra **S**ubroutine**s**)，中文名为昇腾算子模板库，是一个聚焦于提供高性能矩阵乘类算子基础模板的代码库。  
+Ascend/catlass/README.md:   49│ 
+Ascend/catlass/README.md:   50│ 通过抽象分层的方式将矩阵类算子代码模板化，从而实现算子计算逻辑的白盒化组装，让算子代码可复用，可替换，可局部修改。针对昇腾硬件特点进行设计，可以支持复杂场景流水排布，如`Flash Attention`等算子。在上层代码逻辑共享的同时，支持底层硬件差异特化。
+Ascend/catlass/README.md:   51│ 
+Ascend/catlass/README.md:>  52│ 模板库针对定制场景使能快速开发能力，提供不同场景下的性能优化模块供开发者组装定制，在定制shape下的性能能达到相应算子标杆性能的0.98~1.2倍。
+Ascend/catlass/README.md:   53│ 
+Ascend/catlass/README.md:   54│ <p align="center">
+Ascend/catlass/README.md:>  55│   <img src="docs/assets/images/homepage_perf_mm.png" alt="Matmul性能对比" width="70%">
+Ascend/catlass/README.md:   56│ </p>
+Ascend/catlass/README.md:   57│ 
+Ascend/catlass/README.md:   58│ <p align="center">
+Ascend/catlass/README.md:>  59│   <img src="docs/assets/images/homepage_perf_gmm.png" alt="GroupedMatmul性能对比" width="90%">
+Ascend/catlass/README.md:   60│ </p>
+Ascend/catlass/README.md:   61│ 
+Ascend/catlass/README.md:>  62│ 本代码库为CATLASS联创代码仓。结合昇腾生态力量，共同设计研发算子模板，并提供典型算子的高性能实现代码样例，概述详情参考[CATLASS项目介绍](docs/zh/2_Design/00_project_overview.md#catlass-项目介绍)。CATLASS DSL 详情参考[CATLASS DSL 介绍](./python/tla_dsl/README.md)
+Ascend/catlass/README.md:   63│ 
+Ascend/catlass/README.md:   64│ ## ⚡️ 快速上手
+Ascend/catlass/README.md:  ...
+Ascend/catlass/README.md:   76│ ## 📚 进阶参考
+Ascend/catlass/README.md:   77│ 
+Ascend/catlass/README.md:>  78│ 下述资料可助力您深入开展CATLASS算子的开发与调优，实现更优性能的GEMM类算子。
+Ascend/catlass/README.md:   79│ 
+Ascend/catlass/README.md:   80│ - [创新样例开发流程指南](./docs/zh/1_Practice/10_innovative_example_development_guide.md)：从需求分析、方案设计到组件开发、测试合入的完整流程，帮助开发者快速掌握创新样例的开发方法；
+Ascend/catlass/README.md:   81│ 
+Ascend/catlass/README.md:>  82│ - [矩阵乘模板总结](./docs/zh/2_Design/01_kernel_design/04_matmul_summary.md)：介绍模板库的Matmul理论模板和工程优化点，帮助开发者进行Matmul性能调优；
+Ascend/catlass/README.md:   83│ 
+Ascend/catlass/README.md:   84│ - [CATLASS设计总结](./docs/zh/README.md#2-模块设计): 汇总CATLASS工程的样例算法设计、swizzle策略、TLA设计等文档。
+Ascend/catlass/README.md:  ...
+Ascend/catlass/README.md:  128│ | [v1.6.0](https://gitcode.com/cann/catlass/releases/v1.6.0)                                                            | [8.5.0](https://www.hiascend.com/developer/download/community/result?module=cann&cann=8.5.0)<br>[9.0.0](https://www.hiascend.com/developer/download/community/result?module=cann&cann=9.0.0)（Ascend 950 系列产品）     | [Atlas A2 训练系列产品 / Atlas A2 推理系列产品](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html) <br>[Atlas A3 训练系列产品 / Atlas A3 推理系列产品](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)<br>Ascend 950 系列产品 |
+Ascend/catlass/README.md:  129│ | [v1.5.0](https://gitcode.com/cann/catlass/releases/v1.5.0)                                                            | [8.2.RC1](https://www.hiascend.com/developer/download/community/result?module=cann&cann=8.2.RC1)<br>[9.0.0](https://www.hiascend.com/developer/download/community/result?module=cann&cann=9.0.0)（Ascend 950 系列产品） | [Atlas A2 训练系列产品 / Atlas A2 推理系列产品](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html) <br>[Atlas A3 训练系列产品 / Atlas A3 推理系列产品](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)<br>Ascend 950 系列产品 |
+Ascend/catlass/README.md:> 130│ | [v1.4.0](https://gitcode.com/cann/catlass/releases/v1.4.0)~[v1.2.2](https://gitcode.com/cann/catlass/releases/v1.2.2) | [8.2.RC1](https://www.hiascend.com/developer/download/community/result?module=cann&cann=8.2.RC1)                                                                                                                              | [Atlas A2 训练系列产品 / Atlas A2 推理系列产品](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html) <br>[Atlas A3 训练系列产品 / Atlas A3 推理系列产品](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)                              |
+Ascend/catlass/README.md:> 131│ | [v1.2.1](https://gitcode.com/cann/catlass/releases/v1.2.1)~[v1.0.0](https://gitcode.com/cann/catlass/releases/v1.0.0) | [8.2.RC1.alpha002](https://www.hiascend.com/developer/download/community/result?module=cann&cann=8.2.RC1.alpha002)                                                                                                            | [Atlas A2 训练系列产品 / Atlas A2 推理系列产品](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html) <br>[Atlas A3 训练系列产品 / Atlas A3 推理系列产品](https://www.hiascend.com/document/detail/zh/AscendFAQ/ProduTech/productform/hardwaredesc_0001.html)                              |
+Ascend/catlass/README.md:  132│ 
+Ascend/catlass/README.md:  133│ - 若您需要使用`TorchNPU`进行精度测试等辅助开发，需要安装`cann-ops`包（如`cann-910b-ops`/`cann-a3-ops`/`cann-950-ops`）以调用其中的算子实现。在Ascend 950 系列产品中，`cann-950-ops`仅在[CANN 9.0.0](https://www.hiascend.com/developer/download/community/result?module=cann&cann=9.0.0)正式版及以上的版本提供。
+── 寻迹（grep）

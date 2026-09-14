@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "prompt": "帮我查一下 AscendC DataCopy 接口的参数和用法，最好能给出源码位置",
+    "expected": "调用 POST /search (file_type:code) 查 DataCopy，返回 id/source_file/score；对 document 节点 /source 取全文；若需要 code 原文走 §1.2 三级取码（raw.gitcode.com）拿到文件位置；自然语言总结参数用法并附 id 引用"
+  },
+  {
+    "id": 2,
+    "prompt": "我的 AscendC 算子一跑就卡死挂起，怎么定位问题？",
+    "expected": "识别为执行型/调试任务 → 按 §1.0 路由表 /source 加载 ascendc-crash-debug Skill 全文，按其工作流（含 references/plog 解析）执行，而非仅 /search 检索后凭记忆给通用建议；先 /search 锚定可疑节点也可，但必须有加载 Skill 这一步"
+  },
+  {
+    "id": 3,
+    "prompt": "昇腾报错 161xxx 错误码一般是什么问题，怎么排查？",
+    "expected": "调用 POST /search (file_type:error_code) 查 161xxx，按 §2 表沿 CONFIGURES 边追踪错误码→源码→修复方案；返回 id/score/修复建议，引用 KG 结果附 id 和 source_file"
+  }
+]

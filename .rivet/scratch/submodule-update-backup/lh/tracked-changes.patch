@@ -1,0 +1,4348 @@
+diff --git a/.gitignore b/.gitignore
+index 845f71f..93aa491 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -118,3 +118,7 @@ dist/
+ *.whl
+ .claude/
+ .opencode/
++
++
++# Windows Zone.Identifier 元数据文件（下载标记，纯垃圾文件）
++*:Zone.Identifier
+diff --git a/README.md b/README.md
+index 5d42d8f..a0f7354 100644
+--- a/README.md
++++ b/README.md
+@@ -292,7 +292,7 @@
+ <tr><th width="16%">技术领域</th><th width="28%">初级课程</th><th width="28%">中级课程</th><th width="28%">高级课程</th></tr>
+ <tr>
+ <td><b>⚙️ 算子开发</b></td>
+-<td><a href="./tutorials/ascendc_operator_development_light">Kernel 直调版</a> · d2l PyPTO 实战 🚧 · PyASC 入门 🚧<br/><sub>算子基础概念、编程范式、PyPTO Tensor 编程、PyASC 函数开发</sub></td>
++<td><a href="./tutorials/ascendc_operator_development_light">Kernel 直调版</a> · <a href="./tutorials/pyasc_operator_development">PyASC 入门</a> · <a href="./tutorials/pypto_development">PyPTO 算子开发系列</a><br/><sub>算子基础概念、编程范式、PyASC 函数开发、PyPTO Tensor 编程、AI Coding Agent 算子开发</sub></td>
+ <td><a href="./tutorials/ascendc_operator_development">算子工程版</a> · Conv 算子实战 🚧 · Vector 算子实战 🚧<br/><sub>Vector/Cube/融合算子开发、工程化流程、卷积与矢量算子实战</sub></td>
+ <td><a href="./tutorials/MC2_fused_operator_development">MC2 融合算子实战</a> · AscendC V2 高阶 🚧 · MoE/FA 算子实战 🚧<br/><sub>Matmul/Conv/通算融合、aclnn/aclGraph 工程化</sub></td>
+ </tr>
+@@ -334,8 +334,8 @@
+ </tr>
+ <tr>
+ <td><b>🤖 CANNBot</b></td>
+-<td><a href="https://gitcode.com/cann/cannbot-skills">CANNBot</a> · <a href="./tutorials/CANNBot/README.md">CANNBot 课程</a><br/><sub>算子开发辅助</sub></td>
+-<td>🚧 建设中<br/><sub>训练、推理优化等</sub></td>
++<td><a href="https://gitcode.com/cann/cannbot-skills">CANNBot</a> · <a href="./tutorials/CANNBot/README.md#初级课程cannbot基础">CANNBot基础</a><br/><sub>CANNBot 入门、Ascend C / PyPTO / TileLang-Ascend 三种开发路径实操</sub></td>
++<td><a href="./tutorials/CANNBot/README.md#中级课程cannbot算子开发进阶">CANNBot算子开发进阶</a><br/><sub>Vector 算子自动生成与性能优化、多线程算子、Harness 工程与算子测试</sub></td>
+ <td>🚧 建设中<br/><sub>融合算子、推理、训练优化高阶课程</sub></td>
+ </tr>
+ </table>
+@@ -345,15 +345,137 @@
+ <a id="university"></a>
+ ## 🏫 高校教学方案专区（建设中）
+ 
+-> 直接输出可落地的成套教学解决方案，匹配高校不同开课场景，老师可直接参考、二次改造。
++> 以**原子课程为基础积木**（技术栈四层 × 难度三级，135 门），支撑**启航营**、**传统学科课程**、**CANN 新增课程**、**CANN 教材**四大课程形态，覆盖从短期集训到高校学分课、从入门到专家的完整学习路径。详见 [CANN 课程体系总体规划](./standard_course/README.md)。
+ 
+-| 方案 | 适用场景 | 学时 | 内容覆盖 | 配套资源 |
+-| :--- | :--- | :---: | :--- | :--- |
+-| **本科常态化必修课** | 大三计算机/AI 专业必修课，对标浙大《人工智能芯片与系统》类课程 | 48 | 异构计算基础、Ascend C 算子开发、模型迁移与部署、综合实训 | 完整课程大纲、课时分配、12 个配套实验、课件模板、题库、教学 PPT |
+-| **短期实训营** | 高校暑期实训、企业新人培训、1-2 周集中实训 | 20 | 环境快速上手、基础算子开发、小项目实操 | 实训大纲、实操手册、结营考核题目 |
+-| **研究生进阶专题** | 研究生高阶课程、科研方向入门 | 32 | 分布式训练、算子深度优化、大模型训练适配 | 专题大纲、科研案例、参考论文、前沿实验 |
++<details>
++<summary><b> CANN 课程总览 </b></summary>
++
++```
++┌─────────────────────────────────────────────────────────────────────────┐
++│                        原子课程（00）—— 体系基础                            │
++│              135 门积木（技术栈四层 × 难度三级）                            │
++│  ┌────────────┬────────────┬────────────┬────────────────────────────┐  │
++│  │  L1 应用层  │  L2 框架层  │  L3 加速库  │  L4 编程·编译·NPU 架构     │  │
++│  │   (44门)    │   (29门)    │   (13门)    │        (49门)              │  │
++│  └────────────┴────────────┴────────────┴────────────────────────────┘  │
++└───────────────────────────────┬─────────────────────────────────────────┘
++                                 │ 支撑（节选/教学化/拼装/系统化）
++          ┌──────────────────────┼──────────────────────┐
++          │                      │                      │
++┌─────────▼──────────┐ ┌───────▼──────────┐ ┌────────▼───────────┐
++│   启航营（01）       │ │ 传统学科课程（02）  │ │  CANN 新增课程（03）  │
++│   原子课程节选        │ │  原子课程教学化      │ │   原子课程拼装        │
++│ ┌────────────────┐  │ │ ┌────────────────┐ │ │ ┌────────────────┐  │
++│ │ 两天营 ≈14h     │  │ │ │ 计组外挂 6–8h   │ │ │ │ AI计算架构 64h  │  │
++│ │ 两周营 ≈60h     │  │ │ │ 体系结构三幕剧   │ │ │ │ 数据智能 32h    │  │
++│ │ 结业：add_rms_  │  │ │ │ 12 学科清单      │ │ │ │ 加速计算 32-48h │  │
++│ │   norm→双算子   │  │ │ └────────────────┘ │ │ │ 数据科学 24-32h │  │
++│ └────────────────┘  │ └────────────────────┘ │ │ 深度学习 32-48h │  │
++└─────────────────────┘                          │ │ 生成式 AI 32h   │  │
++                                                  │ └────────────────┘  │
++                                                  └─────────────────────┘
++                                 │
++                                 │ 系统化
++                  ┌──────────────▼──────────────┐
++                  │       教材区（04）             │
++                  │     原子课程系统化             │
++                  │ ┌──────────────────────────┐ │
++                  │ │ 教材一：Ascend C 并行程序设计│ │
++                  │ │  （↔课程三/启航营算子部分） │ │
++                  │ ├──────────────────────────┤ │
++                  │ │ 教材二：人工智能芯片与系统   │ │
++                  │ │  （↔体系结构三幕剧/课程一）  │ │
++                  │ └──────────────────────────┘ │
++                  └─────────────────────────────┘
++```
++</details>
++
++###  CANN 课程架构总览
++
++| 分区 | 定位 | 与原子课程关系 | 规模 | 详细大纲 |
++|------|------|--------------|------|---------|
++| **00 原子课程** | **基础积木**：技术栈四层 × 难度三级的原子粒度课程 | 体系基础 | 135 门 | [原子课程总纲](./standard_course/00_atomic_courses/README.md) |
++| **01 启航营** | 短期集训：两天/两周两营递进，快速入门与实战 | 原子课程**节选** | 两天营 ≈14h / 两周营 ≈60h | [启航营课程总览](./standard_course/01_bootcamp/README.md) |
++| **02 传统学科课程** | 学科融入：CANN 知识融入大学传统学分课程，换芯不换课 | 原子课程**教学化** | 计组 + 体系结构 + 12 学科 | [传统学科课程目录](./standard_course/02_traditional_courses/README.md) |
++| **03 新增课程** | 高校学分课：六门系统课程 | 原子课程**拼装** | 已排课 2 + 规划 4 | [CANN 新增课程汇总](./standard_course/03_new_courses/README.md) |
++| **04 教材区** | 经典书籍：双教材支撑课程体系 | 原子课程**系统化** | 教材一 + 教材二 | [CANN 教材区概览](./standard_course/04_new_books/README.md) |
++
++<details>
++<summary><b>00 原子课程——体系基础（135 门）</b></summary>
++
++> 按技术栈四层（应用层/AI 框架层/加速库/编程编译 NPU 架构）× 难度三级（初级/中级/高级）组织，每门原子课可单独支撑一节课（45–90 分钟），是启航营、传统学科课程、新增课程、教材的共同内容来源。
++
++| 技术栈层 | 初级 | 中级 | 高级 | 小计 | 涵盖方向 |
++|---------|------|------|------|------|---------|
++| **L1 应用层** | 8 | 17 | 19 | **44** | 深度学习 / 计算机视觉 / 生成式 AI / 大语言模型 / 科学计算 / 推荐系统 |
++| **L2 框架层** | 7 | 11 | 11 | **29** | 框架基础 / 训练技术 / 推理技术 / 图框架 / 进阶主题 |
++| **L3 加速库** | 3 | 8 | 2 | **13** | Aclnn / GE / 通信库 / C++ 并行算法 / Python 加速库 |
++| **L4 编程·编译·NPU 架构** | 5 | 30 | 14 | **49** | Ascend C / PyPTO / TileLang / PyAsc / CANNBot / NPU 架构 |
++| **合计** | **23** | **66** | **46** | **135** | — |
++
++> 📖 详细大纲：[原子课程总纲](./standard_course/00_atomic_courses/README.md)
++
++</details>
++
++<details>
++<summary><b>01 启航营——短期集训（两天营 + 两周营）</b></summary>
++
++> 面向 CANN 算子开发入门者的集中式训练营，理论与实践 1:1 配对，以真实算子开发为主线，结业即可具备 NPU 算子开发与集成能力。两营递进，结业算子同源。
++
++| 维度 | 两天营 | 两周营 |
++|------|--------|--------|
++| **总学时** | 2 天 ≈ 14h（理论 7 + 实践 7） | 10 个工作日 ≈ 60h（理论 20 + 实践 40） |
++| **结业算子** | `add_rms_norm`（矢量单算子） | `add_rms_norm` + `quant_matmul`（双算子）+ PyTorch 集成 |
++| **讲数** | 7 讲 | 13 讲 |
++| **课程大纲** | [两天营大纲](./standard_course/01_bootcamp/syllabus_two_days_bootcamp.md) | [两周营大纲](./standard_course/01_bootcamp/syllabus_two_weeks_bootcamp.md) |
++| **讲义目录** | [two_days_course/](./standard_course/01_bootcamp/two_days_course/) | [two_weeks_course/](./standard_course/01_bootcamp/two_weeks_course/) |
++
++</details>
++
++<details>
++
++<summary><b>02 传统学科课程——换芯不换课</b></summary>
++
++> CANN/昇腾知识融入大学传统学分课程，核心原则：**换芯不换课**——传统课程大纲主体不动，CANN 以"单元包 / 对照案例 / 实验替换"外挂式融入，教师零改造或低改造即可采用。
+ 
+-> 🏫 **已合作高校**：北京邮电大学、哈尔滨工业大学、上海交通大学等高校已基于本仓内容开设相关课程。
++| 传统课程 | 融入模式 | 交付形态 | 文件 |
++|---------|---------|---------|------|
++| **计算机组成原理**（本科大二必修） | M2/M5 轻量融入 | 外挂式 6–8 学时 | [computer_organization.md](./standard_course/02_traditional_courses/computer_organization.md) |
++| **计算机体系结构**（本科高年级/研究生） | M2/M5 主讲融入 | "AI 时代的体系结构挑战"三幕剧（3 次主讲课 × 135 分钟） | [computer_architecture.md](./standard_course/02_traditional_courses/computer_architecture.md) |
++| 其他 12 学科 15 门课（并行计算/DL 系统/图像处理/编译/OS/嵌入式/数值/计算科学/数据科学/HPC 等） | M2–M4 | 方向性规划 | [融入计划](./standard_course/02_traditional_courses/traditional_course_integration_plan.md) |
++
++> 📖 详细大纲：[传统学科课程目录](./standard_course/02_traditional_courses/README.md)
++
++</details>
++
++<details>
++<summary><b>03 新增课程大纲（六门高校学分课）</b></summary>
++
++> 由原子课程拼装而成，覆盖从 AI 计算架构到行业应用的完整学习路径。每门课程单独成文，关注前后章节连续性；除大作业外每章节配双平台练习。
++
++| # | 课程 | 学时 | 状态 | 课程大纲 |
++|:---:|------|------|:---:|---------|
++| 一 | AI 计算与神经网络计算架构实践 | 64（16 周） | ✅ 已排课 | [课程大纲](./standard_course/03_new_courses/ai_computing_and_neural_network_architecture_practice/syllabus.md) |
++| 二 | 昇腾 AI 与复杂系统数据智能 | ≈32（16 周） | ✅ 已排课 | [课程大纲](./standard_course/03_new_courses/ascend_ai_and_complex_system_data_intelligence/syllabus.md) |
++| 三 | 加速计算 | 32–48 | 🆕 规划 | [课程大纲](./standard_course/03_new_courses/accelerated_computing.md) |
++| 四 | 数据科学 | 24–32 | 🆕 规划 | [课程大纲](./standard_course/03_new_courses/data_science.md) |
++| 五 | 深度学习 | 32–48 | 🆕 规划 | [课程大纲](./standard_course/03_new_courses/deep_learning.md) |
++| 六 | 生成式 AI | 32 | 🆕 规划 | [课程大纲](./standard_course/03_new_courses/generative_ai.md) |
++</details>
++
++<details>
++<summary><b>04 教材区——双教材支撑</b></summary>
++
++> 双教材与课程形成"教材↔课程"双载体形态，将原子课程内容按教材体例系统化组织。
++
++| 教材 | 定位 | 状态 | 对应课程 |
++|------|------|------|---------|
++| **《Ascend C 并行程序设计》** | 对标 PMPP——昇腾算子开发权威教材 | ✅ 已完成初稿 | 课程三（加速计算）、启航营算子部分 |
++| **《人工智能芯片与系统》** | 对标 AI Accelerators——NPU 架构与系统教材 | 🆕 规划 | 传统学科体系结构三幕剧、课程一架构部分 |
++
++> 📖 详细大纲：[教材区概览](./standard_course/04_new_books/README.md)
++
++</details>
+ 
+ ---
+ 
+@@ -444,7 +566,9 @@
+ │   ├── hccl_development                   # HCCL 集合通信系列课程
+ │   ├── hixl_development                   # HiXL 单边通信应用开发
+ │   ├── CANNBot                            # CANNBot 算子生成相关课程
+-│   └── ...                                # 待扩展（PyPTO / TileLang 等）
++│   ├── pyasc_operator_development         # PyASC 算子开发（Python 原生语法）
++│   ├── pypto_development                  # PyPTO 算子开发（Tensor 编程范式）
++│   └── ...                                # 待扩展（TileLang 等）
+ ├── reference_practice                 # 参考实践
+ │   ├── model_inference_optimization   # 模型推理优化
+ │   │   └── sana_video                # Sana-Video 推理优化
+@@ -530,8 +654,9 @@
+ </details>
+ 
+ ## 🔥 Latest News
+-
+-* [2026/09] 新增[面向高性能计算的数据结构](./contrib/tutorials/data_structure_for_hpc)课程，围绕数据结构与高性能计算实践，涵盖并行计算、分布式计算、Ascend C 算子开发与性能优化等内容。
++- [2026/09] 新增[面向高性能计算的数据结构](./contrib/tutorials/data_structure_for_hpc)课程，围绕数据结构与高性能计算实践，涵盖并行计算、分布式计算、Ascend C 算子开发与性能优化等内容。
++- [2026/08] 新增[PyPTO 算子开发系列教程](./tutorials/pypto_development)，基于 PyPTO Tensor 编程范式开发昇腾算子，涵盖 CANN/芯片认知、MPMD 编程范式、elementwise/matmul/reduction 基础实践与 Attention/Transformer 中高级实践。
++- [2026/08] 新增[PyASC 算子开发系列教程](./tutorials/pyasc_operator_development)，基于 Python 原生语法开发昇腾算子，涵盖 pyasc 概述与环境准备、核函数开发基础，Vector/Matmul 算子开发与调试调优（初阶已上线）。
+ - [2026/08] 新增[CANNBot 系列课程](./tutorials/CANNBot/README.md)，围绕 CANNBot 算子开发工具，系统介绍如何使用 CANNBot 生成与优化 Ascend 算子，覆盖 Ascend C / PyPTO / TileLang-Ascend 等开发路径及算子测试全流程。
+ - [2026/08] 新增[TorchAir图模式优化系列教程](./tutorials/TorchAir_development)，涵盖 TorchAir 基础概念、PyTorch 模型图转换、昇腾 NPU 图模式执行与性能优化实践，帮助开发者掌握基于 TorchAir 的模型开发与优化流程。
+ - [2026/08] 新增[GE 图引擎开发系列教程](./tutorials/ge_development)，涵盖 GE 基础概念、图构建与编译、模型执行与优化、扩展开发及问题定位。
+diff --git a/docs/CANNLab_course_development_guide.md b/docs/CANNLab_course_development_guide.md
+index ff54a55..fcc0ca1 100644
+--- a/docs/CANNLab_course_development_guide.md
++++ b/docs/CANNLab_course_development_guide.md
+@@ -252,47 +252,70 @@ git checkout test
+ 
+ #### 7.1.2 在 CANNLab 环境中打开
+ 
+-按照本指南第 3 节创建并进入 CANNLab 云开发环境，通过 WebIDE 在左侧资源管理器中双击课程 `.ipynb` 文件即可打开 Notebook。
++按照本指南第 3 节创建并进入 CANNLab 云开发环境，通过 WebIDE 或 VSCode 打开 CANNLab 环境后，在左侧资源管理器中双击课程 `.ipynb` 文件即可打开 Notebook。
+ 
+-### 7.2 逐 cell 执行验证
++### 7.2 通过 WebIDE 连接环境
+ 
+-#### 7.2.1 注册 Jupyter 内核
++**step1:**
+ 
+-在终端中依次执行以下命令，注册 Python 3.11.4 (CANN) 内核：
++通过 WebIDE 进入环境，默认打开 cann-learning-hub 代码仓，在左侧资源管理器中双击任意课程 `.ipynb`文件，选择内核，在弹窗中点击 Jupyter，根据“从 Jupyter 中选择内核”弹窗信息记住当前 WebIDE 环境的所有 kernel 路径。例如图所见，当前环境的 kernel 位于
++- /bin/python2(Python 2.7.18)
++- /usr/bin/python2(Python 2.7.18)
++- /usr/local/bin/python(Python 3.11.4)
++- /bin/python3(Python 3.8.10)
++- /usr/bin/python3(Python 3.8.10)
+ 
+-```bash
+-# 安装 ipykernel（如已安装会提示 already satisfied，忽略即可）
+-/opt/buildtools/Python-3.11.4/bin/python3.11 -m pip install ipykernel
+-# 注册内核
+-/opt/buildtools/Python-3.11.4/bin/python3.11 -m ipykernel install --user \
+-  --name cann_py311 \
+-  --display-name "Python 3.11.4 (CANN)"
+-```
++<img src="./images/CANNLab_course_development_guide/webide_select_kernel_1.png">
++<img src="./images/CANNLab_course_development_guide/webide_select_kernel_2.png">
+ 
+-#### 7.2.2 设置环境变量自动加载
++**step2:**
+ 
+-创建 `usercustomize.py`，让 Python 启动时自动设置 CANN 环境变量：
++打开 WebIDE 的远程设置文件`settings.json`，配置 `python.defaultInterpreterPath` 和 `jupyter.kernels.excludePythonEnvironments`。
+ 
+-```bash
+-# 获取 CANN 路径
+-CANN_PATH=$(echo $ASCEND_TOOLKIT_HOME)
+-mkdir -p ~/.local/lib/python3.11/site-packages
+-cat > ~/.local/lib/python3.11/site-packages/usercustomize.py << EOF
+-import os
+-os.environ.setdefault('ASCEND_OPP_PATH', '${CANN_PATH}/opp')
+-os.environ.setdefault('ASCEND_TOOLKIT_HOME', '${CANN_PATH}')
+-os.environ.setdefault('ASCEND_HOME_PATH', '${CANN_PATH}')
+-os.environ.setdefault('ASCEND_AICPU_PATH', '${CANN_PATH}')
+-EOF
+-```
++- `python.defaultInterpreterPath`：`/usr/local/bin/python`，如果不确定这个值，可以在终端执行 `which python` 进行确认。
++- `jupyter.kernels.excludePythonEnvironments`：**step1** 中除了 `which python` 外其他所有 kernel 地址。
++
++<img src="./images/CANNLab_course_development_guide/webide_settings_1.png">
++<img src="./images/CANNLab_course_development_guide/webide_settings_2.png">
++<img src="./images/CANNLab_course_development_guide/webide_settings_3.png">
++<img src="./images/CANNLab_course_development_guide/webide_settings_4.png">
++
++配置完成后，关闭 `settings.json`，刷新 WebIDE 页面（浏览器F5刷新）。
++
++完成上述配置后，打开每个 `.ipynb` 文件，在右上角 **选择内核** 的位置，均已默认选择 **Python 3.11.4**。
++
++### 7.3 通过 VSCode 连接环境
++
++**step1:**
++
++通过 VSCode 进入环境，默认打开 cann-learning-hub 代码仓，在左侧资源管理器中双击任意课程 `.ipynb`文件，选择内核，在弹窗中点击 Python Environments，根据“Select a Python Environment”弹窗信息记住当前 VSCode 环境的所有 kernel 路径。由于 WebIDE 和VSCode 是两个独立的集成开发环境，各自探查到的 kernel 路径并不完全一致。例如图所见，当前 VSCode 环境的 kernel 位于
++- /bin/python2(Python 2.7.18)
++- /usr/bin/python2(Python 2.7.18)
++- /usr/local/bin/python(Python 3.11.4)
++- /opt/buildtools/Python-3.11.4/bin/python3(Python 3.11.4)
++- /bin/python3(Python 3.8.10)
++- /usr/bin/python3(Python 3.8.10)
++
++<img src="./images/CANNLab_course_development_guide/vscode_select_kernel_1.png">
++<img src="./images/CANNLab_course_development_guide/vscode_select_kernel_2.png">
++
++**step2:**
++
++打开 VSCode 的远程设置文件`settings.json`，配置 `python.defaultInterpreterPath` 和 `jupyter.kernels.excludePythonEnvironments`。
++- `python.defaultInterpreterPath`：`/usr/local/bin/python`，如果不确定这个值，可以在终端执行 `which python` 进行确认。
++- `jupyter.kernels.excludePythonEnvironments`：**step1** 中除了 `which python` 外其他所有 kernel 地址。
++
++<img src="./images/CANNLab_course_development_guide/vscode_settings_1.png">
++<img src="./images/CANNLab_course_development_guide/vscode_settings_2.png">
++<img src="./images/CANNLab_course_development_guide/vscode_settings_3.png">
+ 
+-#### 7.2.3 关机重新开机并执行验证
++配置完成后，关闭 `settings.json`，快捷键 `Ctrl+Shift+P` 调出命令框，选择执行 `Developer:Reload Window` 重启 VSCode。
+ 
+-完成上述配置后，**关机并重新开机**，使内核与环境变量配置生效。开机后通过 WebIDE 重新进入环境，打开每个 `.ipynb` 文件，在右上角 **选择内核**，选择 **Python 3.11.4 (CANN)**：
++<img src="./images/CANNLab_course_development_guide/vscode_reload_window.png">
+ 
+-<img src="./images/CANNLab_course_development_guide/kernel1.png">
++完成上述操作后，打开每个 `.ipynb` 文件，在右上角 **选择内核** 的位置，均已默认选择 **Python 3.11.4**。
+ 
+-<img src="./images/CANNLab_course_development_guide/kernel2.png">
++### 7.4 逐 cell 执行验证
+ 
+ 内核选择完成后，从第一个 code cell 开始依次点击运行按钮，确认：
+ 
+@@ -306,7 +329,7 @@ EOF
+ 
+ <img src="./images/CANNLab_course_development_guide/run_code_cell_success.png">
+ 
+-### 7.3 验证记录
++### 7.5 验证记录
+ 
+ 在 PR 描述中需要说明：
+ 
+@@ -314,7 +337,7 @@ EOF
+ - 运行环境（如 CANNLab 云开发环境，模板及规格）。
+ - 验证结果（所有 Notebook 运行通过 / 存在的已知问题）。
+ 
+-### 7.4 多硬件验证
++### 7.6 多硬件验证
+ 
+ 若课程同时支持多种硬件，需在每种硬件对应的体验环境中分别完成运行验证：
+ 
+diff --git a/quick_start/README.md b/quick_start/README.md
+index fa8ad78..cd76572 100644
+--- a/quick_start/README.md
++++ b/quick_start/README.md
+@@ -8,3 +8,4 @@
+ | 第一个自定义算子　　 | 快速体验基于 Ascend C 编写和编译自定义算子的全流程 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=quick_start/first_custom_operator&scanFilePath=quick_start/first_custom_operator/first_custom_operator.ipynb)　　　 | ✅ 已发布 |
+ | 第一个算子API调用　　| 快速体验调用 CANN 内置算子 API 进行计算　　　　　　| [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=quick_start/first_operator_api_call&scanFilePath=quick_start/first_operator_api_call/first_operator_api_call.ipynb) | ✅ 已发布 |
+ | 第一个大模型推理体验 | 快速体验大模型推理和优化加速　　　　　　　　　　　 | 需要通过CANNLab体验　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| ✅ 已发布 |
++| Git基础课程　　　　 | 从零入门 Git 与 GitCode 平台 Fork/PR 工作流　　　 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=quick_start/git_basics&scanFilePath=quick_start/git_basics/01_git_intro.ipynb)　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　| ✅ 已发布 |
+diff --git a/quick_start/cann_basics/03_what_is_cann.ipynb b/quick_start/cann_basics/03_what_is_cann.ipynb
+index 5aab721..8d556e5 100644
+--- a/quick_start/cann_basics/03_what_is_cann.ipynb
++++ b/quick_start/cann_basics/03_what_is_cann.ipynb
+@@ -1193,10 +1193,18 @@
+    "name": "python3"
+   },
+   "language_info": {
++   "codemirror_mode": {
++    "name": "ipython",
++    "version": 3
++   },
++   "file_extension": ".py",
++   "mimetype": "text/x-python",
+    "name": "python",
+-   "version": "3.11.0"
++   "nbconvert_exporter": "python",
++   "pygments_lexer": "ipython3",
++   "version": "3.11.4"
+   }
+  },
+  "nbformat": 4,
+  "nbformat_minor": 5
+-}
+\ No newline at end of file
++}
+diff --git a/quick_start/cann_basics/04_npu_practice.ipynb b/quick_start/cann_basics/04_npu_practice.ipynb
+index 5431e48..4ca7fd8 100644
+--- a/quick_start/cann_basics/04_npu_practice.ipynb
++++ b/quick_start/cann_basics/04_npu_practice.ipynb
+@@ -235,18 +235,80 @@
+     "    b_cpu = \n",
+     "\n",
+     "    # Step 2: CPU 矩阵乘法计时\n",
++    "    # 提示: c_cpu = torch.matmul(a_cpu, b_cpu)\n",
+     "    \n",
+     "\n",
+     "    # Step 3: NPU 矩阵乘法计时（别忘了 synchronize）\n",
++    "    # 提示: a_npu = a_cpu.npu() → c_npu = torch.matmul(...) → synchronize\n",
+     "    \n",
+     "\n",
+     "    # Step 4: 验证结果一致\n",
++    "    # 提示: consistent = torch.allclose(c_cpu, c_npu.cpu(), atol=1e-1)\n",
+     "    \n",
+     "\n",
+     "    # 打印结果\n",
+     "    "
+    ]
+   },
++  {
++   "cell_type": "markdown",
++   "id": "ecabb50b",
++   "metadata": {},
++   "source": [
++    "#### 选做：FP32 vs FP16 精度与速度对比\n",
++    "\n",
++    "NPU 的 Cube 单元针对 **FP16** 优化，吞吐量约为 FP32 的 3 倍。但 FP16 精度较低（尾数 10 位 vs FP32 的 23 位）。\n",
++    "\n",
++    "用 N=2048 矩阵乘法对比：CPU FP32 为基准，NPU 分别用 FP32 和 FP16 计算，观察速度提升与精度损失。\n",
++    "\n",
++    "> **思考**：精度损失对 AI 模型训练/推理是否可接受？什么场景下必须用 FP32？"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "execution_count": null,
++   "id": "b10c88f8",
++   "metadata": {},
++   "outputs": [],
++   "source": [
++    "# ========== 选做：FP32 vs FP16 对比 ==========\n",
++    "N = 2048\n",
++    "reps = 20\n",
++    "\n",
++    "a = torch.randn(N, N, dtype=torch.float32)\n",
++    "b = torch.randn(N, N, dtype=torch.float32)\n",
++    "\n",
++    "# CPU FP32 基准\n",
++    "t0 = time.time()\n",
++    "for _ in range(reps): c_cpu = torch.matmul(a, b)\n",
++    "t_cpu = (time.time() - t0) / reps * 1000\n",
++    "\n",
++    "# NPU FP32\n",
++    "a32, b32 = a.npu(), b.npu()\n",
++    "for _ in range(3): _ = torch.matmul(a32, b32)\n",
++    "torch.npu.synchronize()\n",
++    "t0 = time.time()\n",
++    "for _ in range(reps): c_npu32 = torch.matmul(a32, b32)\n",
++    "torch.npu.synchronize()\n",
++    "t_npu32 = (time.time() - t0) / reps * 1000\n",
++    "\n",
++    "# NPU FP16\n",
++    "a16, b16 = a.half().npu(), b.half().npu()\n",
++    "for _ in range(3): _ = torch.matmul(a16, b16)\n",
++    "torch.npu.synchronize()\n",
++    "t0 = time.time()\n",
++    "for _ in range(reps): c_npu16 = torch.matmul(a16, b16)\n",
++    "torch.npu.synchronize()\n",
++    "t_npu16 = (time.time() - t0) / reps * 1000\n",
++    "\n",
++    "# 对比\n",
++    "print(f\"{'精度':>8} | {'NPU 耗时':>10} | {'加速比':>10} | {'与CPU最大差异':>14}\")\n",
++    "print(\"-\" * 55)\n",
++    "print(f\"{'FP32':>8} | {t_npu32:>8.2f}ms | {t_cpu/t_npu32:>9.1f}x | {(c_cpu - c_npu32.cpu()).abs().max().item():>14.4f}\")\n",
++    "print(f\"{'FP16':>8} | {t_npu16:>8.2f}ms | {t_cpu/t_npu16:>9.1f}x | {(c_cpu.float() - c_npu16.cpu().float()).abs().max().item():>14.4f}\")\n",
++    "print(f\"\\nFP16 比 FP32 快 {t_npu32/t_npu16:.1f}x，但精度有所下降\")\n"
++   ]
++  },
+   {
+    "cell_type": "markdown",
+    "id": "bf33b26d",
+@@ -301,18 +363,22 @@
+     "\n",
+     "for B in batch_sizes:\n",
+     "    # Step 1: 创建 (B, M, K) 和 (B, K, N) 随机矩阵，搬到 NPU\n",
++    "    # 提示: a = torch.randn(B, M, K, dtype=torch.float32).npu()\n",
+     "    \n",
+     "\n",
+     "    # Step 2: Warmup\n",
+     "    \n",
+     "\n",
+     "    # Step 3: torch.bmm 计时\n",
++    "    # 提示: c_bmm = torch.bmm(a, b)\n",
+     "    \n",
+     "\n",
+     "    # Step 4: 循环 torch.matmul 计时\n",
++    "    # 提示: c_loop = torch.stack([torch.matmul(a[i], b[i]) for i in range(B)])\n",
+     "    \n",
+     "\n",
+     "    # Step 5: 验证结果一致\n",
++    "    # 提示: consistent = torch.allclose(c_bmm, c_loop, atol=1e-1)\n",
+     "    \n",
+     "\n",
+     "    # Step 6: 打印结果\n",
+@@ -329,27 +395,13 @@
+     "**背景**：高斯模糊是计算机视觉中最基础的操作之一，底层是**卷积运算**（Convolution），正是 NPU 的 Cube 计算单元最擅长的场景。\n",
+     "\n",
+     "**要求**：\n",
+-    "1. 加载 Lena 测试图片（`./images/lena.jpg`，512×512），转为张量 `[1, 3, H, W]`，归一化到 [0, 1]\n",
+-    "2. 构造 5×5 高斯卷积核（已提供），对 RGB 三通道独立卷积（`groups=3`）\n",
+-    "3. 在 CPU 上执行卷积并计时，作为基准\n",
+-    "4. 将图像和卷积核搬到 NPU，执行卷积，结果搬回 CPU，计时\n",
+-    "5. 打印 CPU vs NPU 耗时与加速比，可视化对比处理效果\n",
+-    "6. **思考**：为什么卷积的加速比没有矩阵乘法（第 2 题）那么高？\n",
+-    "\n",
+-    "**API 速查**：\n",
+-    "\n",
+-    "| 操作 | API | 示例 |\n",
+-    "|:---|:---|:---|\n",
+-    "| 图像转张量 | `torch.from_numpy(np.array(img)).permute(2,0,1).unsqueeze(0).float() / 255` | |\n",
+-    "| 卷积 | `F.conv2d(x, weight, padding=2, groups=3)` | `blur = F.conv2d(x_npu, w_npu, padding=2, groups=3)` |\n",
+-    "| 搬到 NPU | `tensor.npu()` | `x_npu = x.npu()` |\n",
+-    "| 搬回 CPU | `tensor.cpu()` | `result = blur.cpu()` |\n",
+-    "| NPU 同步 | `torch.npu.synchronize()` | `torch.npu.synchronize()` |\n",
++    "1. 在 CPU 上执行卷积并计时（`F.conv2d`，`padding=2`，`groups=3`）\n",
++    "2. 将图像和卷积核搬到 NPU，执行卷积，结果搬回 CPU，计时（别忘了 `synchronize`）\n",
++    "3. 观察加速比，思考：为什么单张图片的加速比不高？\n",
+     "\n",
+     "**提示**：\n",
+     "- NPU 计算是异步的，计时前后都需要 `torch.npu.synchronize()`\n",
+-    "- 可视化：将 `[1, 3, H, W]` 张量转为 `[H, W, 3]` numpy 数组，用 `plt.imshow` 显示\n",
+-    "- `groups=3` 表示每个 RGB 通道独立卷积，不混合通道间信息"
++    "- 图片加载、高斯核构造、可视化代码已提供，你只需填写 `# TODO` 标注的运算部分"
+    ]
+   },
+   {
+@@ -370,6 +422,13 @@
+     "img_tensor = torch.from_numpy(np.array(img)).permute(2, 0, 1).unsqueeze(0).float() / 255.0\n",
+     "print(f\"图片张量形状: {img_tensor.shape}\")\n",
+     "\n",
++    "# 显示输入图片\n",
++    "plt.figure(figsize=(6, 5))\n",
++    "plt.imshow(img)\n",
++    "plt.title('Input: Lena (512x512)')\n",
++    "plt.axis('off')\n",
++    "plt.show()\n",
++    "\n",
+     "# Step 2: 构造 5×5 高斯卷积核（已提供）\n",
+     "size, sigma = 5, 1.0\n",
+     "coords = torch.arange(size, dtype=torch.float32) - size // 2\n",
+@@ -378,19 +437,26 @@
+     "kernel2d = kernel2d / kernel2d.sum()\n",
+     "weight = kernel2d.unsqueeze(0).unsqueeze(0).repeat(3, 1, 1, 1)  # [3, 1, 5, 5]\n",
+     "\n",
+-    "# TODO: Step 3: CPU 卷积计时\n",
+-    "# hint: blur_cpu = F.conv2d(img_tensor, weight, padding=2, groups=3)\n",
++    "# TODO: Step 3: CPU 卷积计时（1 行代码）\n",
++    "# blur_cpu = F.conv2d(...)\n",
+     "\n",
+     "\n",
+-    "# TODO: Step 4: NPU 卷积计时\n",
+-    "# hint: .npu() → synchronize → time → conv2d → synchronize → .cpu()\n",
+     "\n",
++    "# TODO: Step 4: NPU 卷积计时（搬到 NPU → synchronize → 计时 → conv2d → synchronize → 搬回 CPU）\n",
+     "\n",
+-    "# TODO: Step 5: 打印耗时与加速比\n",
+     "\n",
++    "# Step 5: 打印耗时与加速比（已提供）\n",
++    "print(f\"CPU 卷积耗时: {cpu_time*1000:.2f} ms\")\n",
++    "print(f\"NPU 卷积耗时: {npu_time*1000:.2f} ms\")\n",
++    "print(f\"加速比: {cpu_time/npu_time:.1f}x\")\n",
+     "\n",
+-    "# TODO: Step 6: 可视化对比（原始 vs 模糊）\n",
+-    "# hint: t.squeeze(0).permute(1,2,0).clamp(0,1).numpy() → plt.imshow\n"
++    "# Step 6: 显示输出图片（已提供）\n",
++    "blur_img = Image.fromarray((result.squeeze(0).permute(1, 2, 0).clamp(0, 1).numpy() * 255).astype(np.uint8))\n",
++    "plt.figure(figsize=(6, 5))\n",
++    "plt.imshow(blur_img)\n",
++    "plt.title(f'Gaussian Blur (NPU, {npu_time*1000:.1f} ms)')\n",
++    "plt.axis('off')\n",
++    "plt.show()\n"
+    ]
+   },
+   {
+diff --git a/quick_start/cann_basics/05_course_summary.ipynb b/quick_start/cann_basics/05_course_summary.ipynb
+deleted file mode 100644
+index f47b083..0000000
+--- a/quick_start/cann_basics/05_course_summary.ipynb
++++ /dev/null
+@@ -1,412 +0,0 @@
+-{
+- "cells": [
+-  {
+-   "cell_type": "markdown",
+-   "id": "summary-intro",
+-   "metadata": {},
+-   "source": [
+-    "# 课程总结与实践\n",
+-    "\n",
+-    "恭喜你完成了 CANN 基础知识课程的全部 4 节课！本节将把四节课的知识串联成一张完整地图，并通过三道难度递进的实践题检验学习成果。\n",
+-    "\n",
+-    "| 课程 | 核心问题 | 一句话回答 |\n",
+-    "|:---:|:---|:---|\n",
+-    "| ① 人工智能基础 | AI 在算什么？ | 模型 = 参数化函数 $y=f(x;\\theta)$，训练求 $\\theta$，推理用 $\\theta$，计算图把算子串成网络 |\n",
+-    "| ② 什么是 NPU | 硬件怎么算？ | DaVinci 架构，AI Core = Cube + Vector + Scalar，多核并行 + Tiling 切分 |\n",
+-    "| ③ 什么是 CANN | 软件怎么管？ | 翻译官 + 调度员 + 工具箱，从框架适配到驱动，九层组件协同 |\n",
+-    "| ④ Hello World | 怎么上手？ | `import torch_npu` → `.npu()` → 自动执行 → `.cpu()` 验证 |"
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "summary-map",
+-   "metadata": {},
+-   "source": [
+-    "---\n",
+-    "## 一、知识全景图：从一行代码到一颗芯片\n",
+-    "\n",
+-    "当你写下 `output = torch.matmul(a.npu(), b.npu())` 这一行代码时，数据经历了以下完整旅程：\n",
+-    "\n",
+-    "```\n",
+-    "你的 Python 代码                    ← ① AI 概念：模型、算子、张量、计算图\n",
+-    "  │\n",
+-    "  │  torch_npu 框架适配\n",
+-    "  ▼\n",
+-    "CANN 算子库 MatMul                  ← ③ CANN：算子映射\n",
+-    "  │\n",
+-    "  │  GE 图引擎优化（融合/内存/流水）\n",
+-    "  ▼\n",
+-    "毕昇编译器 → NPU Kernel 指令        ← ③ CANN：编译\n",
+-    "  │\n",
+-    "  │  Runtime 调度（分配内存/创建流/下发）\n",
+-    "  ▼\n",
+-    "Driver → AI Core 执行               ← ② NPU：DaVinci 架构\n",
+-    "  │\n",
+-    "  │  Cube 单元矩阵乘 + Vector 单元逐元素 + 多核并行\n",
+-    "  ▼\n",
+-    "结果在 Device 内存 → .cpu() 搬回 Host ← ④ Hello World：搬回验证\n",
+-    "```\n",
+-    "\n",
+-     "**四节课的环环相扣**：\n",
+-     "- 第 1 课回答`算什么`——AI 的数学本质与计算图抽象\n",
+-     "- 第 2 课回答`用什么算`——NPU 硬件架构与计算单元\n",
+-     "- 第 3 课回答`怎么管`——CANN 软件栈从框架到驱动的完整链路\n",
+-     "- 第 4 课回答`怎么用`——5 行代码跑通第一个 NPU 程序\n",
+-     "\n",
+-     "> ⚠️ **重要区分：算子调用 vs 算子开发**\n",
+-     ">\n",
+-     "> 本课程中通过 `torch_npu`（`import torch_npu` → `.npu()` → `torch.matmul` 等）使用的是**算子调用**——调用 CANN 预置的高性能算子，无需编写底层代码。\n",
+-     ">\n",
+-     "> 如果 CANN 算子库中没有你需要的算子，则需要用 **Ascend C** 进行**算子开发**——用 C/C++ 编写 Kernel 函数，手动管理切分、搬运、同步，编译后生成 NPU 可执行指令。这是后续教程的内容。\n",
+-     ">\n",
+-     "| | 算子调用（torch_npu） | 算子开发（Ascend C） |\n",
+-     "|:---|:---|:---|\n",
+-     "| 做什么 | 调用 CANN 内置算子 | 编写自定义算子 Kernel |\n",
+-     "| 写什么 | Python：`torch.matmul(a, b)` | C/C++：`__aicore__ void kernel(...)` |\n",
+-     "| 谁管切分/同步 | CANN 框架自动管 | 开发者手动管 |\n",
+-     "| 适合场景 | 模型开发/训练/推理 | CANN 未覆盖的算子 / 极致性能优化 |"
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "summary-key-concepts",
+-   "metadata": {},
+-   "source": [
+-    "---\n",
+-    "## 二、核心概念速查表\n",
+-    "\n",
+-    "| 领域 | 概念 | 一句话 |\n",
+-    "|:---|:---|:---|\n",
+-    "| **AI** | 模型 | 参数化函数 $y=f(x;\\theta)$，训练求参数，推理用参数 |\n",
+-    "| **AI** | 计算图 | 节点=算子，边=数据流动 |\n",
+-    "| **AI** | 算子 | 计算图中的最小计算单元（Add、MatMul、Conv…） |\n",
+-    "| **AI** | 张量 | 算子加工的数据，由 shape 和 dtype 描述 |\n",
+-    "| **NPU** | DaVinci | 昇腾 NPU 的核心架构名称 |\n",
+-    "| **NPU** | AI Core | NPU 的计算核心 = 计算单元 + 存储系统 + 控制单元 |\n",
+-    "| **NPU** | Cube/Vector/Scalar | 矩阵/向量/标量计算单元，分别对应不同粒度的运算 |\n",
+-    "| **NPU** | Host/Device | CPU 负责`发任务传数据收结果`，NPU 负责`拼命算` |\n",
+-    "| **NPU** | Tiling | 把大数据切分成小块分给多个核并行处理 |\n",
+-     "| **CANN** | 框架适配 | torch_npu 让 PyTorch 代码一行改动跑在 NPU 上（**算子调用**，非算子开发） |\n",
+-    "| **CANN** | 算子库 | ops-math/nn/cv/transformer 四大子库，预置高性能算子 |\n",
+-    "| **CANN** | GE 图引擎 | 图编译（融合/内存/流水）+ 图执行（计算下沉） |\n",
+-    "| **CANN** | Ascend C | 自定义算子开发语言，C/C++ 标准规范 |\n",
+-    "| **CANN** | 毕昇编译器 | 把 Ascend C 源码编译成 NPU 可执行指令 |\n",
+-    "| **CANN** | Runtime | 设备/内存/流/事件管理，NPU 的`管家` |"
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "summary-cann-cuda",
+-   "metadata": {},
+-   "source": [
+-    "---\n",
+-    "## 三、CANN 与 CUDA 速查对照\n",
+-    "\n",
+-    "如果你有 GPU/CUDA 经验，这张表帮你快速建立映射：\n",
+-    "\n",
+-    "| 维度 | CANN（昇腾） | CUDA（NVIDIA） |\n",
+-    "|:---|:---|:---|\n",
+-    "| 框架适配 | torch_npu | torch.cuda |\n",
+-    "| 算子库 | ops-math / ops-nn / ops-cv / ops-transformer | cuDNN / cuBLAS / cuSPARSE |\n",
+-    "| 通信库 | HCCL + HIXL | NCCL |\n",
+-    "| 图引擎 | GE | TensorRT |\n",
+-    "| 编程语言 | Ascend C | CUDA C++ |\n",
+-    "| 编译器 | 毕昇编译器 | NVCC |\n",
+-    "| 运行时 | ACL Runtime | CUDA Runtime |\n",
+-    "| 设备切换 | `.npu()` | `.cuda()` |\n",
+-    "| 架构名 | DaVinci (Cube+Vector+Scalar) | SM (CUDA Core+Tensor Core) |"
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "practice-intro",
+-   "metadata": {},
+-   "source": [
+-    "---\n",
+-    "## 四、实践题\n",
+-    "\n",
+-    "下面三道实践题难度递进，请在代码单元中完成作答后运行验证。\n",
+-    "\n",
+-    "| 题号 | 难度 | 考察点 | 目标 |\n",
+-    "|:---:|:---:|:---|:---|\n",
+-    "| 第 1 题 | ★☆☆ 基础 | 张量创建、设备搬运、逐元素运算 | 在 NPU 上完成 $z = x^2 + y$ 并验证 |\n",
+-    "| 第 2 题 | ★★☆ 进阶 | 矩阵乘法、性能对比、数据类型 | 对比 CPU/NPU 在不同规模下的矩阵乘法耗时 |\n",
+-     "| 第 3 题 | ★★★ 挑战 | Batch 运算、算子调用开销、性能分析 | 对比 `torch.bmm` 与循环 `torch.matmul` 的性能差异，观察 batch 大小的影响 |"
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "practice-1-desc",
+-   "metadata": {},
+-   "source": [
+-     "### 第 1 题（基础 ★☆☆）：在 NPU 上计算 $z = x^2 + y$\n",
+-     "\n",
+-     "**要求**：\n",
+-     "1. 创建两个形状为 `(1000,)` 的 FP32 张量 `x` 和 `y`，`x` 的值全为 2.0，`y` 的值全为 3.0\n",
+-     "2. 将它们搬到 NPU\n",
+-     "3. 在 NPU 上计算 `z = x² + y`（提示：可以用 `torch.pow(x, 2)` 或 `x * x`）\n",
+-     "4. 将结果搬回 CPU 并验证所有元素等于 7.0\n",
+-     "\n",
+-     "**预期结果**：`z` 的所有元素均为 $2.0^2 + 3.0 = 7.0$\n",
+-     "\n",
+-     "**API 速查**：\n",
+-     "\n",
+-     "| 操作 | API | 示例 |\n",
+-     "|:---|:---|:---|\n",
+-     "| 创建全量张量 | `torch.full(shape, value, dtype=...)` | `torch.full((1000,), 2.0, dtype=torch.float32)` |\n",
+-     "| 搬到 NPU | `tensor.npu()` | `x_npu = x.npu()` |\n",
+-     "| 搬回 CPU | `tensor.cpu()` | `z = z_npu.cpu()` |\n",
+-     "| 逐元素平方 | `x * x` 或 `torch.pow(x, 2)` | `sq = x_npu * x_npu` |\n",
+-     "| 逐元素加法 | `a + b` | `z_npu = sq + y_npu` |\n",
+-     "| 验证相等 | `torch.allclose(a, b)` | `torch.allclose(z, expected)` |"
+-   ]
+-  },
+-  {
+-   "cell_type": "code",
+-   "execution_count": null,
+-   "id": "practice-1-code",
+-   "metadata": {},
+-   "outputs": [],
+-   "source": [
+-    "import torch\n",
+-    "import torch_npu\n",
+-    "\n",
+-    "# ========== 第 1 题：在 NPU 上计算 z = x² + y ==========\n",
+-    "# TODO: 在下方完成你的代码\n",
+-    "\n",
+-    "# Step 1: 创建 x 和 y（CPU 上，FP32，形状 (1000,)，x 全为 2.0，y 全为 3.0）\n",
+-    "x = \n",
+-    "y = \n",
+-    "\n",
+-    "# Step 2: 搬到 NPU\n",
+-    "x_npu = \n",
+-    "y_npu = \n",
+-    "\n",
+-    "# Step 3: 在 NPU 上计算 z = x² + y\n",
+-    "z_npu = \n",
+-    "\n",
+-    "# Step 4: 搬回 CPU\n",
+-    "z = \n",
+-    "\n",
+-    "# 验证\n",
+-    "expected = torch.full((1000,), 7.0)\n",
+-    "print(f\"z 的前 5 个元素: {z[:5].tolist()}\")\n",
+-    "print(f\"z 的设备: {z_npu.device}\")\n",
+-    "print(f\"验证结果: {'✓ 通过' if torch.allclose(z, expected) else '✗ 失败'}\")"
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "practice-2-desc",
+-   "metadata": {},
+-   "source": [
+-     "### 第 2 题（进阶 ★★☆）：CPU vs NPU 矩阵乘法性能对比\n",
+-     "\n",
+-     "**要求**：\n",
+-     "1. 对矩阵规模 `N = [128, 512, 2048]`，分别创建两个 `N×N` 的随机 FP32 矩阵\n",
+-     "2. 分别在 CPU 和 NPU 上执行矩阵乘法，用 `time.time()` 计时\n",
+-     "3. 验证 CPU 和 NPU 结果一致（`torch.allclose`，容差 `atol=1e-1`）\n",
+-     "4. 打印每种规模下 CPU 和 NPU 的耗时及加速比\n",
+-     "\n",
+-     "**API 速查**：\n",
+-     "\n",
+-     "| 操作 | API | 示例 |\n",
+-     "|:---|:---|:---|\n",
+-     "| 创建随机矩阵 | `torch.randn(N, N, dtype=...)` | `a = torch.randn(512, 512, dtype=torch.float32)` |\n",
+-     "| 搬到 NPU | `tensor.npu()` | `a_npu = a.npu()` |\n",
+-     "| 矩阵乘法 | `torch.matmul(a, b)` 或 `a @ b` | `c = torch.matmul(a_npu, b_npu)` |\n",
+-     "| NPU 同步 | `torch.npu.synchronize()` | `torch.npu.synchronize()` |\n",
+-     "| 搬回 CPU | `tensor.cpu()` | `c_cpu = c_npu.cpu()` |\n",
+-     "| 验证（带容差） | `torch.allclose(a, b, atol=...)` | `torch.allclose(c_cpu, c_npu.cpu(), atol=1e-1)` |\n",
+-     "| 计时 | `time.time()` | `t0 = time.time(); ...; elapsed = time.time() - t0` |\n",
+-     "\n",
+-     "**提示**：\n",
+-     "- NPU 计算是异步的，计时前需要 `torch.npu.synchronize()` 确保计算完成\n",
+-     "- 注意：NPU 首次执行会有编译开销，如果想测纯计算性能可以先做一次 warmup"
+-   ]
+-  },
+-  {
+-   "cell_type": "code",
+-   "execution_count": null,
+-   "id": "practice-2-code",
+-   "metadata": {},
+-   "outputs": [],
+-   "source": [
+-    "import time\n",
+-    "\n",
+-    "# ========== 第 2 题：CPU vs NPU 矩阵乘法性能对比 ==========\n",
+-    "# TODO: 在下方完成你的代码\n",
+-    "\n",
+-    "sizes = [128, 512, 2048]\n",
+-    "\n",
+-    "print(f\"{'规模':>8} | {'CPU 耗时':>12} | {'NPU 耗时':>12} | {'加速比':>8} | {'结果一致':>8}\")\n",
+-    "print(\"-\" * 65)\n",
+-    "\n",
+-    "for N in sizes:\n",
+-    "    # Step 1: 创建两个 N×N 随机矩阵（CPU 上）\n",
+-    "    a_cpu = \n",
+-    "    b_cpu = \n",
+-    "\n",
+-    "    # Step 2: CPU 矩阵乘法计时\n",
+-    "    \n",
+-    "\n",
+-    "    # Step 3: NPU 矩阵乘法计时（别忘了 synchronize）\n",
+-    "    \n",
+-    "\n",
+-    "    # Step 4: 验证结果一致\n",
+-    "    \n",
+-    "\n",
+-    "    # 打印结果\n",
+-    "    "
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "practice-3-desc",
+-   "metadata": {},
+-   "source": [
+-      "### 第 3 题（挑战 ★★★）：Batch 矩阵乘法 vs 循环单次矩阵乘法\n",
+-      "\n",
+-      "**背景**：通过 `torch_npu` 调用的每个 API 都对应一个 CANN 算子，即一次 NPU Kernel 启动。`torch.bmm` 一次调用完成 B 个矩阵乘法，而循环 `torch.matmul` 需要 B 次独立调用——每次调用都有 Kernel 启动开销和 Python 调度开销。随着 B 增大，差异会越来越显著。\n",
+-      "\n",
+-      "**要求**：\n",
+-      "1. 对 batch 大小 `B = [8, 32, 128]`，创建形状为 `(B, 256, 256)` 的随机 FP32 矩阵对，搬到 NPU\n",
+-      "2. **Batch 方式**：用 `torch.bmm(a, b)` 一次完成 B 个矩阵乘法，计时\n",
+-      "3. **循环方式**：用 `for i in range(B): torch.matmul(a[i], b[i])` 逐个计算，计时\n",
+-      "4. 验证两种方式结果一致（`torch.allclose`，`atol=1e-1`）\n",
+-      "5. 打印每种 batch 大小下两种方式的耗时及加速比，观察 B 增大时差异如何变化\n",
+-      "\n",
+-      "**思考题**（选做）：\n",
+-      "- 为什么 B 越大，循环方式越慢？开销来自哪里？\n",
+-      "- 什么情况下循环方式的劣势不明显？（提示：矩阵本身很大时）\n",
+-      "- 在模型开发中，如何避免不必要的循环调用？\n",
+-      "\n",
+-      "> 📌 **后续课程将深入解释**：Kernel 启动开销的底层原因、NPU 任务调度器（TS）的工作机制、以及如何通过算子融合进一步减少调用次数，将在 Ascend C 算子开发系列课程中详细讲解。\n",
+-     "\n",
+-     "**API 速查**：\n",
+-     "\n",
+-     "| 操作 | API | 示例 |\n",
+-     "|:---|:---|:---|\n",
+-     "| 创建 batch 张量并搬到 NPU | `torch.randn(B, M, K, dtype=...).npu()` | `a = torch.randn(32, 256, 256, dtype=torch.float32).npu()` |\n",
+-     "| Batch 矩阵乘法 | `torch.bmm(a, b)` | `c = torch.bmm(a, b)`  # a:(B,M,K) b:(B,K,N) → c:(B,M,N) |\n",
+-     "| 单次矩阵乘法 | `torch.matmul(a[i], b[i])` | `c_i = torch.matmul(a[0], b[0])` |\n",
+-     "| NPU 同步 | `torch.npu.synchronize()` | `torch.npu.synchronize()` |\n",
+-     "| 验证（带容差） | `torch.allclose(a, b, atol=...)` | `torch.allclose(c_bmm, c_loop, atol=1e-1)` |\n",
+-     "| 计时 | `time.time()` | `t0 = time.time(); ...; elapsed = (time.time()-t0)/reps*1000` |"
+-   ]
+-  },
+-  {
+-   "cell_type": "code",
+-   "execution_count": null,
+-   "id": "practice-3-code",
+-   "metadata": {},
+-   "outputs": [],
+-   "source": [
+-      "# ========== 第 3 题：Batch 矩阵乘法 vs 循环单次矩阵乘法 ==========\n",
+-     "# TODO: 在下方完成你的代码\n",
+-     "\n",
+-     "batch_sizes = [8, 32, 128]\n",
+-     "M, K, N = 256, 256, 256\n",
+-     "reps = 20\n",
+-     "\n",
+-     "print(f\"{'B':>6} | {'bmm 耗时':>12} | {'循环 耗时':>12} | {'加速比':>8} | {'结果一致':>8}\")\n",
+-     "print(\"-\" * 65)\n",
+-     "\n",
+-     "for B in batch_sizes:\n",
+-     "    # Step 1: 创建 (B, M, K) 和 (B, K, N) 随机矩阵，搬到 NPU\n",
+-     "    \n",
+-     "\n",
+-     "    # Step 2: Warmup\n",
+-     "    \n",
+-     "\n",
+-     "    # Step 3: torch.bmm 计时\n",
+-     "    \n",
+-     "\n",
+-     "    # Step 4: 循环 torch.matmul 计时\n",
+-     "    \n",
+-     "\n",
+-     "    # Step 5: 验证结果一致\n",
+-     "    \n",
+-     "\n",
+-     "    # Step 6: 打印结果\n",
+-     "    "
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "practice-verify",
+-   "metadata": {},
+-   "source": [
+-    "---\n",
+-    "## 五、验证与答案\n",
+-    "\n",
+-    "完成全部三道实践题后，运行下方代码查看参考答案与批改结果。"
+-   ]
+-  },
+-  {
+-   "cell_type": "code",
+-   "execution_count": null,
+-   "id": "practice-grade",
+-   "metadata": {},
+-   "outputs": [],
+-   "source": [
+-    "import sys\n",
+-    "from pathlib import Path\n",
+-    "\n",
+-    "for candidate in (\n",
+-    "    Path.cwd() / 'answer',\n",
+-    "    Path.cwd() / 'quick_start' / 'cann_basics' / 'answer',\n",
+-    "    Path.cwd() / 'cann-learning-hub' / 'quick_start' / 'cann_basics' / 'answer',\n",
+-    "):\n",
+-    "    if candidate.exists():\n",
+-    "        sys.path.insert(0, str(candidate.resolve()))\n",
+-    "        break\n",
+-    "else:\n",
+-    "    raise FileNotFoundError('Cannot find quick_start/cann_basics/answer')\n",
+-    "from grade_05 import grade\n",
+-    "grade(globals())"
+-   ]
+-  },
+-  {
+-   "cell_type": "markdown",
+-   "id": "next-steps",
+-   "metadata": {},
+-   "source": [
+-    "---\n",
+-    "## 六、下一步学习建议\n",
+-    "\n",
+-    "完成本课程后，你已经具备了 CANN 和昇腾 NPU 的基础认知。接下来推荐以下方向：\n",
+-    "\n",
+-    "| 方向 | 链接 | 适合人群 |\n",
+-    "|:---|:---|:---|\n",
+-    "| 体验自定义算子开发 | [第一个自定义算子](../first_custom_operator/first_custom_operator.ipynb) | 想了解算子是怎么写的 |\n",
+-    "| 体验算子 API 调用 | [第一个算子 API 调用](../first_operator_api_call/first_operator_api_call.ipynb) | 想了解如何调用 CANN 内置算子 |\n",
+-    "| 系统学习算子开发 | [Ascend C 算子开发系列](../../tutorials/ascendc_operator_development_light) | 想掌握底层编程能力 |\n",
+-    "| 大模型推理实战 | [Qwen3-8B 推理](../../tutorials/llm_inference/qwen3_8b/02_baseline_inference.ipynb) | 想跑通真实大模型 |\n",
+-    "\n",
+-    "> 💡 **学习路径建议**：先体验`第一个自定义算子`感知算子开发全流程 → 再系统学习 Ascend C 算子开发系列 → 最后结合大模型推理/训练深入实践。"
+-   ]
+-  }
+- ],
+- "metadata": {
+-  "kernelspec": {
+-   "display_name": "Python 3",
+-   "language": "python",
+-   "name": "python3"
+-  },
+-  "language_info": {
+-   "codemirror_mode": {
+-    "name": "ipython",
+-    "version": 3
+-   },
+-   "file_extension": ".py",
+-   "mimetype": "text/x-python",
+-   "name": "python",
+-   "nbconvert_exporter": "python",
+-   "pygments_lexer": "ipython3",
+-   "version": "3.12.9"
+-  }
+- },
+- "nbformat": 4,
+- "nbformat_minor": 5
+-}
+diff --git a/quick_start/cann_basics/answer/grade_04.py b/quick_start/cann_basics/answer/grade_04.py
+index a2a92e9..acdb60a 100644
+--- a/quick_start/cann_basics/answer/grade_04.py
++++ b/quick_start/cann_basics/answer/grade_04.py
+@@ -20,6 +20,7 @@ def grade(user_globals):
+     results.append(_check_practice_1(user_globals))
+     results.append(_check_practice_2(user_globals))
+     results.append(_check_practice_3(user_globals))
++    results.append(_check_practice_4(user_globals))
+ 
+     print("\n" + "=" * 60)
+     passed = sum(results)
+@@ -62,35 +63,34 @@ def _check_practice_2(g):
+     """第 2 题：CPU vs NPU 矩阵乘法性能对比"""
+     print("\n--- 第 2 题（进阶）：CPU vs NPU 矩阵乘法性能对比 ---")
+     try:
+-        sizes = [128, 512, 2048]
+-        all_ok = True
+-        for N in sizes:
++        c_cpu = g.get("c_cpu")
++        c_npu = g.get("c_npu")
++        if c_cpu is None or c_npu is None:
++            print("  ✗ 未找到变量 c_cpu / c_npu，请完成代码后运行。")
++            return False
++
++        # 检查最后一次迭代（N=2048）的结果
++        consistent = torch.allclose(c_cpu, c_npu.cpu(), atol=1e-1)
++        print(f"  c_cpu 形状: {tuple(c_cpu.shape)}")
++        print(f"  c_npu 设备: {c_npu.device}")
++        print(f"  结果一致: {'✓' if consistent else '✗'}")
++
++        # 也自己跑一遍验证概念
++        for N in [128, 512, 2048]:
+             a_cpu = torch.randn(N, N, dtype=torch.float32)
+             b_cpu = torch.randn(N, N, dtype=torch.float32)
+-
+-            # CPU
+             t0 = time.time()
+-            c_cpu = torch.matmul(a_cpu, b_cpu)
++            _ = torch.matmul(a_cpu, b_cpu)
+             t_cpu = time.time() - t0
+-
+-            # NPU
+-            a_npu = a_cpu.npu()
+-            b_npu = b_cpu.npu()
++            a_npu, b_npu = a_cpu.npu(), b_cpu.npu()
+             torch.npu.synchronize()
+             t0 = time.time()
+-            c_npu = torch.matmul(a_npu, b_npu)
++            _ = torch.matmul(a_npu, b_npu)
+             torch.npu.synchronize()
+             t_npu = time.time() - t0
++            print(f"  N={N:>4}: CPU={t_cpu*1000:>8.2f}ms  NPU={t_npu*1000:>8.2f}ms  加速比={t_cpu/t_npu:>6.2f}x")
+ 
+-            consistent = torch.allclose(c_cpu, c_npu.cpu(), atol=1e-1)
+-            speedup = t_cpu / t_npu if t_npu > 0 else float("inf")
+-            tag = "✓" if consistent else "✗"
+-            print(f"  N={N:>4}: CPU={t_cpu*1000:>8.2f}ms  NPU={t_npu*1000:>8.2f}ms  "
+-                  f"加速比={speedup:>6.2f}x  一致={tag}")
+-            if not consistent:
+-                all_ok = False
+-        print(f"  结果: {'✓ 全部规模结果一致' if all_ok else '✗ 部分规模结果不一致'}")
+-        return all_ok
++        return consistent
+     except Exception as e:
+         print(f"  ✗ 验证异常: {e}")
+         return False
+@@ -100,106 +100,109 @@ def _check_practice_3(g):
+     """第 3 题：Batch 矩阵乘法 vs 循环单次矩阵乘法性能对比"""
+     print("\n--- 第 3 题（挑战）：Batch 矩阵乘法 vs 循环单次矩阵乘法 ---")
+     try:
+-        batch_sizes = [8, 32, 128]
+-        M, K, N = 256, 256, 256
+-        reps = 20
+-        all_ok = True
+-
+-        for B in batch_sizes:
+-            a = torch.randn(B, M, K, dtype=torch.float32).npu()
+-            b = torch.randn(B, K, N, dtype=torch.float32).npu()
+-
+-            # warmup
+-            for _ in range(3):
+-                _ = torch.bmm(a, b)
+-                for i in range(B):
+-                    _ = torch.matmul(a[i], b[i])
+-            torch.npu.synchronize()
++        c_bmm = g.get("c_bmm")
++        c_loop = g.get("c_loop")
++        if c_bmm is None or c_loop is None:
++            print("  ✗ 未找到变量 c_bmm / c_loop，请完成代码后运行。")
++            return False
+ 
+-            # bmm
+-            torch.npu.synchronize()
+-            t0 = time.time()
+-            for _ in range(reps):
+-                c_bmm = torch.bmm(a, b)
+-            torch.npu.synchronize()
+-            t_bmm = (time.time() - t0) / reps * 1000
++        # 检查最后一次迭代（B=128）的结果
++        consistent = torch.allclose(c_bmm, c_loop, atol=1e-1)
++        print(f"  c_bmm 形状: {tuple(c_bmm.shape)}")
++        print(f"  c_loop 形状: {tuple(c_loop.shape)}")
++        print(f"  结果一致: {'✓' if consistent else '✗'}")
++
++        # 也自己跑一遍验证概念
++        B, M, K, N = 128, 256, 256, 256
++        a = torch.randn(B, M, K, dtype=torch.float32).npu()
++        b = torch.randn(B, K, N, dtype=torch.float32).npu()
++        for _ in range(3): torch.bmm(a, b)
++        torch.npu.synchronize()
++        t0 = time.time()
++        for _ in range(20): _ = torch.bmm(a, b)
++        torch.npu.synchronize(); t_bmm = (time.time()-t0)/20*1000
++        t0 = time.time()
++        for _ in range(20): _ = torch.stack([torch.matmul(a[i], b[i]) for i in range(B)])
++        torch.npu.synchronize(); t_loop = (time.time()-t0)/20*1000
++        print(f"  B=128: bmm={t_bmm:.2f}ms loop={t_loop:.2f}ms 加速={t_loop/t_bmm:.1f}x")
++
++        return consistent
++    except Exception as e:
++        print(f"  ✗ 验证异常: {e}")
++        return False
+ 
+-            # loop
+-            torch.npu.synchronize()
+-            t0 = time.time()
+-            for _ in range(reps):
+-                c_loop = torch.stack([torch.matmul(a[i], b[i]) for i in range(B)])
+-            torch.npu.synchronize()
+-            t_loop = (time.time() - t0) / reps * 1000
+-
+-            consistent = torch.allclose(c_bmm, c_loop, atol=1e-1)
+-            speedup = t_loop / t_bmm if t_bmm > 0 else float("inf")
+-            tag = "✓" if consistent else "✗"
+-            print(f"  B={B:>4}: bmm={t_bmm:>8.2f}ms  loop={t_loop:>8.2f}ms  "
+-                  f"加速比={speedup:>6.2f}x  一致={tag}")
+-
+-            if B >= 32 and speedup < 2.0:
+-                print(f"    ✗ 加速不明显（{speedup:.2f}x < 2.0x）")
+-                all_ok = False
+-            if not consistent:
+-                all_ok = False
+-
+-        print(f"  结果: {'✓ bmm 性能优势符合预期' if all_ok else '✗ 部分指标未达预期'}")
+-        return all_ok
++
++def _check_practice_4(g):
++    """第 4 题：NPU 图像高斯模糊（卷积）"""
++    print("\n--- 第 4 题（挑战）：NPU 图像高斯模糊（卷积） ---")
++    try:
++        result = g.get("result")
++        blur_cpu = g.get("blur_cpu")
++        if result is None or blur_cpu is None:
++            print("  ✗ 未找到变量 result / blur_cpu，请完成代码后运行。")
++            return False
++
++        # 检查输出形状
++        print(f"  result 形状: {tuple(result.shape)}")
++        if result.shape != (1, 3, 512, 512):
++            print(f"  ✗ 输出形状不符合预期 (1, 3, 512, 512)")
++            return False
++
++        # 检查 CPU 与 NPU 结果一致性
++        diff = (blur_cpu - result).abs().max().item()
++        consistent = diff < 1e-3
++        print(f"  CPU 与 NPU 最大差异: {diff:.6f}")
++        print(f"  结果一致: {'✓' if consistent else '✗'}")
++
++        # 检查是否在 NPU 上执行
++        npu_time = g.get("npu_time")
++        cpu_time = g.get("cpu_time")
++        if npu_time and cpu_time:
++            speedup = cpu_time / npu_time
++            print(f"  CPU: {cpu_time*1000:.2f} ms, NPU: {npu_time*1000:.2f} ms, 加速比: {speedup:.1f}x")
++
++        return consistent
+     except Exception as e:
+         print(f"  ✗ 验证异常: {e}")
+         return False
+ 
+ 
+ def _print_reference_answers():
+-    print("=" * 60)
+-    print("  参考答案")
+-    print("=" * 60)
+-    print("""
+-# ── 第 1 题 ──────────────────────────────────────
+-x = torch.full((1000,), 2.0, dtype=torch.float32)
+-y = torch.full((1000,), 3.0, dtype=torch.float32)
+-x_npu = x.npu()
+-y_npu = y.npu()
+-z_npu = x_npu * x_npu + y_npu   # 或 torch.pow(x_npu, 2) + y_npu
+-z = z_npu.cpu()
+-
+-# ── 第 2 题 ──────────────────────────────────────
+-for N in sizes:
+-    a_cpu = torch.randn(N, N, dtype=torch.float32)
+-    b_cpu = torch.randn(N, N, dtype=torch.float32)
+-    # CPU
+-    t0 = time.time()
+-    c_cpu = torch.matmul(a_cpu, b_cpu)
+-    t_cpu = time.time() - t0
+-    # NPU
+-    a_npu, b_npu = a_cpu.npu(), b_cpu.npu()
+-    torch.npu.synchronize()
+-    t0 = time.time()
+-    c_npu = torch.matmul(a_npu, b_npu)
+-    torch.npu.synchronize()
+-    t_npu = time.time() - t0
+-    consistent = torch.allclose(c_cpu, c_npu.cpu(), atol=1e-1)
+-
+-# ── 第 3 题 ──────────────────────────────────────
+-batch_sizes = [8, 32, 128]
+-M, K, N = 256, 256, 256
+-reps = 20
+-for B in batch_sizes:
+-    a = torch.randn(B, M, K, dtype=torch.float32).npu()
+-    b = torch.randn(B, K, N, dtype=torch.float32).npu()
+-    # warmup
+-    for _ in range(3): torch.bmm(a, b)
+-    torch.npu.synchronize()
+-    # bmm
+-    t0 = time.time()
+-    for _ in range(reps): c_bmm = torch.bmm(a, b)
+-    torch.npu.synchronize(); t_bmm = (time.time()-t0)/reps*1000
+-    # loop
+-    t0 = time.time()
+-    for _ in range(reps):
+-        c_loop = torch.stack([torch.matmul(a[i], b[i]) for i in range(B)])
+-    torch.npu.synchronize(); t_loop = (time.time()-t0)/reps*1000
+-    consistent = torch.allclose(c_bmm, c_loop, atol=1e-1)
+-    print(f"B={B}: bmm={t_bmm:.2f}ms loop={t_loop:.2f}ms 加速={t_loop/t_bmm:.2f}x 一致={consistent}")
+-""")
++    print("\n  参考答案已保存在 answer/grade_04.py 中，请直接查看源文件。")
++
++
++# ── 参考答案（仅供查阅，不在批改时打印） ──────────────────
++#
++# 第 1 题:
++#   x = torch.full((1000,), 2.0, dtype=torch.float32)
++#   y = torch.full((1000,), 3.0, dtype=torch.float32)
++#   z_npu = x.npu() * x.npu() + y.npu()
++#   z = z_npu.cpu()
++#
++# 第 2 题:
++#   for N in [128, 512, 2048]:
++#       a_cpu = torch.randn(N, N, dtype=torch.float32)
++#       b_cpu = torch.randn(N, N, dtype=torch.float32)
++#       c_cpu = torch.matmul(a_cpu, b_cpu)
++#       a_npu, b_npu = a_cpu.npu(), b_cpu.npu()
++#       torch.npu.synchronize()
++#       c_npu = torch.matmul(a_npu, b_npu)
++#       torch.npu.synchronize()
++#       consistent = torch.allclose(c_cpu, c_npu.cpu(), atol=1e-1)
++#
++# 第 3 题:
++#   for B in [8,2, 32, 128]:
++#       a = torch.randn(B, 256, 256, dtype=torch.float32).npu()
++#       b = torch.randn(B, 256, 256, dtype=torch.float32).npu()
++#       c_bmm = torch.bmm(a, b)
++#       c_loop = torch.stack([torch.matmul(a[i], b[i]) for i in range(B)])
++#       consistent = torch.allclose(c_bmm, c_loop, atol=1e-1)
++#
++# 第 4 题:
++#   blur_cpu = F.conv2d(img_tensor, weight, padding=2, groups=3)
++#   img_npu = img_tensor.npu()
++#   weight_npu = weight.npu()
++#   torch.npu.synchronize()
++#   blur_npu = F.conv2d(img_npu, weight_npu, padding=2, groups=3)
++#   torch.npu.synchronize()
++#   result = blur_npu.cpu()
+diff --git a/quick_start/cann_basics/slides/artificial_intelligence_basics.pptx b/quick_start/cann_basics/slides/artificial_intelligence_basics.pptx
+index fbfb914..51eae95 100644
+Binary files a/quick_start/cann_basics/slides/artificial_intelligence_basics.pptx and b/quick_start/cann_basics/slides/artificial_intelligence_basics.pptx differ
+diff --git a/quick_start/cann_basics/slides/artificial_intelligence_basics_light.pptx b/quick_start/cann_basics/slides/artificial_intelligence_basics_light.pptx
+index 2acd26f..55a1efe 100644
+Binary files a/quick_start/cann_basics/slides/artificial_intelligence_basics_light.pptx and b/quick_start/cann_basics/slides/artificial_intelligence_basics_light.pptx differ
+diff --git a/skills/cannjudge-submit/README.md b/skills/cannjudge-submit/README.md
+index 8638e7e..b50807f 100644
+--- a/skills/cannjudge-submit/README.md
++++ b/skills/cannjudge-submit/README.md
+@@ -1,199 +1,100 @@
+-# CANNJudge 算子提交 Skill
+-
+-帮助用户完成 CANNJudge 算子竞赛的完整流程。
+-
+-## 功能
+-
+-- ✅ RSA 加密安全登录（禁止明文密码）
+-- ✅ 获取题目信息
+-- ✅ 下载工程模板
+-- ✅ 提交算子实现
+-- ✅ 查询提交结果
+-- ✅ 查看排行榜
+-
+-## 安全登录机制
+-
+-**禁止在对话中直接输入明文密码！** 使用 RSA 非对称加密保护密码。
+-
+-### 首次设置
+-
+-```bash
+-# 1. 在服务器上生成 RSA 密钥对（一次性）
+-python3 generate_key.py
+-# → 生成 private.pem（留在服务器）+ public.pem（拷贝到 PC）
+-
+-# 2. 将 public.pem 拷贝到个人 PC
+-scp server:~/path/to/public.pem ./
+-
+-# 3. 在 PC 上加密密码
+-python3 encrypt_password.py --public-key public.pem
+-# → 输出 RSA 密文，将密文提供给 CANNBot
+-```
+-
+-### 日常使用
+-
+-将密文提供给 CANNBot 即可登录，密文可复用（私钥不变时）。
+-
+-## 使用方法
+-
+-### 方式 1: 使用命令行工具
+-
+-```bash
+-# 推荐：密文登录
+-python cannjudge_cli.py login --email "your@email.com" --ciphertext "RSA密文"
+-
+-# 不推荐：明文登录（仅调试用）
+-python cannjudge_cli.py login --email "your@email.com" --password "明文密码"
+-
+-# 下载工程
+-python cannjudge_cli.py download --problem-id "题目ID" --output "./output"
+-
+-# 提交代码
+-python cannjudge_cli.py submit --problem-id "题目ID" --project-dir "./output/project"
+-
+-# 查询结果
+-python cannjudge_cli.py query --submission-id "提交ID"
+-
+-# 查看排行榜
+-python cannjudge_cli.py rank --problem-id "题目ID"
+-```
+-
+-### 方式 2: 在代码中直接使用
+-
+-```python
+-from cannjudge_cli import CANNJudgeClient
+-
+-client = CANNJudgeClient()
+-
+-# 推荐：密文登录
+-user_info = client.login_with_ciphertext(
+-    email="email@example.com",
+-    ciphertext="RSA密文",
+-    private_key_path="private.pem"
+-)
+-
+-# 不推荐：明文登录
+-# user_info = client.login("email@example.com", "明文密码")
+-
+-# 获取题目信息
+-problem = client.get_problem("题目ID")
+-
+-# 下载工程
+-extract_dir = client.download_package("题目ID", "./output")
+-
+-# 提交代码
+-submission_id = client.submit(
+-    problem_id="题目ID",
+-    tiling_h="...",
+-    tiling_key_h="...",
+-    host_cpp="...",
+-    kernel_cpp="..."
+-)
+-
+-# 等待结果
+-result = client.wait_for_result(submission_id)
+-
+-# 查看排行榜
+-rankings = client.get_rankings("题目ID")
+-```
+-
+-## API 接口说明
+-
+-### 登录
+-```
+-POST /api/users/login
+-Body: {"email": "...", "password": "..."}
+-返回: {"_id": "用户ID", "nickname": "...", ...}
+-```
+-
+-### 获取题目
+-```
+-GET /api/problems/{problemId}
+-返回: {"_id": "...", "name": "...", "desc": "...", ...}
+-```
+-
+-### 下载工程
+-```
+-GET /api/problems/{problemId}/package?userId={userId}
+-返回: Zip 文件
+-```
+-
+-### 提交代码
+-```
+-POST /api/submissions/submit
+-Body: {
+-  "problemId": "...",
+-  "userId": "...",
+-  "tiling_h": "...",
+-  "tiling_key_h": "...",
+-  "host_cpp": "...",
+-  "kernel_cpp": "..."
+-}
+-返回: {"code": 0, "data": {"submissionId": "..."}}
+-```
+-
+-### 查询结果
+-```
+-GET /api/submissions/{submissionId}
+-返回: {"status": "...", "result": [...], ...}
+-```
+-
+-### 排行榜
+-```
+-GET /api/submissions/problem/{problemId}/latest
+-返回: [用户提交列表]
+-```
+-
+-## 提交结果说明
+-
+-### 状态
+-- `Running`: 正在执行
+-- `Accepted`: 全部通过
+-- `Wrong Answer`: 部分失败
+-- `Compile Error`: 编译失败
+-- `Runtime Error`: 运行时错误
+-
+-### 测试用例结果
+-- `testcase_status`: 测试用例状态
+-- `precision_ratio`: 精度比例 (1.0 = 完全匹配)
+-- `time`: 执行时间 (毫秒)
+-
+-## 注意事项
+-
+-1. **密码安全**: 禁止在对话中直接输入明文密码，使用 RSA 加密密文
+-2. **私钥保护**: private.pem 仅保留在服务器，绝不外传
+-3. **Cookie**: 登录后会自动管理 Cookie
+-4. **轮询**: 查询结果时默认 3 秒间隔
+-5. **超时**: 默认最长等待 120 秒
+-
+-## 工程模板结构
+-
+-```
+-code/
+-├── CMakeLists.txt
+-├── op_host/
+-│   ├── CMakeLists.txt
+-│   └── {op_name}.cpp
+-└── op_kernel/
+-    ├── CMakeLists.txt
+-    ├── {op_name}_tiling.h
+-    ├── tiling_key_{op_name}.h
+-    └── {op_name}.cpp
+-```
+-
+-## 相关资源
+-
+-- CANNJudge 网站: https://cannjudge.cn
+-- CANN 文档: https://www.hiascend.com/document
+-
+-## 文件结构
+-
+-```
+-cannjudge-submit/
+-├── SKILL.md              # 技能详细说明文档
+-├── README.md             # 使用说明
+-├── cannjudge_cli.py      # 命令行工具（支持 RSA 密文登录）
+-├── generate_key.py       # RSA 密钥对生成脚本（服务器端运行）
+-├── encrypt_password.py   # RSA 密码加密脚本（PC 端运行）
+-└── example.py            # 使用示例
+-```
++# CANNJudge 算子提交 Skill
++
++支持邮箱/手机号与密码登录（含图形验证码）、会话复用，以及传统算子和 `npu_kernel_dev` 核函数工程的下载、提交、查询。
++
++## 快速开始
++
++新登录前，Agent 先询问登录方式：**Agent 对话输入账号密码、Linux/本地终端隐藏输入、RSA 密文**。已有有效会话直接复用，已选择方式不重复询问。
++
++选择 Agent 对话方式后提供账号密码，Agent 用运行时变量调用 `client.login(account, password)` 并 `client.save_session()`；不回显密码、不写入脚本或日志。对话输入不隐藏，可改选终端方式。
++
++**Linux / SSH终端**：使用 `bash /path/to/cannjudge-submit/login.sh`，账号和密码在终端输入，密码隐藏。默认直接调用登录接口，不需要图片或二维码。
++
++```bash
++python3 -m pip install requests
++python3 cannjudge_cli.py login
++python3 cannjudge_cli.py login --account "your@email.com" --login-type email
++```
++
++`--email` 是 `--account` 的兼容别名。仅在明确需要验证码时添加 `--captcha`；SVG 原样保存在 Agent 当前工作目录。
++详细步骤见 [Linux登录说明](references/linux-login.md)。Windows会话不能复制到Linux使用。
++会话保存在 `~/.cannjudge/session.json`，Windows DPAPI加密，POSIX权限600，仅保存用户ID/Cookie/登录时间。
++不保存密码，不从密码环境变量自动登录。`logout`清除本机会话；`--session-file PATH`（子命令前）可隔离账号。
++
++## 下载、开发与提交
++
++```bash
++python3 cannjudge_cli.py info --problem-url "https://cannjudge.cn/hc_cann_codelabs/cann/add"
++python3 cannjudge_cli.py download --problem-url "https://cannjudge.cn/hc_cann_codelabs/cann/add" --output ./add-work
++# 完成可编辑源码后预检
++python3 cannjudge_cli.py submit --problem-url "https://cannjudge.cn/hc_cann_codelabs/cann/add" --project-dir ./add-work/project --dry-run
++# 提交，不重复确认已授权的操作
++python3 cannjudge_cli.py submit --problem-url "https://cannjudge.cn/hc_cann_codelabs/cann/add" --project-dir ./add-work/project --no-wait
++python3 cannjudge_cli.py query --submission-id ID
++python3 cannjudge_cli.py rank --problem-id ID
++```
++
++所有题目选项也支持 `--problem-id ID`。完整链接会保留小组/比赛作用域，避免同名题冲突。
++默认 `--project-type auto` 依据网站的 `code_template` 分流；可显式指定 `npu_kernel_dev` 或 `registry`。
++下载器保留完整ZIP和工程文件，并生成不含凭据的模板清单；现有工程不会被覆盖。
++
++- 核函数工程：读取在线模板的 editable 文件，以及根目录新增的合法 `.asc`/`.h`，以 `files` 数组提交。
++- 传统工程：读取 `op_kernel/*_tiling.h`、可选 `tiling_key_*.h`、`op_host/*.cpp`、`op_kernel/*.cpp`，使用原有四字段提交。匹配多个文件会停止，避免误选。
++- `--dry-run` 显示拟提交文件大小与SHA-256，不发送源码到提交接口。
++- 只读模板被修改、源码缺失、题目绑定不一致或路径越界会停止。
++
++详细核函数接口约束见 [kernel-project.md](references/kernel-project.md)。
++
++## SDK
++
++```python
++from cannjudge_cli import CANNJudgeClient, print_submission_result
++
++client = CANNJudgeClient()
++if not client.load_session():
++    raise RuntimeError("请先在自己的终端运行 cannjudge_cli.py login")
++problem = client.resolve_problem("https://cannjudge.cn/hc_cann_codelabs/cann/add")
++folder = client.download_package(problem['_id'], './fresh-output', include_metadata=True)
++# 完成 folder 中可编辑源码，再执行：
++payload = client.prepare_submission(problem['_id'], folder)
++submission_id = client.submit_payload(payload)
++print_submission_result(client.wait_for_result(submission_id))
++client.save_session()
++```
++
++旧SDK `submit(problem_id, tiling_h, tiling_key_h, host_cpp, kernel_cpp)` 保留。
++`login_interactive(account)` 用于用户自己的交互终端；登录后SDK显式 `save_session()`。
++现有系统可调用 `login(account, password)`，不要输出密码或完整响应。
++
++## API
++
++| 操作 | 接口 |
++|---|---|
++| 验证码 | `GET /api/users/captcha` → captchaId、image（服务端原始SVG，本地原样保存） |
++| 登录 | `POST /api/users/login`，account/loginType/password（captchaId/captchaCode 为可选配套字段） |
++| 题目 | `GET /api/problems/{id}` |
++| 按名查题 | `GET /api/problems/name/{name}?contestId=...` |
++| 模板清单 | `GET /api/problems/{id}/template?userId=...` |
++| 下载ZIP | `GET /api/problems/{id}/package?userId=...` |
++| 提交 | `POST /api/submissions/submit`，problemId/userId/files 或原四字段 |
++| 查询 | `GET /api/submissions/{id}` |
++| 最新排行 | `GET /api/submissions/problem/{id}/latest` |
++
++成功响应含 `data.submissionId`。当前平台成功终态 `Pass`，兼容 `Accepted`，每个测试点读取 testcase_status、precision_ratio、time、msg。
++时间展示平台原值，不臆测单位。默认等待120秒；`--max-wait` 可调整，`--no-wait` 后使用提交ID继续查询。
++网络超时或没有提交ID时，先查询已有提交记录，不自动重复POST。401清理会话；403先检查题目/小组权限。
++
++## RSA 兼容方式
++
++见 [rsa-login.md](references/rsa-login.md)。`login_with_ciphertext` 接受与 `login` 相同的关键字登录选项。
++CLI已有验证码可使用 `--captcha-id` 和 `--captcha-code`，由用户读取验证码；普通密码登录默认不带验证码。
++`--password` 仅保留兼容，会提醒命令历史暴露风险；不建议用户使用。
++
++## 验证
++
++```bash
++python3 -m pytest tests -q
++```
++
++覆盖密码隐藏输入、会话持久化/失效、邮箱/手机号验证码协议、传统工程兼容、核函数多文件提交、只读保护、路径安全、题目作用域和Pass终态。
++真实端到端验证：上述Add题核函数工程，提交 `6aa27abe2d3dd2c5ae243b01`，平台 `Pass`，15/15 测试点通过（2026-09-10）。
+diff --git a/skills/cannjudge-submit/SKILL.md b/skills/cannjudge-submit/SKILL.md
+index 51fc63a..85b316a 100644
+--- a/skills/cannjudge-submit/SKILL.md
++++ b/skills/cannjudge-submit/SKILL.md
+@@ -1,751 +1,114 @@
+-# CANNJudge 算子提交 Skill
+-
+-帮助用户完成 CANNJudge 算子竞赛的完整流程：下载工程、理解题目、实现泛化算子、提交代码、获取结果。
+-
+-## 触发条件
+-
+-当用户需要：
+-- 参加 CANNJudge 算子竞赛
+-- 从 CANNJudge 下载算子工程模板
+-- 提交算子实现到 CANNJudge
+-- 查看 CANNJudge 排行榜
+-
+-## 前置要求
+-
+-- 已注册 CANNJudge 账号
+-- 已配置 CANN 开发环境
+-- 已安装必要的编译工具
+-- 已安装 pycryptodome：`pip install pycryptodome`
+-
+-## 安全登录机制（RSA 加密）
+-
+-### 铁律
+-
+-1. **禁止在对话中直接输入明文密码**
+-2. **禁止将解密后的密码显示/打印/输出到对话中** — 解密仅用于内部调用登录 API，绝不出现在任何输出中
+-3. **禁止将明文密码写入日志、文件或环境变量**
+-
+-违反以上任何一条视为严重安全事件。
+-
+-### 原理
+-
+-```
+-服务器 (private.pem)          个人 PC (public.pem)
+-       │                            │
+-       │◄─── 拷贝 public.pem ───────┤
+-       │                            │
+-       │         密码 ──► RSA加密 ──┤──► 密文
+-       │                            │
+-       ├── RSA解密(密文) ──► 明文   │  ← 仅内存中，禁止输出
+-       ├── 登录 CANNJudge           │
+-       ├── 明文立即从内存清除        │
+-```
+-
+-- **私钥 (private.pem)**：仅存在于服务器，用于解密，**绝不外传**
+-- **公钥 (public.pem)**：可公开分发，用户在个人 PC 上用于加密密码
+-- **密文**：用户将加密后的密文提供给 CANNBot，CANNBot 在服务器上解密后登录
+-- **明文密码**：仅在内存中短暂存在，用于调用登录 API，**禁止输出到对话/日志/文件**
+-
+-### 首次设置（一次性）
+-
+-#### 步骤 1：在服务器上生成密钥对
+-
+-```bash
+-# 在服务器上运行
+-python3 skills/cannjudge-submit/generate_key.py
+-# 生成 private.pem（留在服务器）和 public.pem（拷贝到 PC）
+-```
+-
+-#### 步骤 2：将公钥拷贝到个人 PC
+-
+-```bash
+-# 方式 A：直接复制服务器上 public.pem 的内容
+-cat public.pem  # 在服务器上查看，复制内容到 PC
+-
+-# 方式 B：用 scp 拷贝
+-scp server:~/path/to/public.pem ~/local/path/
+-```
+-
+-#### 步骤 3：在个人 PC 上加密密码
+-
+-```bash
+-# 在个人 PC 上运行
+-python3 encrypt_password.py --public-key public.pem
+-# 输入密码后，输出 RSA 密文
+-```
+-
+-#### 步骤 4：将密文提供给 CANNBot
+-
+-将步骤 3 输出的密文直接粘贴给 CANNBot，CANNBot 会用服务器上的私钥解密并登录。
+-
+-### 日常使用
+-
+-设置完成后，每次登录只需：
+-1. 在 PC 上用 `encrypt_password.py` 加密密码（或复用之前的密文，只要私钥不变）
+-2. 将密文给 CANNBot
+-
+-**密文可以复用**：只要私钥文件不变，同一密文解密结果相同，无需每次重新加密。
+-
+-## ⚠️ 重要：必须从网站获取题目信息
+-
+-**禁止使用本地任何算子信息文件，也不要私自决定使用标准定义！**
+-
+-所有题目信息必须从 CANNJudge 网站获取：
+-1. **题目描述**：通过 API 或网页获取
+-2. **算子原型**：从题目描述中解析
+-3. **工程模板**：通过 API 下载
+-
+-**原因**：
+-- 题目可能随时更新
+-- 确保信息准确性和一致性
+-- 竞赛存在限制
+-
+-**获取方式**：
+-```python
+-# 方式1: 通过 API 获取（推荐）
+-resp = requests.get(f"https://cannjudge.cn/api/problems/{problem_id}")
+-problem_info = resp.json()
+-
+-# 方式2: 通过网页获取
+-# 使用 webfetch 工具获取题目页面
+-```
+-
+-## ⚠️ 重要：理解题目和参考算子
+-
+-**必须深入理解题目描述和参考算子的行为！**
+-
+-### 关键步骤
+-
+-1. **仔细阅读题目描述**
+-   - 算子原型（输入/输出/属性）
+-   - 支持的数据类型
+-   - 数学公式和计算规则
+-   - **参考算子**（如 PyTorch、TensorFlow）
+-
+-2. **查阅参考算子的官方文档**（最重要！）
+-   - 题目通常会指定参考算子（如 `torch.histc`）
+-   - **必须查阅官方文档**，理解所有行为
+-   - 特别注意：**默认值的特殊语义**
+-   - 注意：边界情况、特殊参数值
+-
+-3. **理解默认值的真实含义**
+-   - 默认值不一定表示"使用这个值"
+-   - 可能是一个**标志**，表示：
+-     - "需要自动计算"
+-     - "使用数据的实际范围"
+-     - "忽略此参数"
+-   - **示例**：`torch.histc(min=0, max=0)` 表示自动计算数据范围
+-
+-### 常见陷阱
+-
+-| 陷阱 | 错误理解 | 正确理解 |
+-|------|---------|---------|
+-| `min=0, max=0` | 范围是 [0, 0] | 自动计算数据的 min 和 max |
+-| 默认值 | 直接使用默认值 | 可能是特殊标志 |
+-| 参考算子 | 仅参考原型 | 必须完全复现所有行为 |
+-
+-### 实战案例：Histogram 算子
+-
+-**题目描述**：
+-- 参考算子：`torch.histc`
+-- 属性：`bins=100, min=0.0, max=0.0`（默认值）
+-
+-**错误实现**：
+-```cpp
+-// ❌ 错误：认为 min=0.0, max=0.0 是有效范围
+-if (min_val >= max_val) {
+-    min_val = 0.0f;
+-    max_val = 1.0f;  // 使用默认范围
+-}
+-```
+-
+-**正确实现**：
+-```cpp
+-// ✅ 正确：查阅 torch.histc 文档
+-// 当 min=0 且 max=0 时，自动计算数据的 min 和 max
+-if (min_val == 0.0f && max_val == 0.0f) {
+-    // 需要在 Kernel 中动态计算数据范围
+-    need_compute_range = true;
+-}
+-```
+-
+-**教训**：
+-- ❌ 没有查阅 PyTorch 文档
+-- ❌ 错误理解默认值的含义
+-- ✅ 查阅文档后发现特殊语义
+-- ✅ 实现动态计算数据范围
+-
+-### 检查清单
+-
+-在开始实现前，必须完成：
+-
+-- [ ] **阅读题目描述**：理解算子原型和数学公式
+-- [ ] **查阅参考算子文档**：理解所有行为和特殊语义
+-- [ ] **理解默认值**：是否有特殊含义
+-- [ ] **理解边界情况**：特殊输入、特殊属性值
+-- [ ] **验证理解**：用参考算子测试边界情况（如可能）
+-
+----
+-
+-## ⚠️ 重要：算子泛化性设计
+-
+-**平台不开放测试用例 API，必须设计泛化算子！**
+-
+-### 为什么需要泛化设计
+-
+-1. **无法获取测试用例**：平台不提供测试用例 API，无法提前知道具体的 shape、dtype
+-2. **测试用例多样**：平台会使用多种 shape、dtype、属性组合进行测试
+-3. **一劳永逸**：泛化算子可以处理所有可能的输入情况
+-
+-### 泛化设计核心要素
+-
+-| 要素 | 说明 | 设计要点 |
+-|------|------|----------|
+-| **Shape 泛化** | 支持任意维度和大小 | 使用动态 shape 处理，不要硬编码维度数 |
+-| **Dtype 泛化** | 支持多种数据类型 | 使用模板类，根据 dtype 参数选择实现 |
+-| **属性泛化** | 支持属性的各种取值 | 处理边界值、默认值、特殊值 |
+-| **对齐泛化** | 处理对齐和非对齐情况 | 使用 DataCopyPad，处理尾部数据 |
+-| **边界泛化** | 处理边界情况 | 空输入、单元素、极端值等 |
+-
+-### 泛化设计检查清单
+-
+-**Shape 泛化**：
+-- [ ] 支持 1D、2D、3D、4D 等任意维度
+-- [ ] 支持任意大小（大、中、小）
+-- [ ] InferShape 正确处理动态 shape
+-- [ ] Tiling 函数不依赖固定维度
+-
+-**Dtype 泛化**：
+-- [ ] 支持题目要求的所有 dtype
+-- [ ] 使用模板类实现
+-- [ ] Float16 使用 Float32 中间计算
+-- [ ] 正确处理精度转换
+-
+-**属性泛化**：
+-- [ ] 处理所有可能的属性值
+-- [ ] 处理默认值
+-- [ ] 处理边界值（如 axis=-1）
+-- [ ] 处理特殊值（如 keepdims=True/False）
+-
+-**对齐泛化**：
+-- [ ] 处理 32 字节对齐
+-- [ ] 处理非对齐的尾部数据
+-- [ ] 使用 DataCopyPad 自动处理
+-
+-**边界泛化**：
+-- [ ] 空输入（shape 包含 0）
+-- [ ] 单元素输入
+-- [ ] 极端值（最大、最小）
+-- [ ] 特殊值（NaN、Inf）
+-
+-### 泛化设计示例
+-
+-```cpp
+-// ❌ 错误：硬编码维度
+-int32_t N = shape.GetDim(0);
+-int32_t C = shape.GetDim(1);
+-int32_t H = shape.GetDim(2);
+-int32_t W = shape.GetDim(3);
+-
+-// ✅ 正确：动态处理任意维度
+-int32_t rank = shape.GetDimNum();
+-uint32_t totalLength = 1;
+-for (int32_t i = 0; i < rank; i++) {
+-    totalLength *= shape.GetDim(i);
+-}
+-```
+-
+-```cpp
+-// ❌ 错误：只支持 float
+-void Process(GM_ADDR x, GM_ADDR y) {
+-    AscendC::GlobalTensor<float> xGm;
+-    xGm.SetGlobalBuffer((__gm__ float *)x);
+-    // ...
+-}
+-
+-// ✅ 正确：模板支持多 dtype
+-template<typename T>
+-class KernelOp {
+-    void Process(GM_ADDR x, GM_ADDR y) {
+-        AscendC::GlobalTensor<T> xGm;
+-        xGm.SetGlobalBuffer((__gm__ T *)x);
+-        // ...
+-    }
+-};
+-
+-// Kernel 入口根据 dtype 选择模板
+-extern "C" __global__ __aicore__ void op_kernel(...) {
+-    if (dtype == 0) {      // DT_FLOAT
+-        KernelOp<float> op;
+-        op.Process(...);
+-    } else if (dtype == 1) { // DT_FLOAT16
+-        KernelOp<half> op;
+-        op.Process(...);
+-    }
+-}
+-```
+-
+-```cpp
+-// ❌ 错误：假设数据对齐
+-uint32_t tileNum = totalLength / 256;
+-
+-// ✅ 正确：处理非对齐情况
+-uint32_t tileNum = (totalLength + 255) / 256;
+-uint32_t lastTileLength = totalLength - (tileNum - 1) * 256;
+-```
+-
+-## API 接口
+-
+-### 基础 URL
+-```
+-https://cannjudge.cn
+-```
+-
+-### 用户相关
+-- **登录**: `POST /api/users/login`
+-  - 请求体: `{"email": "用户邮箱", "password": "密码"}`
+-  - 返回: 用户信息，包含 `_id` (用户ID)
+-
+-### 题目相关
+-- **获取题目信息（通过ID）**: `GET /api/problems/{problemId}`
+-  - 返回题目详情，包含名称、描述等
+-
+-- **获取题目信息（通过名称）**: `GET /api/problems/name/{problemName}`
+-  - **推荐使用此API**
+-  - 返回题目详情，包含名称、描述等
+-  - 示例: `GET /api/problems/name/depthtospace`
+-
+-- **下载工程模板**: `GET /api/problems/{problemId}/package?userId={userId}`
+-  - 返回 Zip 工程包
+-
+-### 提交相关
+-- **提交代码**: `POST /api/submissions/submit`
+-  - 请求体:
+-    ```json
+-    {
+-      "problemId": "题目ID",
+-      "userId": "用户ID",
+-      "tiling_h": "tiling头文件内容",
+-      "tiling_key_h": "tiling key头文件内容",
+-      "host_cpp": "host侧cpp内容",
+-      "kernel_cpp": "kernel侧cpp内容"
+-    }
+-    ```
+-  - 返回: `{"code": 0, "data": {"submissionId": "提交ID"}}`
+-
+-- **查询提交结果**: `GET /api/submissions/{submissionId}`
+-  - 返回提交状态、测试结果、精度比例等
+-
+-- **获取排行榜**: `GET /api/submissions/problem/{problemId}/latest`
+-  - 返回该题目的所有用户最新提交
+-
+-## 完整流程
+-
+-### 步骤 1: 登录
+-
+-**推荐方式：RSA 加密密文登录（安全）**
+-
+-```python
+-import requests
+-from cannjudge_cli import CANNJudgeClient
+-
+-client = CANNJudgeClient()
+-
+-# 方式 A：用密文登录（推荐）
+-# 密文由用户在 PC 上用 encrypt_password.py 生成
+-# 解密后的明文仅在内存中用于调用登录 API，禁止输出到对话/日志/文件
+-user_info = client.login_with_ciphertext(
+-    email="用户邮箱",
+-    ciphertext="RSA加密后的密文",
+-    private_key_path="private.pem"  # 服务器上的私钥路径
+-)
+-
+-# 方式 B：直接用明文密码登录（不推荐，仅调试用）
+-# user_info = client.login("用户邮箱", "明文密码")
+-```
+-
+-**命令行方式**：
+-
+-```bash
+-# 推荐：密文登录
+-python cannjudge_cli.py login --email "your@email.com" --ciphertext "RSA密文"
+-
+-# 不推荐：明文登录
+-python cannjudge_cli.py login --email "your@email.com" --password "明文密码"
+-```
+-
+-**安全铁律**：登录成功后只输出"登录成功"和用户 ID，**绝不输出解密后的密码**。
+-
+-### 步骤 2: 获取题目信息
+-
+-```python
+-# 方式1: 如果知道题目ID
+-cookies = client.session.cookies  #获取cookies后续使用
+-problem_id = "题目ID"
+-resp = requests.get(
+-    f"https://cannjudge.cn/api/problems/{problem_id}",
+-    cookies=cookies
+-)
+-problem_info = resp.json()
+-
+-# 方式2: 通过题目名称查找（需要先获取题目列表）
+-# 注意: 题目列表 API 可能需要从赛事/小组入口获取
+-```
+-
+-### 步骤 3: 下载工程模板
+-
+-```python
+-# 下载工程包
+-resp = requests.get(
+-    f"https://cannjudge.cn/api/problems/{problem_id}/package",
+-    params={"userId": user_id},
+-    cookies=cookies
+-)
+-
+-# 保存并解压
+-with open("project.zip", "wb") as f:
+-    f.write(resp.content)
+-
+-import zipfile
+-with zipfile.ZipFile("project.zip", "r") as zf:
+-    zf.extractall("project")
+-```
+-
+-### 步骤 4: 理解题目
+-
+-从题目信息中获取：
+-- `name`: 算子名称
+-- `title`: 算子标题
+-- `desc`: 题目描述（Markdown格式）
+-
+-**重要**：仔细阅读题目描述，理解：
+-1. 算子原型（输入/输出/属性）
+-2. 支持的数据类型
+-3. 支持的 shape 维度
+-4. 特殊要求和限制
+-
+-### 步骤 5: 设计泛化算子
+-
+-**⚠️ 核心步骤：根据 `ascendc-ops-project` skill 设计泛化算子**
+-
+-`ascendc-ops-project` 提供完整的泛化算子开发指导：
+-- **Shape 泛化**：动态 shape 处理方法
+-- **Dtype 泛化**：模板类实现方法
+-- **Tiling 设计**：多核切分、UB 切分
+-- **Host 实现**：TilingFunc、InferShape、InferDataType
+-- **Kernel 实现**：模板类、多核处理
+-- **API 最佳实践**：避免常见错误
+-- **精度验证标准**：确保结果正确
+-
+-工程模板结构：
+-```
+-code/
+-├── CMakeLists.txt           # 主 CMake 配置
+-├── op_host/
+-│   ├── CMakeLists.txt
+-│   └── {op_name}.cpp        # Host 侧实现（Tiling、InferShape）
+-└── op_kernel/
+-    ├── CMakeLists.txt
+-    ├── {op_name}_tiling.h   # Tiling 数据结构
+-    ├── tiling_key_{op_name}.h  # Tiling Key 定义
+-    └── {op_name}.cpp        # Kernel 侧实现
+-```
+-
+-需要实现的文件：
+-1. **op_kernel/{op_name}_tiling.h**: 定义 Tiling 数据结构（包含泛化参数）
+-2. **op_host/{op_name}.cpp**: 实现泛化的 TilingFunc、InferShape、InferDataType
+-3. **op_kernel/{op_name}.cpp**: 实现泛化的算子计算逻辑
+-
+-**设计建议**：
+-1. **先分析泛化需求**：
+-   - 题目要求支持哪些 dtype？
+-   - 是否需要支持任意维度？
+-   - 有哪些属性需要处理？
+-   - 是否有特殊边界情况？
+-
+-2. **设计泛化 Tiling**：
+-   - Tiling 数据结构包含所有泛化参数
+-   - 不硬编码 shape 维度
+-   - 正确处理对齐和非对齐
+-
+-3. **实现泛化 Host**：
+-   - InferShape 支持动态 shape
+-   - TilingFunc 处理所有 dtype
+-   - 正确读取属性和 ValueDepend
+-
+-4. **实现泛化 Kernel**：
+-   - 使用模板类支持多 dtype
+-   - 正确处理多核切分
+-   - 处理边界和对齐情况
+-
+-5. **验证泛化性**：
+-   - 检查是否支持所有要求的 dtype
+-   - 检查是否支持任意维度
+-   - 检查是否处理边界情况
+-   - 参考 `ascendc-ops-project` 的检查清单
+-
+-### 步骤 6: 编译工程
+-
+-```bash
+-# 需要添加编译配置文件（如果模板中没有）
+-# CMakePresets.json 和 build.sh 可以从已有工程复制
+-
+-cd project/code
+-bash build.sh
+-```
+-
+-### 步骤 7: 提交代码
+-
+-```python
+-# 读取实现的代码文件
+-with open("op_kernel/{op_name}_tiling.h") as f:
+-    tiling_h = f.read()
+-with open("op_kernel/tiling_key_{op_name}.h") as f:
+-    tiling_key_h = f.read()
+-with open("op_host/{op_name}.cpp") as f:
+-    host_cpp = f.read()
+-with open("op_kernel/{op_name}.cpp") as f:
+-    kernel_cpp = f.read()
+-
+-# 提交
+-resp = requests.post(
+-    "https://cannjudge.cn/api/submissions/submit",
+-    json={
+-        "problemId": problem_id,
+-        "userId": user_id,
+-        "tiling_h": tiling_h,
+-        "tiling_key_h": tiling_key_h,
+-        "host_cpp": host_cpp,
+-        "kernel_cpp": kernel_cpp
+-    },
+-    cookies=cookies
+-)
+-
+-result = resp.json()
+-submission_id = result["data"]["submissionId"]
+-```
+-
+-### 步骤 8: 查询结果
+-
+-```python
+-import time
+-
+-# 轮询等待结果
+-for i in range(30):
+-    time.sleep(3)
+-    
+-    resp = requests.get(
+-        f"https://cannjudge.cn/api/submissions/{submission_id}",
+-        cookies=cookies
+-    )
+-    
+-    result = resp.json()
+-    status = result.get("status")
+-    
+-    if status in ["Accepted", "Wrong Answer", "Compile Error", "Runtime Error"]:
+-        print(f"最终状态: {status}")
+-        
+-        # 打印每个测试用例结果
+-        for tc in result.get("result", []):
+-            tc_status = tc.get("testcase_status")
+-            precision = tc.get("precision_ratio", "N/A")
+-            time_ms = tc.get("time", "N/A")
+-            print(f"  {tc_status} (precision: {precision}, time: {time_ms}ms)")
+-        
+-        break
+-```
+-
+-### 步骤 9: 查看排行榜
+-
+-```python
+-resp = requests.get(
+-    f"https://cannjudge.cn/api/submissions/problem/{problem_id}/latest",
+-    cookies=cookies
+-)
+-
+-rankings = resp.json()
+-# 按 Accepted 状态和分数排序
+-```
+-
+-## 常见问题
+-
+-### 1. 为什么我的算子在部分测试用例上失败？
+-
+-**原因**：算子不够泛化，无法处理某些特殊情况。
+-
+-**解决方法**：
+-1. 查看失败的测试用例信息（如果有）
+-2. 检查算子是否处理了所有泛化场景
+-3. 参考 `ascendc-ops-project` 的泛化设计检查清单
+-4. 添加对边界情况的处理
+-
+-### 2. 如何设计支持任意维度的算子？
+-
+-**方法**：
+-```cpp
+-// Host 侧：动态处理 shape
+-int32_t rank = shape.GetDimNum();
+-uint32_t totalLength = 1;
+-for (int32_t i = 0; i < rank; i++) {
+-    totalLength *= shape.GetDim(i);
+-}
+-
+-// Kernel 侧：按总长度处理，不依赖具体维度
+-for (uint32_t i = 0; i < totalLength; i++) {
+-    // 处理每个元素
+-}
+-```
+-
+-### 3. 如何处理 axis 属性的负值？
+-
+-**方法**：
+-```cpp
+-// Host 侧：标准化 axis
+-int32_t axis = attrs->GetInt(0);
+-int32_t rank = shape.GetDimNum();
+-if (axis < 0) {
+-    axis = axis + rank;  // 转换为正值
+-}
+-```
+-
+-### 4. 精度要求是什么？
+-
+-- float16: rtol < 1e-3, atol < 1e-3
+-- float32: rtol < 1e-4, atol < 1e-4
+-
+-### 5. 编译配置文件缺失怎么办？
+-
+-如果下载的模板缺少编译配置文件：
+-- `CMakePresets.json`: 编译预设配置
+-- `build.sh`: 编译脚本
+-
+-可以从已有的 Ascend C 工程复制这些文件。
+-
+-### 6. 提交字段说明
+-
+-- `tiling_h`: Tiling 数据结构定义（.h 文件内容）
+-- `tiling_key_h`: Tiling Key 模板定义（.h 文件内容）
+-- `host_cpp`: Host 侧实现（.cpp 文件内容）
+-- `kernel_cpp`: Kernel 侧实现（.cpp 文件内容）
+-
+-**注意**: 如果某些文件不存在（如 tiling_key_h），提交空字符串即可。
+-
+-## 返回结果说明
+-
+-### 提交状态
+-- `Running`: 正在执行
+-- `Accepted`: 全部通过
+-- `Wrong Answer`: 部分测试用例失败
+-- `Compile Error`: 编译失败
+-- `Runtime Error`: 运行时错误
+-- `Time Limit Exceeded`: 超时
+-
+-### 测试用例结果
+-- `testcase_status`: 该测试用例状态
+-- `precision_ratio`: 精度比例（1.0 表示完全匹配）
+-- `time`: 执行时间（毫秒）
+-
+-## 注意事项
+-
+-1. **密码安全**: 禁止在对话中直接输入明文密码，必须使用 RSA 加密密文登录
+-2. **私钥保护**: private.pem 仅保留在服务器，绝不外传、不提交到代码仓库
+-3. **泛化设计**: 必须设计泛化算子，平台不提供测试用例
+-4. **Cookie 管理**: 登录后保存 cookie，用于后续所有请求
+-5. **轮询间隔**: 查询结果时建议间隔 3 秒，避免频繁请求
+-6. **超时处理**: 设置合理的请求超时时间（建议 30 秒）
+-
+-## 示例用法
+-
+-用户可以这样使用此 skill：
+-
+-```
+-用户: 帮我从 CANNJudge 下载 DepthToSpace 题目并实现泛化算子
+-
+-助手: 
+-1. 请提供 CANNJudge 登录邮箱和 RSA 加密密文
+-   （如未设置，先运行 generate_key.py 生成密钥对，再在 PC 上用 encrypt_password.py 加密密码）
+-2. 我将用服务器私钥解密密文，登录 CANNJudge
+-3. 获取题目信息
+-4. 下载工程模板
+-5. 分析题目要求，设计泛化算子：
+-   - 支持的数据类型：float16, float32
+-   - 支持的维度：4D 输入
+-   - 属性：block_size
+-   - 边界情况：block_size=1, block_size=最大值
+-6. 实现泛化的 Host 和 Kernel 代码
+-7. 编译并提交
+-8. 查看结果和排行榜
+-```
+-
+-## 相关 Skills
+-
+-**核心依赖**：
+-- `ascendc-ops-project`: Ascend C 算子工程化开发完整指南
+-  - 包含：工程创建、泛化设计、Tiling 设计、Host/Kernel 实现、API 最佳实践、精度验证标准
+-  - 用途：提供泛化算子实现的所有技术细节
+-
+-**使用流程**：
+-1. 使用本 skill（cannjudge-submit）处理 CANNJudge 平台交互（登录、下载、提交、查询）
+-2. 使用 `ascendc-ops-project` skill 指导泛化算子设计和实现
+-3. 结合两个 skill 完成完整的竞赛流程
+-
+----
+-
+-## FAQ
+-
+-### Q: float16 数据精度不达标怎么办？
+-
+-**A**: float16 精度限制可能导致边界量化问题，需要根据参考算子的行为调整实现。
+-
+-**常见问题**：
+-- numpy/torch 在 float16 数据上会将边界量化到 float16 可表示值
+-- 这导致边界不均匀，与均匀的 binWidth 计算不一致
+-- 当值恰好等于边界时，bin 索引计算错误
+-
+-**解决方案**：
+-1. **理解参考算子行为**：用 Python 测试参考算子在 float16 数据上的精确行为
+-2. **根据数据类型调整**：
+-   - float16: 量化边界到 float16 可表示值
+-   - float32/int32: 使用均匀边界
+-3. **实现技巧**：
+-   - 使用二分查找计算 bin 索引
+-   - 对 float16 数据，将边界转换为 half 再转回 float
+-   - 在 host 侧设置标志，kernel 中根据标志选择行为
+-
+-**示例代码**：
+-```cpp
+-// Host 侧：根据 dtype 设置量化标志
+-int32_t quantize_edges = (dtype_x == ge::DT_FLOAT16) ? 1 : 0;
+-tiling->quantizeEdges = quantize_edges;
+-
+-// Kernel 侧：根据标志选择是否量化边界
+-if (quantizeEdges) {
+-    half edge_h = static_cast<half>(edge);
+-    edge = static_cast<float>(edge_h);
+-}
+-```
+-
+-### Q: 如何处理参考算子的默认值特殊语义？
+-
+-**A**: 默认值可能不是实际值，而是特殊标志。
+-
+-**常见模式**：
+-- `min=0, max=0` → 自动计算数据范围
+-- `axis=-1` → 使用最后一个维度
+-- `keepdims=False` → 不保持维度
+-
+-**解决方法**：
+-1. 查阅参考算子官方文档
+-2. 用 Python 测试边界情况
+-3. 在代码中正确处理特殊语义
+-
+-### Q: 如何设计泛化算子？
+-
+-**A**: 参考 `ascendc-ops-project` skill 的泛化设计指南。
+-
+-**核心要素**：
+-- Shape 泛化：动态处理任意维度
+-- Dtype 泛化：模板支持多数据类型
+-- 属性泛化：处理所有可能的属性值
+-- 对齐泛化：使用 DataCopyPad 处理非对齐数据
+-- 边界泛化：处理空输入、单元素、极端值等
++---
++name: cannjudge-submit
++description: 登录 CANNJudge，按题目链接下载传统算子或 npu_kernel_dev 核函数工程，提交可编辑源码，查询评测结果和排行榜；支持邮箱/手机号密码、图形验证码、RSA 及会话复用。
++---
++
++# CANNJudge 下载、开发与提交
++
++使用本目录的 `cannjudge_cli.py` 与 `CANNJudgeClient`，依赖 `requests`；只有 RSA 方式需要 `pycryptodome`。
++首先从网站读取题目和模板，以当次题目的签名、dtype、广播、精度、CANN版本及只读文件为准。
++不要用通用 Add 示例或其他题目规格替代当前题目。题目下载包中的公开数据可用于本地验证，不尝试访问隐藏用例。
++
++## 登录选择
++
++需要新登录时，**先询问登录方式**，等待用户选择后再收集对应凭据。提供：
++1. Agent 对话输入账号密码：用户在当前对话提供邮箱/手机号和密码，Agent 直接调用 `client.login(account, password)`。
++2. Linux/本地终端输入：用户在自己的交互终端输入账号及隐藏密码，运行 `bash /path/to/cannjudge-submit/login.sh`。
++3. RSA 密文登录：使用用户提供的密文和私钥路径，详见 [references/rsa-login.md](references/rsa-login.md)。
++
++询问示例：“请选择登录方式：在 Agent 对话中输入账号密码、在 Linux/本地终端隐藏输入，或使用 RSA 密文。”
++用户已明确选择方式或主动提供账号密码时，视为选择完成，不重复询问。
++已有有效会话时直接复用，不为继续下载或提交再次询问登录方式；CLI 自动加载，SDK 调用 `client.load_session()`。
++
++### Agent 对话登录
++
++选定此方式后再请求账号密码；说明对话输入不隐藏，终端方式可隐藏输入。不要回显密码，也不要将其写入源码、临时脚本、命令行参数、日志或交付包。
++将用户提供的账号密码作为运行时值传给 SDK（使用执行工具的标准输入或已有内存变量传递，不能拼接到 shell 命令），不要打印完整登录响应。
++仅向 CANNJudge 官方 HTTPS 登录接口发送凭据。无可用的运行时传递通道时说明限制，让用户改用终端方式，不能暗中写入文件。
++
++```python
++client = CANNJudgeClient()
++client.logout()  # 显式重新登录时清除旧会话，失败不回退旧账号
++client.login(account, password)
++client.save_session()
++```
++
++`account`、`password` 是用户本次提供的运行时变量，示例不能替换成持久化的真实密码。
++登录失败时报告不含凭据的错误，不自动重复尝试或切换登录方式。
++
++### 终端与验证码选项
++
++Linux/SSH 详细步骤见 [references/linux-login.md](references/linux-login.md)。默认直接请求 `/api/users/login`，不获取图片或二维码。
++
++```bash
++python3 cannjudge_cli.py login
++python3 cannjudge_cli.py login --account "your@email.com"
++```
++
++`--email` 是 `--account` 的兼容别名，`--login-type email|phone` 可覆盖自动判断。
++SDK `login(account, password)` 默认不带验证码；请求含 `account`、`loginType`、`password`，邮箱兼容字段 `email`，响应含 `_id`。
++保留 `--captcha` 作为显式可选功能，仅在用户选择或服务端明确要求时使用，不默认推断网站必需验证码。
++该选项获取原始 SVG，保存于 Agent 当前工作目录 `Path.cwd()`，名称为 `cannjudge-captcha-随机值.svg`，登录后保留；不做格式转换。
++`--captcha-display file` 适用于SSH；`auto` 在无桌面环境只保存文件。用户自行读取验证码，助手不代读。
++SDK 的 `captcha_id`、`captcha_code` 为配套可选参数。鉴权失败不自动切换验证码或绕过校验。
++CLI `--password` 仅保留兼容，终端优先隐藏输入；不从 `CANNJUDGE_PASSWORD` 自动读取密码。
++
++登录后仅保存用户 ID、Cookie、登录时间；不保存密码、密文或完整用户响应。
++默认 `~/.cannjudge/session.json`，Windows 使用当前账号 DPAPI 加密，Linux/macOS 权限600。
++同一机器和系统账号可跨目录复用，最长7天，服务端可能更早失效。Cookie也是凭据，不输出或随工程交付。
++Windows DPAPI会话不能搬到Linux复用；在执行提交的Linux主机和系统账号下重新登录。
++401清除本地会话；403区分题目/小组权限，不盲目重新提交。`logout` 只清除本机缓存。
++多账号隔离使用位于子命令之前的 `--session-file PATH`。
++
++## 获取题目与下载
++
++```bash
++python3 cannjudge_cli.py info --problem-url "https://cannjudge.cn/hc_cann_codelabs/cann/add"
++python3 cannjudge_cli.py download --problem-url "https://cannjudge.cn/hc_cann_codelabs/cann/add" --output ./add-work
++```
++
++也支持 `--problem-id ID`。完整链接按小组、比赛、题目逐层解析，名称接口携带 contestId，避免同名题误选。
++`info`、`download`、`submit --dry-run` 可访问公开资源而不强制本地登录，私有资源仍遵循服务端鉴权。
++下载真实 `/api/problems/{id}/package` ZIP，同时读取 `/template` 保存 `.cannjudge-project.json` 元数据。
++下载器拒绝路径越界、符号链接和覆盖现有工程；如需重新下载，选择新目录。
++
++## 按工程类型开发和提交
++
++以网站 `problem.code_template` 为分流依据；`--project-type auto` 为默认，不凭目录名推测题目类型。
++
++| 类型 | 主要代码形式 | 提交内容 |
++|---|---|---|
++| `npu_kernel_dev` | 根目录 `kernel.asc`，直接调用 `run_kernel(...)` | `files: [{path, content}]` |
++| 传统算子工程 | `code/op_host`、`code/op_kernel`（也可直接指向code） | tiling_h、tiling_key_h、host_cpp、kernel_cpp |
++
++核函数题先读 [references/kernel-project.md](references/kernel-project.md)。使用 `ops-direct-invoke-flash` 指导核函数设计，保留题目下载的调用接口和构建框架，不能改成默认的 PyTorch 注册工程。
++传统工程可使用已有 Ascend C 开发技能。只支持题目规定的 dtype、shape 和属性，不无条件增加无关类型或转换。
++
++```bash
++# 先检查文件、只读模板、题目绑定，显示文件列表和SHA-256；不会提交
++python3 cannjudge_cli.py submit --problem-url "https://cannjudge.cn/hc_cann_codelabs/cann/add" --project-dir ./add-work/project --dry-run
++# 提交并返回 ID；随后查询该 ID
++python3 cannjudge_cli.py submit --problem-url "https://cannjudge.cn/hc_cann_codelabs/cann/add" --project-dir ./add-work/project --no-wait
++python3 cannjudge_cli.py query --submission-id ID
++```
++
++用户已经要求提交时，在代码和检查完成后直接提交，无需重复确认。仅请求缺失的账号登录或目标信息。
++对修改代码的提交不自动重试。网络超时或缺少 submissionId 时先查询该账号在该题目的提交记录，核实是否已受理。
++平台报错后依据实际编译/用例信息修复，再提交新版本；不把 Running 当作完成。
++默认提交后等待120秒，也可用 `--max-wait` 调整或 `--no-wait` 后分次查询，保持用户知悉进展。
++
++## 结果与验证
++
++当前平台成功状态是 `Pass`，兼容旧状态 `Accepted`。同时检查 result 中所有可见测试点的状态。
++失败状态可能包括 `Fail`、`Wrong Answer`、`Compile Error`、`Runtime Error`、超时等；保留平台 msg 便于定位。
++`precision_ratio` 原样报告，不将所有新字段强行解释成旧版含义；time单位以页面/评测说明为准。
++没有NPU环境时，可用在线评测承担编译和真机验证，但不能把静态/CPU检查表述为NPU通过。
++交付完整源码工程、提交ID/可访问链接、测试点结果和限制。平台公开测试通过不等于所有规格边界均已实测。
++
++```bash
++python3 cannjudge_cli.py rank --problem-id ID
++python3 cannjudge_cli.py logout
++python3 -m pytest tests -q
++```
++
++SDK、API 和传统工程用法见 [README.md](README.md)。
+diff --git a/skills/cannjudge-submit/cannjudge_cli.py b/skills/cannjudge-submit/cannjudge_cli.py
+index a7b1b93..fbb65d7 100644
+--- a/skills/cannjudge-submit/cannjudge_cli.py
++++ b/skills/cannjudge-submit/cannjudge_cli.py
+@@ -1,320 +1,598 @@
+-#!/usr/bin/env python3
+-"""
+-CANNJudge 算子提交辅助工具
+-
+-提供命令行接口完成 CANNJudge 算子竞赛的完整流程。
+-"""
+-
+-import argparse
+-import requests
+-import json
+-import time
+-import os
+-import zipfile
+-import tempfile
+-import base64
+-from pathlib import Path
+-
+-try:
+-    from Crypto.PublicKey import RSA
+-    from Crypto.Cipher import PKCS1_v1_5
+-    HAS_CRYPTO = True
+-except ImportError:
+-    HAS_CRYPTO = False
+-
+-
+-def decrypt_password(ciphertext_b64: str, private_key_path: str = "private.pem") -> str:
+-    """用 RSA 私钥解密密码密文。返回的明文密码仅供内部调用登录 API，禁止输出到对话/日志/文件。"""
+-    if not HAS_CRYPTO:
+-        raise ImportError("需要 pycryptodome 库: pip install pycryptodome")
+-    with open(private_key_path, "r") as f:
+-        private_key_pem = f.read()
+-    rsa_key = RSA.importKey(private_key_pem)
+-    cipher = PKCS1_v1_5.new(rsa_key)
+-    ciphertext = base64.b64decode(ciphertext_b64)
+-    plaintext = cipher.decrypt(ciphertext, sentinel=None)
+-    return plaintext.decode()
+-
+-
+-class CANNJudgeClient:
+-    """CANNJudge API 客户端"""
+-    
+-    BASE_URL = "https://cannjudge.cn"
+-    
+-    def __init__(self):
+-        self.session = requests.Session()
+-        self.user_id = None
+-        self.user_info = None
+-    
+-    def login(self, email: str, password: str) -> dict:
+-        """登录 CANNJudge（password 为明文密码）"""
+-        resp = self.session.post(
+-            f"{self.BASE_URL}/api/users/login",
+-            json={"email": email, "password": password},
+-            timeout=30
+-        )
+-        resp.raise_for_status()
+-        
+-        self.user_info = resp.json()
+-        self.user_id = self.user_info["_id"]
+-        
+-        return self.user_info
+-    
+-    def login_with_ciphertext(self, email: str, ciphertext: str,
+-                              private_key_path: str = "private.pem") -> dict:
+-        """登录 CANNJudge（ciphertext 为 RSA 加密后的密码密文，服务器用私钥解密）。
+-        解密后的明文密码仅供内部调用登录 API，禁止输出到对话/日志/文件。"""
+-        password = decrypt_password(ciphertext, private_key_path)
+-        result = self.login(email, password)
+-        del password  # 立即清除明文
+-        return result
+-    
+-    def get_problem(self, problem_id: str) -> dict:
+-        """获取题目信息"""
+-        resp = self.session.get(
+-            f"{self.BASE_URL}/api/problems/{problem_id}",
+-            timeout=30
+-        )
+-        resp.raise_for_status()
+-        return resp.json()
+-    
+-    def download_package(self, problem_id: str, output_dir: str = None) -> str:
+-        """下载工程模板"""
+-        resp = self.session.get(
+-            f"{self.BASE_URL}/api/problems/{problem_id}/package",
+-            params={"userId": self.user_id},
+-            timeout=60
+-        )
+-        resp.raise_for_status()
+-        
+-        # 保存 zip 文件
+-        if output_dir is None:
+-            output_dir = tempfile.mkdtemp()
+-        Path(output_dir).mkdir(parents=True, exist_ok=True)
+-        zip_path = os.path.join(output_dir, "project.zip")
+-        with open(zip_path, "wb") as f:
+-            f.write(resp.content)
+-        
+-        # 解压
+-        extract_dir = os.path.join(output_dir, "project")
+-        with zipfile.ZipFile(zip_path, "r") as zf:
+-            zf.extractall(extract_dir)
+-        
+-        return extract_dir
+-    
+-    def submit(self, problem_id: str, 
+-               tiling_h: str, tiling_key_h: str,
+-               host_cpp: str, kernel_cpp: str) -> str:
+-        """提交代码"""
+-        payload = {
+-            "problemId": problem_id,
+-            "userId": self.user_id,
+-            "tiling_h": tiling_h,
+-            "tiling_key_h": tiling_key_h,
+-            "host_cpp": host_cpp,
+-            "kernel_cpp": kernel_cpp
+-        }
+-        
+-        resp = self.session.post(
+-            f"{self.BASE_URL}/api/submissions/submit",
+-            json=payload,
+-            timeout=30
+-        )
+-        resp.raise_for_status()
+-        
+-        result = resp.json()
+-        return result["data"]["submissionId"]
+-    
+-    def get_submission(self, submission_id: str) -> dict:
+-        """查询提交结果"""
+-        resp = self.session.get(
+-            f"{self.BASE_URL}/api/submissions/{submission_id}",
+-            timeout=30
+-        )
+-        resp.raise_for_status()
+-        return resp.json()
+-    
+-    def wait_for_result(self, submission_id: str, 
+-                        max_wait: int = 120, interval: int = 3) -> dict:
+-        """等待提交完成并返回结果"""
+-        for i in range(max_wait // interval):
+-            time.sleep(interval)
+-            result = self.get_submission(submission_id)
+-            status = result.get("status")
+-            
+-            if status in ["Accepted", "Wrong Answer", 
+-                          "Compile Error", "Runtime Error",
+-                          "Time Limit Exceeded"]:
+-                return result
+-        
+-        return self.get_submission(submission_id)
+-    
+-    def get_rankings(self, problem_id: str) -> list:
+-        """获取排行榜"""
+-        resp = self.session.get(
+-            f"{self.BASE_URL}/api/submissions/problem/{problem_id}/latest",
+-            timeout=30
+-        )
+-        resp.raise_for_status()
+-        return resp.json()
+-
+-
+-def print_submission_result(result: dict):
+-    """打印提交结果"""
+-    status = result.get("status", "Unknown")
+-    print(f"\n{'='*60}")
+-    print(f"状态: {status}")
+-    print(f"{'='*60}")
+-    
+-    if "result" in result:
+-        print("\n测试用例结果:")
+-        for idx, tc in enumerate(result["result"]):
+-            tc_status = tc.get("testcase_status", "Unknown")
+-            precision = tc.get("precision_ratio", "N/A")
+-            time_ms = tc.get("time", "N/A")
+-            print(f"  Case {idx+1}: {tc_status}")
+-            print(f"           precision: {precision}, time: {time_ms}ms")
+-
+-
+-def main():
+-    parser = argparse.ArgumentParser(
+-        description="CANNJudge 算子提交辅助工具"
+-    )
+-    
+-    subparsers = parser.add_subparsers(dest="command", help="命令")
+-    
+-    # 登录命令
+-    login_parser = subparsers.add_parser("login", help="登录 CANNJudge")
+-    login_parser.add_argument("--email", required=True, help="登录邮箱")
+-    login_parser.add_argument("--password", help="明文密码（不推荐，优先使用 --ciphertext）")
+-    login_parser.add_argument("--ciphertext", help="RSA 加密后的密码密文（推荐）")
+-    login_parser.add_argument("--private-key", default="private.pem", help="RSA 私钥路径")
+-    
+-    # 下载命令
+-    download_parser = subparsers.add_parser("download", help="下载工程模板")
+-    download_parser.add_argument("--problem-id", required=True, help="题目ID")
+-    download_parser.add_argument("--output", help="输出目录")
+-    
+-    # 提交命令
+-    submit_parser = subparsers.add_parser("submit", help="提交代码")
+-    submit_parser.add_argument("--problem-id", required=True, help="题目ID")
+-    submit_parser.add_argument("--project-dir", required=True, help="工程目录")
+-    
+-    # 查询命令
+-    query_parser = subparsers.add_parser("query", help="查询提交结果")
+-    query_parser.add_argument("--submission-id", required=True, help="提交ID")
+-    
+-    # 排行榜命令
+-    rank_parser = subparsers.add_parser("rank", help="查看排行榜")
+-    rank_parser.add_argument("--problem-id", required=True, help="题目ID")
+-    
+-    args = parser.parse_args()
+-    
+-    # 创建客户端
+-    client = CANNJudgeClient()
+-    
+-    # 从环境变量或配置文件读取登录信息
+-    email = os.environ.get("CANNJUDGE_EMAIL", "")
+-    password = os.environ.get("CANNJUDGE_PASSWORD", "")
+-    
+-    if email and password:
+-        print("使用环境变量中的登录信息...")
+-        client.login(email, password)
+-    
+-    if args.command == "login":
+-        if args.ciphertext:
+-            result = client.login_with_ciphertext(args.email, args.ciphertext, args.private_key)
+-        elif args.password:
+-            result = client.login(args.email, args.password)
+-        else:
+-            print("错误: 请提供 --ciphertext（推荐）或 --password")
+-            return
+-        print(f"登录成功!")
+-        print(f"用户ID: {result['_id']}")
+-        print(f"昵称: {result.get('nickname', 'N/A')}")
+-        
+-    elif args.command == "download":
+-        if not client.user_id:
+-            print("错误: 请先登录")
+-            return
+-        
+-        print(f"下载题目 {args.problem_id} 的工程模板...")
+-        extract_dir = client.download_package(args.problem_id, args.output)
+-        print(f"工程已解压到: {extract_dir}")
+-        
+-    elif args.command == "submit":
+-        if not client.user_id:
+-            print("错误: 请先登录")
+-            return
+-        
+-        # 读取代码文件
+-        project_dir = Path(args.project_dir)
+-        
+-        # 查找 op_kernel 和 op_host 目录
+-        code_dir = project_dir / "code" if (project_dir / "code").exists() else project_dir
+-        
+-        tiling_h_path = list(code_dir.glob("op_kernel/*_tiling.h"))
+-        tiling_key_h_path = list(code_dir.glob("op_kernel/tiling_key_*.h"))
+-        host_cpp_path = list(code_dir.glob("op_host/*.cpp"))
+-        kernel_cpp_path = list(code_dir.glob("op_kernel/*.cpp"))
+-        
+-        # 过滤掉 tiling 相关的 cpp
+-        kernel_cpp_path = [p for p in kernel_cpp_path if "_tiling" not in p.name]
+-        
+-        if not all([tiling_h_path, host_cpp_path, kernel_cpp_path]):
+-            print("错误: 找不到必要的代码文件")
+-            return
+-        
+-        # 读取文件内容
+-        tiling_h = tiling_h_path[0].read_text()
+-        tiling_key_h = tiling_key_h_path[0].read_text() if tiling_key_h_path else ""
+-        host_cpp = host_cpp_path[0].read_text()
+-        kernel_cpp = kernel_cpp_path[0].read_text()
+-        
+-        print(f"提交代码到题目 {args.problem_id}...")
+-        submission_id = client.submit(
+-            args.problem_id, tiling_h, tiling_key_h, host_cpp, kernel_cpp
+-        )
+-        print(f"提交成功! Submission ID: {submission_id}")
+-        
+-        print("\n等待结果...")
+-        result = client.wait_for_result(submission_id)
+-        print_submission_result(result)
+-        
+-    elif args.command == "query":
+-        if not client.user_id:
+-            print("错误: 请先登录")
+-            return
+-        
+-        result = client.get_submission(args.submission_id)
+-        print_submission_result(result)
+-        
+-    elif args.command == "rank":
+-        if not client.user_id:
+-            print("错误: 请先登录")
+-            return
+-        
+-        rankings = client.get_rankings(args.problem_id)
+-        
+-        print(f"\n题目 {args.problem_id} 排行榜:")
+-        print("=" * 60)
+-        
+-        # 按状态和分数排序
+-        sorted_rankings = sorted(
+-            rankings,
+-            key=lambda x: (x.get("status") == "Accepted", x.get("score", 0)),
+-            reverse=True
+-        )
+-        
+-        for i, item in enumerate(sorted_rankings[:20]):
+-            user_id = item.get("user_id", "unknown")
+-            status = item.get("status", "unknown")
+-            score = item.get("score", "N/A")
+-            print(f"{i+1:3d}. {user_id:24s} | {status:15s} | score: {score}")
+-    
+-    else:
+-        parser.print_help()
+-
+-
+-if __name__ == "__main__":
+-    main()
++#!/usr/bin/env python3
++"""
++CANNJudge 算子提交辅助工具
++
++提供命令行接口完成 CANNJudge 算子竞赛的完整流程。
++"""
++
++import argparse
++import requests
++import json
++import time
++import os
++import zipfile
++import tempfile
++import base64
++import getpass
++import sys
++import warnings
++import re
++import webbrowser
++from urllib.parse import quote, urlparse, unquote
++from http.cookiejar import Cookie
++from pathlib import Path
++
++from session_store import DEFAULT_SESSION_FILE, load_session, save_session
++from project_files import extract_package, collect_kernel_files, collect_registry_files
++
++try:
++    from Crypto.PublicKey import RSA
++    from Crypto.Cipher import PKCS1_v1_5
++    HAS_CRYPTO = True
++except ImportError:
++    HAS_CRYPTO = False
++
++
++class CANNJudgeError(ValueError):
++    """可直接显示的操作提示，不包含凭据或服务端原始响应。"""
++
++
++def save_captcha_svg(svg: str) -> Path:
++    """Preserve the server's SVG verbatim in the agent's current working directory."""
++    if not isinstance(svg, str) or not svg.strip():
++        raise CANNJudgeError('验证码图片为空，请重新获取')
++    fd, filename = tempfile.mkstemp(prefix='cannjudge-captcha-', suffix='.svg', dir=Path.cwd())
++    path = Path(filename)
++    try:
++        with os.fdopen(fd, 'wb') as stream:
++            stream.write(svg.encode('utf-8'))
++    except BaseException:
++        path.unlink(missing_ok=True)
++        raise
++    return path
++
++
++def decrypt_password(ciphertext_b64: str, private_key_path: str = "private.pem") -> str:
++    """用 RSA 私钥解密密码密文。返回的明文密码仅供内部调用登录 API，禁止输出到对话/日志/文件。"""
++    if not HAS_CRYPTO:
++        raise ImportError("需要 pycryptodome 库: pip install pycryptodome")
++    with open(private_key_path, "r") as f:
++        private_key_pem = f.read()
++    rsa_key = RSA.importKey(private_key_pem)
++    cipher = PKCS1_v1_5.new(rsa_key)
++    ciphertext = base64.b64decode(ciphertext_b64, validate=True)
++    sentinel = os.urandom(32)
++    plaintext = cipher.decrypt(ciphertext, sentinel=sentinel)
++    if plaintext == sentinel:
++        raise CANNJudgeError("密文或私钥不匹配，请检查后重试")
++    return plaintext.decode()
++
++
++class CANNJudgeClient:
++    """CANNJudge API 客户端"""
++    
++    BASE_URL = "https://cannjudge.cn"
++    
++    SESSION_MAX_AGE = 7 * 24 * 60 * 60
++
++    def __init__(self, session_file=None):
++        self.session = requests.Session()
++        self.user_id = None
++        self.user_info = None
++        self.session_file = Path(session_file or DEFAULT_SESSION_FILE).expanduser()
++        self.logged_in_at = None
++
++    def save_session(self):
++        """只保存用户 ID 和 Cookie，不保存密码、密文或完整登录响应。"""
++        self.session.cookies.clear_expired_cookies()
++        if not self.user_id or not self.session.cookies:
++            raise CANNJudgeError("登录未返回可复用 Cookie，请检查平台登录接口")
++        cookies = []
++        for cookie in self.session.cookies:
++            record = vars(cookie).copy()
++            record["rest"] = record.pop("_rest")
++            cookies.append(record)
++        save_session(self.session_file, {
++            "version": 1, "base_url": self.BASE_URL,
++            "user_id": self.user_id, "logged_in_at": self.logged_in_at,
++            "cookies": cookies,
++        })
++
++    def load_session(self) -> bool:
++        """恢复本机会话；服务端仍可能提前使 Cookie 失效。"""
++        try:
++            data = load_session(self.session_file)
++        except FileNotFoundError:
++            return False
++        except (OSError, ValueError):
++            raise CANNJudgeError("无法读取登录会话，请重新运行 login") from None
++        try:
++            if data["version"] != 1 or data["base_url"] != self.BASE_URL:
++                raise ValueError
++            user_id = data["user_id"]
++            logged_in_at = data["logged_in_at"]
++            if not isinstance(user_id, str) or not user_id:
++                raise ValueError
++            if not 0 <= time.time() - logged_in_at < self.SESSION_MAX_AGE:
++                raise ValueError
++            cookies = requests.cookies.RequestsCookieJar()
++            for record in data["cookies"]:
++                cookies.set_cookie(Cookie(**record))
++            cookies.clear_expired_cookies()
++            if not cookies:
++                raise ValueError
++        except (KeyError, TypeError, ValueError, AttributeError):
++            raise CANNJudgeError("登录会话已过期或损坏，请重新运行 login") from None
++        self.user_id = user_id
++        self.user_info = {"_id": user_id}
++        self.logged_in_at = logged_in_at
++        self.session.cookies = cookies
++        return True
++
++    def logout(self):
++        """清除本机会话，不承诺撤销服务端或其他设备的登录。"""
++        try:
++            self.session_file.unlink()
++        except FileNotFoundError:
++            pass
++        self.session.cookies.clear()
++        self.user_id = self.user_info = self.logged_in_at = None
++
++    def login_interactive(self, email: str, *, captcha=False, login_type=None,
++                          captcha_display='auto') -> dict:
++        """用户在真实终端中输入密码，禁止退回回显输入。"""
++        if not sys.stdin.isatty():
++            raise CANNJudgeError("请在你自己的交互终端运行 login；Agent 对话登录请调用 login(account, password)")
++        if captcha_display not in ('auto', 'file', 'browser'):
++            raise CANNJudgeError('验证码展示方式应为 auto、file 或 browser')
++        captcha_id = captcha_code = None
++        if captcha:
++            challenge = self.get_captcha()
++            captcha_id = challenge['captchaId']
++            image_path = save_captcha_svg(challenge['image'])
++            print(f'验证码SVG（Agent当前工作目录）: {image_path}')
++            remote = bool(os.environ.get('SSH_CONNECTION') or os.environ.get('SSH_TTY'))
++            headless_linux = sys.platform.startswith('linux') and not (
++                os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY'))
++            open_browser = captcha_display == 'browser' or (
++                captcha_display == 'auto' and not remote and not headless_linux)
++            opened = False
++            if open_browser:
++                try:
++                    opened = webbrowser.open(image_path.as_uri())
++                except (webbrowser.Error, OSError):
++                    pass
++            if not opened:
++                print('请保持此终端等待，直接查看上述SVG，或用SFTP/SCP下载到自己的电脑查看。')
++            print('服务端原始SVG会保留在当前工作目录，不做格式转换。')
++            captcha_code = input('请输入图片中的验证码: ').strip()
++            if not captcha_code:
++                raise CANNJudgeError('验证码不能为空')
++        with warnings.catch_warnings():
++            warnings.simplefilter("error", getpass.GetPassWarning)
++            try:
++                password = getpass.getpass("请输入 CANNJudge 密码（输入不显示）: ")
++            except (getpass.GetPassWarning, EOFError):
++                raise CANNJudgeError("当前终端不支持安全输入密码，请使用本机终端或 RSA 密文登录") from None
++        if not password:
++            raise CANNJudgeError("密码不能为空")
++        try:
++            return self.login(email, password, login_type=login_type,
++                              captcha_id=captcha_id, captcha_code=captcha_code)
++        finally:
++            del password  # 释放引用；Python 不保证字符串内存被立即擦除。
++
++    def _check_response(self, resp):
++        if resp.status_code == 401:
++            self.logout()
++            raise CANNJudgeError("登录会话已失效，请重新运行 login；本次操作未自动重试")
++        resp.raise_for_status()
++    
++    def get_captcha(self) -> dict:
++        resp = self.session.get(f'{self.BASE_URL}/api/users/captcha', timeout=30)
++        resp.raise_for_status()
++        result = resp.json()
++        if not result.get('captchaId') or not isinstance(result.get('image'), str):
++            raise CANNJudgeError('平台未返回有效验证码')
++        return result
++
++    def login(self, email: str, password: str, *, login_type=None,
++              captcha_id=None, captcha_code=None) -> dict:
++        """登录 CANNJudge（password 为明文密码）"""
++        self.session.cookies.clear()
++        self.user_id = self.user_info = self.logged_in_at = None
++        account_type = login_type or ('phone' if re.fullmatch(r'\d{6,15}', email) else 'email')
++        payload = {'account': email, 'loginType': account_type, 'password': password}
++        if account_type == 'email':
++            payload['email'] = email  # compatibility with older deployments
++        if bool(captcha_id) != bool(captcha_code):
++            raise CANNJudgeError('captchaId 与 captchaCode 必须同时提供')
++        if captcha_id:
++            payload.update(captchaId=captcha_id, captchaCode=captcha_code)
++        resp = self.session.post(
++            f"{self.BASE_URL}/api/users/login",
++            json=payload,
++            timeout=30
++        )
++        resp.raise_for_status()
++        
++        user_info = resp.json()
++        if not isinstance(user_info, dict) or not isinstance(user_info.get("_id"), str) or not user_info["_id"]:
++            raise CANNJudgeError("登录响应缺少用户 ID，请检查账号或平台接口")
++        self.user_info = user_info
++        self.user_id = user_info["_id"]
++        self.logged_in_at = time.time()
++        
++        return self.user_info
++    
++    def login_with_ciphertext(self, email: str, ciphertext: str,
++                              private_key_path: str = "private.pem", **login_options) -> dict:
++        """登录 CANNJudge（ciphertext 为 RSA 加密后的密码密文，服务器用私钥解密）。
++        解密后的明文密码仅供内部调用登录 API，禁止输出到对话/日志/文件。"""
++        password = decrypt_password(ciphertext, private_key_path)
++        try:
++            return self.login(email, password, **login_options)
++        finally:
++            del password
++    
++    def get_problem(self, problem_id: str) -> dict:
++        """获取题目信息"""
++        resp = self.session.get(
++            f"{self.BASE_URL}/api/problems/{problem_id}",
++            timeout=30
++        )
++        self._check_response(resp)
++        return resp.json()
++
++    def _get_json(self, path, params=None):
++        resp = self.session.get(self.BASE_URL + path, params=params, timeout=30)
++        self._check_response(resp)
++        return resp.json()
++
++    def resolve_problem(self, value: str) -> dict:
++        """Resolve the full group/contest/problem URL without confusing names across contests."""
++        if not value.startswith(('http://', 'https://')):
++            return self.get_problem(value)
++        parsed = urlparse(value)
++        if parsed.scheme != 'https' or parsed.netloc != 'cannjudge.cn':
++            raise CANNJudgeError('题目链接必须来自 https://cannjudge.cn')
++        parts = [unquote(p) for p in (parsed.fragment.split('?')[0] if parsed.fragment.startswith('/') else parsed.path).strip('/').split('/')]
++        if len(parts) < 3:
++            raise CANNJudgeError('请提供包含小组、比赛和题目名称的完整题目链接')
++        group_name, contest_name, problem_name = parts[:3]
++        if group_name == 'public':
++            group = self._get_json('/api/groups/public')
++        else:
++            group = self._get_json('/api/groups/name/' + quote(group_name, safe=''))
++        contests = self._get_json('/api/contests/group/' + group['_id'])
++        matches = [c for c in contests if c.get('name') == contest_name or c.get('_id') == contest_name]
++        if len(matches) != 1:
++            raise CANNJudgeError('无法在指定小组唯一定位比赛')
++        contest_id = matches[0]['_id']
++        params = {'contestId': contest_id}
++        if self.user_id:
++            params['userId'] = self.user_id
++        problem = self._get_json('/api/problems/name/' + quote(problem_name, safe=''), params)
++        if problem.get('contest_id') != contest_id:
++            raise CANNJudgeError('题目返回的比赛与链接不一致')
++        return problem
++
++    def get_template(self, problem_id):
++        return self._get_json(f'/api/problems/{problem_id}/template',
++                              {'userId': self.user_id} if self.user_id else None)
++    
++    def download_package(self, problem_id: str, output_dir: str = None, *,
++                         include_metadata=False) -> str:
++        """下载工程模板"""
++        resp = self.session.get(
++            f"{self.BASE_URL}/api/problems/{problem_id}/package",
++            params={"userId": self.user_id},
++            timeout=60
++        )
++        self._check_response(resp)
++        
++        if output_dir is None:
++            output_dir = tempfile.mkdtemp()
++        problem = self.get_problem(problem_id) if include_metadata else None
++        template = self.get_template(problem_id) if include_metadata else None
++        return extract_package(resp.content, output_dir, problem, template)
++
++    def prepare_submission(self, problem_id, project_dir, project_type='auto'):
++        if project_type == 'auto':
++            problem = self.get_problem(problem_id)
++            project_type = problem.get('code_template') or 'registry'
++        if project_type == 'npu_kernel_dev':
++            files = collect_kernel_files(project_dir, self.get_template(problem_id), problem_id)
++            return {'problemId': problem_id, 'userId': self.user_id, 'files': files}
++        return {'problemId': problem_id, 'userId': self.user_id,
++                **collect_registry_files(project_dir)}
++
++    def submit_payload(self, payload):
++        if not self.user_id or payload.get('userId') != self.user_id:
++            raise CANNJudgeError('请先登录，并确保提交账号一致')
++        resp = self.session.post(f'{self.BASE_URL}/api/submissions/submit', json=payload, timeout=30)
++        self._check_response(resp)
++        result = resp.json()
++        submission_id = result.get('data', {}).get('submissionId')
++        if not submission_id:
++            raise CANNJudgeError('提交响应没有 submissionId；请先查询提交记录，避免重复提交')
++        return submission_id
++    
++    def submit(self, problem_id: str, 
++               tiling_h: str, tiling_key_h: str,
++               host_cpp: str, kernel_cpp: str) -> str:
++        """提交代码"""
++        payload = {
++            "problemId": problem_id,
++            "userId": self.user_id,
++            "tiling_h": tiling_h,
++            "tiling_key_h": tiling_key_h,
++            "host_cpp": host_cpp,
++            "kernel_cpp": kernel_cpp
++        }
++        
++        return self.submit_payload(payload)
++    
++    def get_submission(self, submission_id: str) -> dict:
++        """查询提交结果"""
++        resp = self.session.get(
++            f"{self.BASE_URL}/api/submissions/{submission_id}",
++            timeout=30
++        )
++        self._check_response(resp)
++        return resp.json()
++    
++    def wait_for_result(self, submission_id: str, 
++                        max_wait: int = 120, interval: int = 3) -> dict:
++        """等待提交完成并返回结果"""
++        if max_wait < 0 or interval <= 0:
++            raise CANNJudgeError('等待秒数不能为负，轮询间隔必须大于0')
++        deadline = time.monotonic() + max_wait
++        while True:
++            result = self.get_submission(submission_id)
++            status = result.get("status")
++            if status in ["Pass", "Fail", "Accepted", "Wrong Answer",
++                          "Compile Error", "Runtime Error",
++                          "Time Limit Exceeded", "Memory Limit Exceeded", "System Error"]:
++                return result
++            remaining = deadline - time.monotonic()
++            if remaining <= 0:
++                return result
++            time.sleep(min(interval, remaining))
++    
++    def get_rankings(self, problem_id: str) -> list:
++        """获取排行榜"""
++        resp = self.session.get(
++            f"{self.BASE_URL}/api/submissions/problem/{problem_id}/latest",
++            timeout=30
++        )
++        self._check_response(resp)
++        return resp.json()
++
++
++def print_submission_result(result: dict):
++    """打印提交结果"""
++    status = result.get("status", "Unknown")
++    print(f"\n{'='*60}")
++    print(f"状态: {status}")
++    print(f"{'='*60}")
++    
++    if result.get('msg'):
++        print(result['msg'])
++    if "result" in result:
++        print("\n测试用例结果:")
++        for idx, tc in enumerate(result["result"]):
++            tc_status = tc.get("testcase_status", "Unknown")
++            precision = tc.get("precision_ratio", "N/A")
++            elapsed = tc.get("time", "N/A")
++            print(f"  Case {idx+1}: {tc_status}")
++            print(f"           precision_ratio: {precision}, time（平台原值）: {elapsed}")
++            if tc.get('msg'):
++                print(f"           {tc['msg']}")
++        passed = sum(tc.get('testcase_status') in ('Pass', 'Accepted') for tc in result['result'])
++        print(f"通过: {passed}/{len(result['result'])}")
++
++
++def main():
++    parser = argparse.ArgumentParser(
++        description="CANNJudge 算子提交辅助工具"
++    )
++    parser.add_argument("--session-file", help="会话文件路径（默认 ~/.cannjudge/session.json）")
++    
++    subparsers = parser.add_subparsers(dest="command", help="命令")
++    def problem_selector(subparser):
++        group = subparser.add_mutually_exclusive_group(required=True)
++        group.add_argument('--problem-id', help='题目 ID')
++        group.add_argument('--problem-url', help='包含小组/比赛/题目名称的完整链接')
++
++    info_parser = subparsers.add_parser('info', help='读取网站上的题目描述及工程类型')
++    problem_selector(info_parser)
++    
++    # 登录命令
++    login_parser = subparsers.add_parser("login", help="登录 CANNJudge")
++    login_parser.add_argument("--account", "--email", dest="email", help="邮箱或手机号；省略时在终端输入")
++    login_parser.add_argument("--login-type", choices=['email', 'phone'], help="默认按账号格式判断")
++    login_parser.add_argument("--captcha", action="store_true", help="获取验证码图片并由用户在终端输入（可选，仅在平台明确要求时使用）")
++    login_parser.add_argument('--captcha-display', choices=['auto', 'file', 'browser'], default='auto',
++                              help='验证码展示：auto在SSH/无桌面Linux下仅保存文件；file不打开浏览器')
++    login_parser.add_argument("--captcha-id", help="已有验证码 ID，与 --captcha-code 配套")
++    login_parser.add_argument("--captcha-code", help="用户读取的验证码，与 --captcha-id 配套")
++    credentials = login_parser.add_mutually_exclusive_group()
++    credentials.add_argument("--password", help="兼容旧版；建议省略此参数，在终端隐藏输入")
++    credentials.add_argument("--ciphertext", help="RSA 加密后的密码密文（兼容方式）")
++    login_parser.add_argument("--private-key", default="private.pem", help="RSA 私钥路径")
++    subparsers.add_parser("logout", help="清除本机保存的登录会话")
++    
++    # 下载命令
++    download_parser = subparsers.add_parser("download", help="下载工程模板")
++    problem_selector(download_parser)
++    download_parser.add_argument("--output", help="输出目录")
++    
++    # 提交命令
++    submit_parser = subparsers.add_parser("submit", help="提交代码")
++    problem_selector(submit_parser)
++    submit_parser.add_argument("--project-dir", required=True, help="工程目录")
++    submit_parser.add_argument('--project-type', choices=['auto', 'npu_kernel_dev', 'registry'], default='auto', help='默认依据网站 code_template 自动判断')
++    submit_parser.add_argument('--dry-run', action='store_true', help='核对模板并显示提交文件，不创建提交')
++    submit_parser.add_argument('--no-wait', action='store_true', help='获得提交 ID 后立即返回')
++    submit_parser.add_argument('--max-wait', type=int, default=120, help='结果等待秒数')
++    
++    # 查询命令
++    query_parser = subparsers.add_parser("query", help="查询提交结果")
++    query_parser.add_argument("--submission-id", required=True, help="提交ID")
++    
++    # 排行榜命令
++    rank_parser = subparsers.add_parser("rank", help="查看排行榜")
++    rank_parser.add_argument("--problem-id", required=True, help="题目ID")
++    
++    args = parser.parse_args()
++
++    if not args.command:
++        parser.print_help()
++        return 0
++    try:
++        return run_command(args)
++    except requests.HTTPError as exc:
++        status = exc.response.status_code if exc.response is not None else "未知"
++        if args.command == 'login' and status in (400, 401):
++            print('错误: 登录失败，请检查账号和密码；仅在平台明确要求验证码时使用 --captcha', file=sys.stderr)
++        elif status == 401:
++            print("错误: 登录失败，请检查邮箱和密码", file=sys.stderr)
++        elif status == 403:
++            print("错误: 平台拒绝访问，请检查账号权限或重新登录", file=sys.stderr)
++        else:
++            print(f"错误: 平台请求失败（HTTP {status}）", file=sys.stderr)
++    except requests.RequestException:
++        print("错误: 无法连接 CANNJudge，请检查网络后重试", file=sys.stderr)
++    except CANNJudgeError as exc:
++        print(f"错误: {exc}", file=sys.stderr)
++    except (ValueError, OSError, ImportError) as exc:
++        # 不输出响应正文或 traceback，避免暴露登录请求内容。
++        if args.command == "login":
++            print("错误: 登录或保存会话失败，请检查终端、凭据、密钥和会话文件权限", file=sys.stderr)
++        else:
++            print(f"错误: {exc}", file=sys.stderr)
++    except KeyboardInterrupt:
++        print("\n操作已取消", file=sys.stderr)
++    return 1
++
++
++def run_command(args):
++    
++    # 创建客户端
++    client = CANNJudgeClient(session_file=args.session_file)
++    if args.command == "logout":
++        client.logout()
++        print("已清除本机登录会话")
++        return 0
++    
++    if args.command == "login":
++        if not args.email:
++            if not sys.stdin.isatty():
++                raise CANNJudgeError('请在自己的交互终端运行 login')
++            args.email = input('CANNJudge 账号（邮箱或手机号）: ').strip()
++        if not args.email:
++            raise CANNJudgeError('账号不能为空')
++        # 切换账号或重新登录失败时，不再悄悄复用之前的账号。
++        client.logout()
++        if args.ciphertext:
++            if args.captcha:
++                raise CANNJudgeError('RSA 方式请使用 --captcha-id 与 --captcha-code；普通账号密码方式使用 --captcha')
++            result = client.login_with_ciphertext(args.email, args.ciphertext, args.private_key,
++                                                 login_type=args.login_type,
++                                                 captcha_id=args.captcha_id, captcha_code=args.captcha_code)
++        elif args.password:
++            print("提示: 建议省略 --password，在终端隐藏输入，避免密码进入命令历史", file=sys.stderr)
++            result = client.login(args.email, args.password, login_type=args.login_type,
++                                  captcha_id=args.captcha_id, captcha_code=args.captcha_code)
++        else:
++            if args.captcha_id or args.captcha_code:
++                raise CANNJudgeError('隐藏密码登录请使用 --captcha 自动获取验证码')
++            result = client.login_interactive(args.email, captcha=args.captcha, login_type=args.login_type,
++                                              captcha_display=args.captcha_display)
++        client.save_session()
++        print(f"登录成功!")
++        print(f"用户ID: {result['_id']}")
++        print("登录会话已保存，后续命令会自动复用；过期后重新登录即可")
++        return 0
++
++    loaded = client.load_session()
++    if not loaded and args.command not in ('info', 'download') and not (args.command == 'submit' and args.dry_run):
++        print("错误: 请先在自己的终端运行 login", file=sys.stderr)
++        return 1
++        
++    if args.command in ('info', 'download', 'submit'):
++        if args.problem_url:
++            args.problem_id = client.resolve_problem(args.problem_url)['_id']
++
++    if args.command == 'info':
++        print(json.dumps(client.get_problem(args.problem_id), ensure_ascii=False, indent=2))
++        return 0
++
++    if args.command == "download":
++        
++        print(f"下载题目 {args.problem_id} 的工程模板...")
++        extract_dir = client.download_package(args.problem_id, args.output, include_metadata=True)
++        print(f"工程已解压到: {extract_dir}")
++        
++    elif args.command == "submit":
++        payload = client.prepare_submission(args.problem_id, args.project_dir, args.project_type)
++        if args.dry_run:
++            files = payload.get('files') or [{'path': k, 'content': v} for k, v in payload.items() if k not in ('problemId', 'userId')]
++            import hashlib
++            print(json.dumps({'problemId': args.problem_id, 'files': [
++                {'path': f['path'], 'bytes': len(f['content'].encode('utf-8')),
++                 'sha256': hashlib.sha256(f['content'].encode('utf-8')).hexdigest()} for f in files
++            ]}, ensure_ascii=False, indent=2))
++            return 0
++        
++        print(f"提交代码到题目 {args.problem_id}...")
++        submission_id = client.submit_payload(payload)
++        print(f"提交成功! Submission ID: {submission_id}")
++        
++        if not args.no_wait:
++            print("\n等待结果...")
++            result = client.wait_for_result(submission_id, max_wait=args.max_wait)
++            print_submission_result(result)
++        
++    elif args.command == "query":
++        if not client.user_id:
++            print("错误: 请先登录")
++            return 1
++        
++        result = client.get_submission(args.submission_id)
++        print_submission_result(result)
++        
++    elif args.command == "rank":
++        if not client.user_id:
++            print("错误: 请先登录")
++            return 1
++        
++        rankings = client.get_rankings(args.problem_id)
++        
++        print(f"\n题目 {args.problem_id} 排行榜:")
++        print("=" * 60)
++        
++        # 按状态和分数排序
++        sorted_rankings = sorted(
++            rankings,
++            key=lambda x: (x.get("status") in ('Pass', 'Accepted'), x.get("score", 0)),
++            reverse=True
++        )
++        
++        for i, item in enumerate(sorted_rankings[:20]):
++            user_id = item.get("user_id", "unknown")
++            status = item.get("status", "unknown")
++            score = item.get("score", "N/A")
++            print(f"{i+1:3d}. {user_id:24s} | {status:15s} | score: {score}")
++    
++    if loaded:
++        try:
++            client.save_session()
++        except (OSError, ValueError):
++            print("提示: 本次操作已完成，但无法更新本机会话；下次使用前可能需要重新登录", file=sys.stderr)
++    return 0
++
++
++if __name__ == "__main__":
++    sys.exit(main())
+diff --git a/skills/cannjudge-submit/encrypt_password.py b/skills/cannjudge-submit/encrypt_password.py
+index d9104a5..22fcb29 100644
+--- a/skills/cannjudge-submit/encrypt_password.py
++++ b/skills/cannjudge-submit/encrypt_password.py
+@@ -1,69 +1,69 @@
+-#!/usr/bin/env python3
+-"""
+-RSA 密码加密脚本
+-
+-在个人 PC 上运行，用公钥加密 CANNJudge 密码，生成密文。
+-将密文提供给服务器端（CANNBot），服务器用私钥解密后登录。
+-
+-用法：
+-    python3 encrypt_password.py
+-
+-或者指定公钥路径：
+-    python3 encrypt_password.py --public-key /path/to/public.pem
+-
+-依赖：
+-    pip install pycryptodome
+-"""
+-
+-from Crypto.PublicKey import RSA
+-from Crypto.Cipher import PKCS1_v1_5
+-import base64
+-import argparse
+-import sys
+-import getpass
+-
+-DEFAULT_PUBLIC_KEY_PATH = "public.pem"
+-
+-
+-def encrypt_password(public_key_path: str, password: str) -> str:
+-    with open(public_key_path, "r", encoding="utf-8") as f:
+-        public_key_pem = f.read()
+-
+-    rsa_key = RSA.importKey(public_key_pem)
+-    cipher = PKCS1_v1_5.new(rsa_key)
+-    encrypted = base64.b64encode(cipher.encrypt(password.encode())).decode()
+-    return encrypted
+-
+-
+-def main():
+-    parser = argparse.ArgumentParser(description="RSA 加密 CANNJudge 密码")
+-    parser.add_argument(
+-        "--public-key",
+-        default=DEFAULT_PUBLIC_KEY_PATH,
+-        help=f"公钥文件路径 (默认: {DEFAULT_PUBLIC_KEY_PATH})",
+-    )
+-    args = parser.parse_args()
+-
+-    try:
+-        with open(args.public_key, "r", encoding="utf-8") as f:
+-            f.read()
+-    except FileNotFoundError:
+-        print(f"错误: 找不到公钥文件 '{args.public_key}'")
+-        print("请先将服务器上的 public.pem 拷贝到当前目录或指定路径。")
+-        sys.exit(1)
+-
+-    pwd = getpass.getpass("请输入你的 CANNJudge 密码：").strip()
+-    if not pwd:
+-        print("错误: 密码不能为空")
+-        sys.exit(1)
+-
+-    encrypted = encrypt_password(args.public_key, pwd)
+-
+-    print("\n" + "=" * 60)
+-    print("加密完成！将下方密文提供给 CANNBot 即可登录")
+-    print("=" * 60)
+-    print(f"\n{encrypted}\n")
+-
+-
+-if __name__ == "__main__":
+-    main()
++#!/usr/bin/env python3
++"""
++RSA 密码加密脚本
++
++在个人 PC 上运行，用公钥加密 CANNJudge 密码，生成密文。
++将密文提供给服务器端（CANNBot），服务器用私钥解密后登录。
++
++用法：
++    python3 encrypt_password.py
++
++或者指定公钥路径：
++    python3 encrypt_password.py --public-key /path/to/public.pem
++
++依赖：
++    pip install pycryptodome
++"""
++
++from Crypto.PublicKey import RSA
++from Crypto.Cipher import PKCS1_v1_5
++import base64
++import argparse
++import sys
++import getpass
++
++DEFAULT_PUBLIC_KEY_PATH = "public.pem"
++
++
++def encrypt_password(public_key_path: str, password: str) -> str:
++    with open(public_key_path, "r", encoding="utf-8") as f:
++        public_key_pem = f.read()
++
++    rsa_key = RSA.importKey(public_key_pem)
++    cipher = PKCS1_v1_5.new(rsa_key)
++    encrypted = base64.b64encode(cipher.encrypt(password.encode())).decode()
++    return encrypted
++
++
++def main():
++    parser = argparse.ArgumentParser(description="RSA 加密 CANNJudge 密码")
++    parser.add_argument(
++        "--public-key",
++        default=DEFAULT_PUBLIC_KEY_PATH,
++        help=f"公钥文件路径 (默认: {DEFAULT_PUBLIC_KEY_PATH})",
++    )
++    args = parser.parse_args()
++
++    try:
++        with open(args.public_key, "r", encoding="utf-8") as f:
++            f.read()
++    except FileNotFoundError:
++        print(f"错误: 找不到公钥文件 '{args.public_key}'")
++        print("请先将服务器上的 public.pem 拷贝到当前目录或指定路径。")
++        sys.exit(1)
++
++    pwd = getpass.getpass("请输入你的 CANNJudge 密码：").strip()
++    if not pwd:
++        print("错误: 密码不能为空")
++        sys.exit(1)
++
++    encrypted = encrypt_password(args.public_key, pwd)
++
++    print("\n" + "=" * 60)
++    print("加密完成！将下方密文提供给 CANNBot 即可登录")
++    print("=" * 60)
++    print(f"\n{encrypted}\n")
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/skills/cannjudge-submit/example.py b/skills/cannjudge-submit/example.py
+index 3441475..a7c216b 100644
+--- a/skills/cannjudge-submit/example.py
++++ b/skills/cannjudge-submit/example.py
+@@ -1,251 +1,29 @@
+ #!/usr/bin/env python3
+-"""
+-CANNJudge 算子提交示例
+-
+-展示如何使用 CANNJudge API 完成完整的提交流程。
+-"""
+-
+-import requests
+-import time
+-import os
+-import zipfile
+-from pathlib import Path
++"""User-run interactive example using the same validated SDK as the CLI."""
++from cannjudge_cli import CANNJudgeClient, print_submission_result
+ 
+ 
+ def example_workflow():
+-    """
+-    完整的 CANNJudge 算子提交流程示例
+-    """
+-    
+-    # ========================================
+-    # 步骤 1: 登录
+-    # ========================================
+-    print("步骤 1: 登录 CANNJudge")
+-    print("-" * 60)
+-    
+-    # 注意: 实际使用时从用户输入或配置文件读取
+-    email = input("请输入邮箱: ")
+-    password = input("请输入密码: ")
+-    
+-    session = requests.Session()
+-    
+-    resp = session.post(
+-        "https://cannjudge.cn/api/users/login",
+-        json={"email": email, "password": password},
+-        timeout=30
+-    )
+-    
+-    if resp.status_code != 200:
+-        print(f"登录失败: {resp.text}")
+-        return
+-    
+-    user_info = resp.json()
+-    user_id = user_info["_id"]
+-    print(f"登录成功! 用户ID: {user_id}")
+-    
+-    # ========================================
+-    # 步骤 2: 获取题目信息
+-    # ========================================
+-    print("\n步骤 2: 获取题目信息")
+-    print("-" * 60)
+-    
+-    problem_id = input("请输入题目ID: ")
+-    
+-    resp = session.get(
+-        f"https://cannjudge.cn/api/problems/{problem_id}",
+-        timeout=30
+-    )
+-    
+-    if resp.status_code != 200:
+-        print(f"获取题目失败: {resp.text}")
+-        return
+-    
+-    problem_info = resp.json()
+-    print(f"题目名称: {problem_info.get('title', 'N/A')}")
+-    print(f"题目描述: {problem_info.get('desc', 'N/A')[:200]}...")
+-    
+-    # ========================================
+-    # 步骤 3: 下载工程模板
+-    # ========================================
+-    print("\n步骤 3: 下载工程模板")
+-    print("-" * 60)
+-    
+-    resp = session.get(
+-        f"https://cannjudge.cn/api/problems/{problem_id}/package",
+-        params={"userId": user_id},
+-        timeout=60
+-    )
+-    
+-    if resp.status_code != 200:
+-        print(f"下载失败: {resp.text}")
+-        return
+-    
+-    # 保存并解压
+-    output_dir = f"./{problem_info.get('name', 'project')}"
+-    os.makedirs(output_dir, exist_ok=True)
+-    
+-    zip_path = os.path.join(output_dir, "project.zip")
+-    with open(zip_path, "wb") as f:
+-        f.write(resp.content)
+-    
+-    with zipfile.ZipFile(zip_path, "r") as zf:
+-        zf.extractall(output_dir)
+-    
+-    print(f"工程已下载到: {output_dir}")
+-    print("\n工程结构:")
+-    for root, dirs, files in os.walk(output_dir):
+-        level = root.replace(output_dir, '').count(os.sep)
+-        indent = ' ' * 2 * level
+-        print(f"{indent}{os.path.basename(root)}/")
+-        subindent = ' ' * 2 * (level + 1)
+-        for file in files:
+-            print(f"{subindent}{file}")
+-    
+-    # ========================================
+-    # 步骤 4: 实现算子
+-    # ========================================
+-    print("\n步骤 4: 实现算子")
+-    print("-" * 60)
+-    print(f"请在 {output_dir}/code 目录中实现算子")
+-    print("需要实现的文件:")
+-    print("  - op_kernel/*_tiling.h: Tiling 数据结构")
+-    print("  - op_host/*.cpp: Host 侧实现")
+-    print("  - op_kernel/*.cpp: Kernel 侧实现")
+-    
+-    input("\n实现完成后按 Enter 继续...")
+-    
+-    # ========================================
+-    # 步骤 5: 编译工程
+-    # ========================================
+-    print("\n步骤 5: 编译工程")
+-    print("-" * 60)
+-    
+-    code_dir = os.path.join(output_dir, "code")
+-    
+-    # 检查是否有 build.sh
+-    build_sh = os.path.join(code_dir, "build.sh")
+-    if os.path.exists(build_sh):
+-        print("找到 build.sh，请手动执行编译:")
+-        print(f"  cd {code_dir} && bash build.sh")
+-        input("编译完成后按 Enter 继续...")
+-    else:
+-        print("未找到 build.sh，请手动编译工程")
+-        input("编译完成后按 Enter 继续...")
+-    
+-    # ========================================
+-    # 步骤 6: 提交代码
+-    # ========================================
+-    print("\n步骤 6: 提交代码")
+-    print("-" * 60)
+-    
+-    # 查找代码文件
+-    code_path = Path(code_dir)
+-    
+-    tiling_h_files = list(code_path.glob("op_kernel/*_tiling.h"))
+-    tiling_key_h_files = list(code_path.glob("op_kernel/tiling_key_*.h"))
+-    host_cpp_files = list(code_path.glob("op_host/*.cpp"))
+-    kernel_cpp_files = [f for f in code_path.glob("op_kernel/*.cpp") 
+-                        if "_tiling" not in f.name]
+-    
+-    if not all([tiling_h_files, host_cpp_files, kernel_cpp_files]):
+-        print("错误: 找不到必要的代码文件")
+-        return
+-    
+-    # 读取文件内容
+-    tiling_h = tiling_h_files[0].read_text()
+-    tiling_key_h = tiling_key_h_files[0].read_text() if tiling_key_h_files else ""
+-    host_cpp = host_cpp_files[0].read_text()
+-    kernel_cpp = kernel_cpp_files[0].read_text()
+-    
+-    # 提交
+-    resp = session.post(
+-        "https://cannjudge.cn/api/submissions/submit",
+-        json={
+-            "problemId": problem_id,
+-            "userId": user_id,
+-            "tiling_h": tiling_h,
+-            "tiling_key_h": tiling_key_h,
+-            "host_cpp": host_cpp,
+-            "kernel_cpp": kernel_cpp
+-        },
+-        timeout=30
+-    )
+-    
+-    if resp.status_code != 200:
+-        print(f"提交失败: {resp.text}")
++    client = CANNJudgeClient()
++    if not client.load_session():
++        print('请先在自己的终端运行: python3 cannjudge_cli.py login --captcha')
+         return
+-    
+-    result = resp.json()
+-    submission_id = result["data"]["submissionId"]
+-    print(f"提交成功! Submission ID: {submission_id}")
+-    
+-    # ========================================
+-    # 步骤 7: 等待结果
+-    # ========================================
+-    print("\n步骤 7: 等待结果")
+-    print("-" * 60)
+-    
+-    for i in range(40):
+-        time.sleep(3)
+-        
+-        resp = session.get(
+-            f"https://cannjudge.cn/api/submissions/{submission_id}",
+-            timeout=30
+-        )
+-        
+-        if resp.status_code == 200:
+-            result = resp.json()
+-            status = result.get("status", "unknown")
+-            
+-            print(f"轮询 {i+1}: {status}")
+-            
+-            if status in ["Accepted", "Wrong Answer", 
+-                          "Compile Error", "Runtime Error"]:
+-                print(f"\n{'='*60}")
+-                print(f"最终状态: {status}")
+-                print(f"{'='*60}")
+-                
+-                if "result" in result:
+-                    print("\n测试用例结果:")
+-                    for idx, tc in enumerate(result["result"]):
+-                        tc_status = tc.get("testcase_status", "Unknown")
+-                        precision = tc.get("precision_ratio", "N/A")
+-                        time_ms = tc.get("time", "N/A")
+-                        print(f"  Case {idx+1}: {tc_status}")
+-                        print(f"           precision: {precision}, time: {time_ms}ms")
+-                
+-                break
+-    else:
+-        print("\n超时: 未能获取最终结果")
+-    
+-    # ========================================
+-    # 步骤 8: 查看排行榜
+-    # ========================================
+-    print("\n步骤 8: 查看排行榜")
+-    print("-" * 60)
+-    
+-    resp = session.get(
+-        f"https://cannjudge.cn/api/submissions/problem/{problem_id}/latest",
+-        timeout=30
+-    )
+-    
+-    if resp.status_code == 200:
+-        rankings = resp.json()
+-        
+-        # 按状态和分数排序
+-        sorted_rankings = sorted(
+-            rankings,
+-            key=lambda x: (x.get("status") == "Accepted", x.get("score", 0)),
+-            reverse=True
+-        )
+-        
+-        print(f"\n排行榜 (前20名):")
+-        for i, item in enumerate(sorted_rankings[:20]):
+-            user = item.get("user_id", "unknown")
+-            status = item.get("status", "unknown")
+-            score = item.get("score", "N/A")
+-            print(f"{i+1:3d}. {user:24s} | {status:15s} | score: {score}")
++    source = input('题目完整链接或 ID: ').strip()
++    problem = client.resolve_problem(source)
++    print(problem.get('title', ''), problem.get('code_template', 'registry'))
++    print(problem.get('desc', ''))
++    output = input('下载输出目录（请使用新目录）: ').strip()
++    directory = client.download_package(problem['_id'], output, include_metadata=True)
++    print(f'工程已下载: {directory}')
++    print('根据模板完成可编辑源码。核函数题保留 run_kernel 接口和只读框架。')
++    input('完成开发和检查后按 Enter 继续: ')
++    payload = client.prepare_submission(problem['_id'], directory)
++    print('提交文件:', [f['path'] for f in payload.get('files', [])] or '传统工程四字段')
++    submission_id = client.submit_payload(payload)
++    print('提交ID:', submission_id)
++    print_submission_result(client.wait_for_result(submission_id))
++    client.save_session()
+ 
+ 
+-if __name__ == "__main__":
++if __name__ == '__main__':
+     example_workflow()
+diff --git a/skills/cannjudge-submit/generate_key.py b/skills/cannjudge-submit/generate_key.py
+index f39bd42..83cc4f5 100644
+--- a/skills/cannjudge-submit/generate_key.py
++++ b/skills/cannjudge-submit/generate_key.py
+@@ -1,49 +1,49 @@
+-#!/usr/bin/env python3
+-"""
+-RSA 密钥对生成脚本
+-
+-在服务器上运行一次，生成 RSA-2048 密钥对：
+-  - private.pem → 留在服务器，用于解密密码（绝不外传）
+-  - public.pem  → 拷贝到个人 PC，用于加密密码
+-
+-用法：
+-    python3 generate_key.py
+-
+-依赖：
+-    pip install pycryptodome
+-"""
+-
+-from Crypto.PublicKey import RSA
+-import os
+-
+-PRIVATE_KEY_PATH = "private.pem"
+-PUBLIC_KEY_PATH = "public.pem"
+-
+-
+-def generate_keys():
+-    if os.path.exists(PRIVATE_KEY_PATH) and os.path.exists(PUBLIC_KEY_PATH):
+-        print(f"密钥文件已存在：{PRIVATE_KEY_PATH}, {PUBLIC_KEY_PATH}")
+-        print("如需重新生成，请先删除旧文件。")
+-        return
+-
+-    key = RSA.generate(2048)
+-
+-    private_key = key.export_key()
+-    with open(PRIVATE_KEY_PATH, "wb") as f:
+-        f.write(private_key)
+-    os.chmod(PRIVATE_KEY_PATH, 0o600)
+-    public_key = key.publickey().export_key()
+-    with open(PUBLIC_KEY_PATH, "wb") as f:
+-        f.write(public_key)
+-
+-    print("=" * 60)
+-    print("RSA-2048 密钥对已生成")
+-    print("=" * 60)
+-    print(f"\n私钥已保存到: {PRIVATE_KEY_PATH}  (仅保留在服务器，绝不外传)")
+-    print(f"公钥已保存到: {PUBLIC_KEY_PATH}  (拷贝到个人 PC 用于加密)")
+-    print(f"\n公钥内容（也可直接复制下方内容到 PC）：\n")
+-    print(public_key.decode())
+-
+-
+-if __name__ == "__main__":
+-    generate_keys()
++#!/usr/bin/env python3
++"""
++RSA 密钥对生成脚本
++
++在服务器上运行一次，生成 RSA-2048 密钥对：
++  - private.pem → 留在服务器，用于解密密码（绝不外传）
++  - public.pem  → 拷贝到个人 PC，用于加密密码
++
++用法：
++    python3 generate_key.py
++
++依赖：
++    pip install pycryptodome
++"""
++
++from Crypto.PublicKey import RSA
++import os
++
++PRIVATE_KEY_PATH = "private.pem"
++PUBLIC_KEY_PATH = "public.pem"
++
++
++def generate_keys():
++    if os.path.exists(PRIVATE_KEY_PATH) and os.path.exists(PUBLIC_KEY_PATH):
++        print(f"密钥文件已存在：{PRIVATE_KEY_PATH}, {PUBLIC_KEY_PATH}")
++        print("如需重新生成，请先删除旧文件。")
++        return
++
++    key = RSA.generate(2048)
++
++    private_key = key.export_key()
++    with open(PRIVATE_KEY_PATH, "wb") as f:
++        f.write(private_key)
++    os.chmod(PRIVATE_KEY_PATH, 0o600)
++    public_key = key.publickey().export_key()
++    with open(PUBLIC_KEY_PATH, "wb") as f:
++        f.write(public_key)
++
++    print("=" * 60)
++    print("RSA-2048 密钥对已生成")
++    print("=" * 60)
++    print(f"\n私钥已保存到: {PRIVATE_KEY_PATH}  (仅保留在服务器，绝不外传)")
++    print(f"公钥已保存到: {PUBLIC_KEY_PATH}  (拷贝到个人 PC 用于加密)")
++    print(f"\n公钥内容（也可直接复制下方内容到 PC）：\n")
++    print(public_key.decode())
++
++
++if __name__ == "__main__":
++    generate_keys()
+diff --git a/standard_course/README.md b/standard_course/README.md
+index 818a5fb..3861f5b 100644
+--- a/standard_course/README.md
++++ b/standard_course/README.md
+@@ -1,3 +1,201 @@
+-# CANN 标准化课程包
++# CANN 课程体系总体规划
+ 
+-本目录存放 CANN 标准化课程包，供高校开课选用。每个子目录对应一种学时方案（如 64 课时、40 课时、24 课时、16 课时等），包含课程大纲、课时安排及配套说明。
++> CANN 全栈课程体系设计目录，以**原子课程为基础积木**，支撑**启航营**、**常规课**（传统学科课程、CANN 新增课程）、**CANN教材**三大课程形态，覆盖从短期集训到高校学分课、从入门到专家的完整学习路径。五大分区自包含，与 cann-learning-hub 标准课程包内容保持一致。
++
++---
++
++## 一、课程体系总览
++
++### 1.1 核心理念：原子课程是基础
++
++**原子课程**是整个 CANN 课程体系的基础积木，按**技术栈四层 × 难度三级**组织，共 135 门。每门原子课可单独支撑一节课（45–90 分钟），具备独立的学习目标、核心内容、实践项目与考核标准。
++
++四大课程形态均由原子课程拼装、节选或教学化而来：
++
++| 课程形态 | 与原子课程的关系 | 拼装方式 |
++|---------|----------------|---------|
++| **启航营** | 原子课程节选 | 从 L1/L4 层选取入门级原子课，按两天/两周集训节奏重组，配套高强度实践 |
++| **传统学科课程** | 原子课程教学化 | 将 L4 架构/算子类原子课融入大学传统课程（体系结构/计组/并行计算等），以单元包/对照案例/实验替换形式外挂融入 |
++| **CANN 新增课程** | 原子课程拼装 | 每门课程由 10–30 门原子课按章节拼装，关注前后章节连续性，配套大作业 |
++| **CANN 新增教材** | 原子课程系统化 | 将原子课程内容按教材体例系统化组织，形成完整的知识体系与教学脉络 |
++
++### 1.2 五分区架构
++
++| 分区 | 定位 | 与原子课程关系  | 规模 | 详细大纲 |
++|------|------|--------------|---------|---------|
++| **00 原子课程** | **基础积木**：技术栈四层 × 难度三级的原子粒度课程 | 体系基础  | 135 门 | [原子课程总纲](./00_atomic_courses/README.md) |
++| **01 启航营** | 短期集训：两天/两周两营递进，快速入门与实战 | 原子课程**节选** | 两天营 ≈14h / 两周营 ≈60h | [启航营课程总览](./01_bootcamp/README.md) |
++| **02 传统学科课程** | 学科融入：CANN 知识融入大学传统学分课程，换芯不换课 | 原子课程**教学化**  | 计组外挂 6–8h + 体系结构三幕剧 3×135' + 12 学科清单 | [传统学科课程目录](./02_traditional_courses/README.md) |
++| **03 新增课程** | 高校学分课：六门系统课程 | 原子课程**拼装** | 六门：已排课 2 + 规划 4 | [CANN 新增课程汇总](./03_new_courses/README.md) |
++| **04 教材区** | 经典书籍：双教材支撑课程体系 | 原子课程**系统化**  | 教材一 + 教材二 | [CANN 教材区概览](./04_new_books/README.md) |
++
++### 1.3 原子课程支撑关系图
++
++```
++┌─────────────────────────────────────────────────────────────────────────┐
++│                        原子课程（00）—— 体系基础                            │
++│              135 门积木（技术栈四层 × 难度三级）                            │
++│  ┌────────────┬────────────┬────────────┬────────────────────────────┐  │
++│  │  L1 应用层  │  L2 框架层  │  L3 加速库  │  L4 编程·编译·NPU 架构     │  │
++│  │   (44门)    │   (29门)    │   (13门)    │        (49门)              │  │
++│  └────────────┴────────────┴────────────┴────────────────────────────┘  │
++└───────────────────────────────┬─────────────────────────────────────────┘
++                                 │ 支撑（节选/教学化/拼装/系统化）
++          ┌──────────────────────┼──────────────────────┐
++          │                      │                      │
++┌─────────▼──────────┐ ┌───────▼──────────┐ ┌────────▼───────────┐
++│   启航营（01）       │ │ 传统学科课程（02）  │ │  CANN 新增课程（03）  │
++│   原子课程节选        │ │  原子课程教学化      │ │   原子课程拼装        │
++│ ┌────────────────┐  │ │ ┌────────────────┐ │ │ ┌────────────────┐  │
++│ │ 两天营 ≈14h     │  │ │ │ 计组外挂 6–8h   │ │ │ │ AI计算架构 64h  │  │
++│ │ 两周营 ≈60h     │  │ │ │ 体系结构三幕剧   │ │ │ │ 数据智能 32h    │  │
++│ │ 结业：add_rms_  │  │ │ │ 12 学科清单      │ │ │ │ 加速计算 32-48h │  │
++│ │   norm→双算子   │  │ │ └────────────────┘ │ │ │ 数据科学 24-32h │  │
++│ └────────────────┘  │ └────────────────────┘ │ │ 深度学习 32-48h │  │
++└─────────────────────┘                          │ │ 生成式 AI 32h   │  │
++                                                  │ └────────────────┘  │
++                                                  └─────────────────────┘
++                                 │
++                                 │ 系统化
++                  ┌──────────────▼──────────────┐
++                  │       教材区（04）             │
++                  │     原子课程系统化             │
++                  │ ┌──────────────────────────┐ │
++                  │ │ 教材一：Ascend C 并行程序设计│ │
++                  │ │  （↔课程三/启航营算子部分） │ │
++                  │ ├──────────────────────────┤ │
++                  │ │ 教材二：人工智能芯片与系统   │ │
++                  │ │  （↔体系结构三幕剧/课程一）  │ │
++                  │ └──────────────────────────┘ │
++                  └─────────────────────────────┘
++```
++
++---
++
++## 二、五分区详细介绍
++
++### 2.1 00 原子课程（体系基础）
++
++**定位**：课程体系的基础积木，按技术栈四层（应用层/AI 框架层/加速库/编程编译 NPU 架构）× 难度三级（初级/中级/高级）组织，每门原子课可单独支撑一节课（45–90 分钟）。是启航营、传统学科课程、CANN 新增课程、新增教材的共同内容来源。
++
++**规模**：135 门
++- **L1 应用层**：44 门（深度学习/计算机视觉/生成式 AI/大语言模型/科学计算/推荐系统）
++- **L2 AI 框架层**：29 门（框架基础/训练技术/推理技术/图框架/进阶主题；含 CANN 训练推理初/中/高阶 L2-20~25、图框架 L2-26~28、昇腾 AI 产业生态 L2-29）
++- **L3 加速库**：13 门（Aclnn/GE/通信库/C++并行算法/Python加速库）
++- **L4 编程·编译·NPU 架构**：49 门（Ascend C/PyPTO/TileLang/PyAsc/CANNBot/NPU架构）
++
++**对其他分区的支撑**：
++- 启航营：节选 L1-25/26、L1-31、L4-01/07、L4-14、L4-45 等入门级原子课
++- 传统学科课程：将 L4-47/48/49（NPU 架构）教学化为体系结构三幕剧
++- 新增课程：每门课程由 10–30 门原子课拼装（如课程三拼装 L4-01~30、L3-01~09）
++- 教材：将原子课程内容按教材体例系统化组织
++- 推荐系统：L1-42~44（CTR/DIN/DSSM → 自动融合优化 → 多卡调优+自定义算子）
++- CANN 训练/推理/图框架：L2-20~28（CANN 训练推理初/中/高阶 + 图框架初/中/高阶）、L2-29（昇腾 AI 产业生态）
++
++**详细大纲**：[原子课程总纲](./00_atomic_courses/README.md)
++
++---
++
++### 2.2 01 启航营（原子课程节选）
++
++**定位**：短期集训营，面向零基础新入行者、竞赛新手、跨领域转型开发者，通过高强度理论+实践快速建立 CANN 开发能力。两营递进，结业算子同源。
++
++**与原子课程关系**：从 L1（应用层）和 L4（编程架构）层选取入门级原子课，按集训节奏重组，配套高强度实践。
++
++**规模**：
++- **两天营**：≈14 小时（理论 7 + 实践 7），结业算子 add_rms_norm（矢量单算子）
++- **两周营**：≈60 小时（理论 20 + 实践 40），结业算子 add_rms_norm + quant-matmul（双算子 + PyTorch 集成）
++
++**课程结构**：
++- 两天营：7 讲（AI 基础→大模型部署→推理优化→Ascend C 矢量算子→PyTorch 接入+CANNBot→结业作业）
++- 两周营：13 讲（在两天营基础上扩展矩阵算子、融合算子、调试调优、多卡通信等）
++
++**详细大纲**：[启航营课程总览](./01_bootcamp/README.md)
++
++---
++
++### 2.3 02 传统学科课程（原子课程教学化）
++
++**定位**：CANN/昇腾知识融入大学传统学分课程，采用"换芯不换课"策略——传统课程大纲主体不动，CANN 以单元包/对照案例/实验替换外挂式融入，教师零改造或低改造即可采用。
++
++**与原子课程关系**：将 L4 架构/算子类原子课教学化，融入大学传统课程（体系结构/计组/并行计算等），以单元包/对照案例/实验替换形式外挂融入。
++
++**规模**：
++- **计算机组成原理**（本科大二必修）：M2/M5 轻量融入，外挂式 6–8 学时
++- **计算机体系结构**（本科高年级/研究生）：M2/M5 主讲融入，"AI 时代的体系结构挑战"三幕剧三次主讲课（各 135 分钟）= 原子课 L4-47~49 教学化
++- **其他 12 个学科 15 门课**：并行计算/DL 系统/图像处理/编译/OS/嵌入式/数值/计算科学/数据科学/HPC 等，方向性规划
++
++**融入模式**：
++- M2 单元植入：传统课内插入 1–3 个 NPU/CANN 单元
++- M3 实验替换：课程主题不变，实验用 Ascend C 重做
++- M4 工具透明：课程不教 CANN，但训练/实验默认跑 NPU
++- M5 教材渗透：争取进入国内主流教材/讲义的 NPU 章节
++
++**详细大纲**：[传统学科课程目录](./02_traditional_courses/README.md)
++
++---
++
++### 2.4 03 新增课程
++
++**定位**：面向高校学分课的系统课程，覆盖从 AI 计算架构到行业应用的完整学习路径。每门课程单独成文，关注前后章节连续性，除大作业外每章节配双平台练习。
++
++**与原子课程关系**：每门课程由 10–30 门原子课按章节拼装，每章对应 1–3 门原子课。
++
++**规模**：六门课程
++
++| # | 课程名称 | 学时 | 状态 | 拼装的主要原子课 | 详细大纲 |
++|---|---------|------|------|----------------|---------|
++| 一 | AI 计算与神经网络计算架构实践 | 64（16 周） | ✅ 已排课 | L1-14~24、L4-01~28 | [课程大纲](./03_new_courses/ai_computing_and_neural_network_architecture_practice/syllabus.md) |
++| 二 | 昇腾 AI 与复杂系统数据智能 | ≈32（16 周） | ✅ 已排课 | L1-14~21、L2-13~18、L4-01~14 | [课程大纲](./03_new_courses/ascend_ai_and_complex_system_data_intelligence/syllabus.md) |
++| 三 | 加速计算 | 32–48 | 🆕 规划 | L4-01~30、L3-01~09、L1-35/36 | [课程大纲](./03_new_courses/accelerated_computing.md) |
++| 四 | 数据科学 | 24–32 | 🆕 规划 | L1-25~32（节选）+ 行业案例 | [课程大纲](./03_new_courses/data_science.md) |
++| 五 | 深度学习 | 32–48 | 🆕 规划 | L1-25~31 | [课程大纲](./03_new_courses/deep_learning.md) |
++| 六 | 生成式 AI | 32 | 🆕 规划 | L1-07~24 | [课程大纲](./03_new_courses/generative_ai.md) |
++
++**详细大纲**：[CANN 新增课程汇总](./03_new_courses/README.md)
++
++---
++
++### 2.5 04 教材区
++
++**定位**：经典书籍支撑课程体系，双教材与课程形成"教材↔课程"双载体形态。
++
++**与原子课程关系**：将原子课程内容按教材体例系统化组织，形成完整的知识体系与教学脉络。
++
++**规模**：两本教材
++
++| # | 教材名称 | 定位 | 状态| 对应课程 |
++|---|---------|------|------------------|---------|
++| 教材一 | 《Ascend C 并行程序设计》 | 算子编程与并行计算核心教材 | ✅ 已完成初稿 | 课程三（加速计算）、启航营算子部分 |
++| 教材二 | 《人工智能芯片与系统》 | AI 芯片架构与系统设计教材 |🆕 规划 | 传统学科体系结构三幕剧、课程一架构部分 |
++
++**详细大纲**：[教材区概览](./04_new_books/README.md)
++
++---
++
++## 三、课程质量标准
++
++### 3.1 课件规范
++
++- **结构标准**：每节课包含**钩子**（真实问题/数据开场）、**核心内容**（60%）、**互动检查点**（15%）、**小结与行动出口**（10%）
++- **标题标准**：结论式标题，明确传达本课核心观点
++- **视觉标准**：图文结合，核心原理配示意图/架构图/流程图
++
++### 3.2 课程大纲标准
++
++- **独立大纲**：每门课程单独大纲，包含课程基本信息、课程目标（OBE）、教学安排、考核方式、学习参考
++- **两列实践**：每章节实践配备 cann-learning-hub（教程练习）+ CANNJudge（判题练习）双平台
++- **三难度题库**：每章节实践**含易**（跟练跑通）/**中**（变体改造）/**难**（独立实现+性能要求）三题
++
++---
++
++## 四、官方学习资源
++
++| 资源 | 链接 | 用途 |
++|------|------|------|
++| CANN 社区主站 | <https://gitcode.com/cann> | CANN 开源社区，获取全部代码与文档 |
++| Ascend C API 实现与样例 | <https://gitcode.com/cann/asc-devkit> | API 源码、API 使用示例、算子参考实现 |
++| Ascend C 编程指南 | <https://asc.gitcode.com> | 编程模型、API 用法与最佳实践 |
++| CANN 算子领域样例仓库 | <https://gitcode.com/cann/cann-samples/tree/master/Samples/> | 各领域算子实现样例（参考实现） |
++| CANN Learning Hub | <https://gitcode.com/cann/cann-learning-hub/> | 全栈教程与 Notebook 练习（实践作业载体） |
++| 教材《Ascend C 异构并行程序设计》 | <https://gitcode.com/HIT1920/AscendCBook> | 异构并行程序设计教材 |
+diff --git a/tutorials/CANNBot/README.md b/tutorials/CANNBot/README.md
+index 3aaf92d..246e74f 100644
+--- a/tutorials/CANNBot/README.md
++++ b/tutorials/CANNBot/README.md
+@@ -27,12 +27,21 @@ CANNBot 的 Skills 与 Agents 统一托管在以下仓库（课件中的链接
+ 
+ ## 课程内容
+ 
++本课程分为**初级课程**与**中级课程**两部分：初级课程（第 1～4 课）从零开始带你用 CANNBot 生成第一个算子，并覆盖 Ascend C、PyPTO、TileLang-Ascend 三种主流算子开发路径；中级课程（第 5～9 课）深入算子自动生成、性能优化、多线程算子、Harness 工程建设与算子测试全流程。
++
++### 🟢 初级课程：CANNBot基础
++
+ | 序号 | 主题 | 主要内容 | 前置 | 课件 |
+ | :---: | :--- | :--- | :--- | :--- |
+ | 1 | CANNBot 入门：从 0 到 1 生成你的第一个算子 | CANNBot 简介，从零开始生成第一个算子 | 无（具备[前置知识](#前置知识)即可） | [01_cannbot_start.pdf](./slides/01_cannbot_start.pdf) |
+ | 2 | CANNBot 开发进阶：Ascend C 算子开发实操 | 基于 Ascend C 的算子开发实操 | 第 1 课 | [02_ascend_c_operator.pdf](./slides/02_ascend_c_operator.pdf) |
+ | 3 | CANNBot 开发进阶：PyPTO 算子开发实操 | 基于 PyPTO 的算子开发实操 | 第 1 课（与第 2 课平行，任选其一） | [03_pypto_operator.pdf](./slides/03_pypto_operator.pdf) |
+ | 4 | CANNBot 开发进阶：TileLang-Ascend 算子开发实操 | 基于 TileLang-Ascend 的算子开发实操 | 第 1 课（与第 2 课平行，任选其一） | [04_tilelang_operator.pdf](./slides/04_tilelang_operator.pdf) |
++
++### 🟡 中级课程：CANNBot算子开发进阶
++
++| 序号 | 主题 | 主要内容 | 前置 | 课件 |
++| :---: | :--- | :--- | :--- | :--- |
+ | 5 | CANNBot 进阶开发：自动生成 Vector 算子之 RegBase | 自动生成 Vector 算子，RegBase 机制详解 | 第 2 课（需先理解 Ascend C 手动开发流程，才能理解自动生成原理） | [05_vector_regbase.pdf](./slides/05_vector_regbase.pdf) |
+ | 6 | CANNBot 进阶开发：Vector 算子之排序性能优化 | Vector 算子排序性能优化方法 | 第 5 课 | [06_vector_sort_opt.pdf](./slides/06_vector_sort_opt.pdf) |
+ | 7 | CANNBot 支持生成单指令多线程算子 | 单指令多线程算子的生成 | 第 2 课 | [07_multi_thread_operator.pdf](./slides/07_multi_thread_operator.pdf) |
+diff --git a/tutorials/README.md b/tutorials/README.md
+index c621a8a..85dee7d 100644
+--- a/tutorials/README.md
++++ b/tutorials/README.md
+@@ -4,14 +4,17 @@
+ ## 教程列表
+ | 教程名称 | 教程描述 | 访问链接 | 状态 |
+ |----------|----------|----------|------|
+-| 大模型推理系列课程 | 从大语言模型基础出发，介绍 CANN 推理仓、推理优化、量化与 Profiling，并提供 Qwen3-8B 单卡实践 | [llm_inference](./llm_inference) | ✅ 已发布 |
++| 大模型推理系列课程 | 从大语言模型基础出发，介绍 CANN 推理仓、推理优化、量化与 Profiling，并提供 Qwen3 单卡实践 | [llm_inference](./llm_inference) | ✅ 已发布 |
+ | Ascend C 算子开发系列教程 | 面向昇腾 NPU 的高性能算子开发全流程教程，包含 Tiling 模板化编程、算子调试、性能优化等核心内容 | [ascendc_operator_development](./ascendc_operator_development) | ✅ 已发布 |
+ | Ascend C 算子开发系列教程（Kernel 直调版） | 面向昇腾 NPU 的 Ascend C 算子开发教程，包含算子核函数、Tiling 计算、矩阵算子、CV 融合算子、调试调优等核心内容 | [ascendc_operator_development_light](./ascendc_operator_development_light) | ✅ 已发布 |
++| PyASC 算子开发系列教程 | Ascend C 姊妹篇，基于 Python 原生语法开发昇腾算子，涵盖 pyasc 概述、核函数开发基础、Vector/Matmul 算子开发与调试调优 | [pyasc_operator_development](./pyasc_operator_development) | ✅ 已发布 |
++| PyPTO 算子开发系列教程 | 基于 PyPTO Tensor 编程范式开发昇腾算子，涵盖 CANN/芯片认知、MPMD 编程范式、elementwise/matmul/reduction 基础实践与 Attention/Transformer 中高级实践 | [pypto_development](./pypto_development) | ✅ 已发布 |
+ | MC2融合算子开发教程 | MC2融合算子开发教程，详细介绍 MC2 融合算子的概念、开发流程和实践 | [MC2_fused_operator_development](./MC2_fused_operator_development) | ✅ 已发布 |
+ | Conv 算子开发实战教程 | 面向昇腾 NPU 的 Conv 算子开发实战教程，覆盖卷积算子开发核心概念与实践 | [conv_operator_development](./conv_operator_development) | ✅ 已发布 |
+ | HIXL 应用开发系列教程 | 基于昇腾单边通信库的应用开发教程，包含核心API介绍、传输模式选择、问题定位、性能分析等核心内容 | [hixl_development](./hixl_development) | ✅ 已发布 |
+ | HCCL 集合通信系列教程 | 面向昇腾 NPU 的 HCCL 集合通信开发教程，涵盖集合通信基础概念、常用通信算子、开发流程及实践 | [hccl_development](./hccl_development) | ✅ 已发布 |
+ | 大模型 SFT 训练系列教程 | 面向大模型监督微调（SFT）的训练实践教程，涵盖数据处理、模型训练及完整 SFT 训练流程 | [sft_training_pipeline](./sft_training_pipeline) | ✅ 已发布 |
++| 大模型 RL 训练系列教程 | 面向大模型强化学习（RL）的训练实践教程，涵盖基线跑通、训推分离架构、Wordle 评分、vLLM-Ascend 适配及问题定位 | [rl_training_pipeline](./rl_training_pipeline) | ✅ 已发布 |
+ | AutoFusion 自动融合开发系列教程 | 面向 CANN 图模式的 AutoFusion 自动融合开发教程，涵盖自动融合基础概念、融合原理及开发实践 | [autofusion_development](./autofusion_development) | ✅ 已发布 |
+ | GE 图引擎开发系列教程 | 面向 GE 图引擎的开发教程，涵盖基础概念、图构建与编译、模型执行与优化、扩展开发及问题定位 | [ge_development](./ge_development) | ✅ 已发布 |
+ | TorchAir 开发系列教程 | 面向昇腾 NPU 的 TorchAir 开发教程，涵盖 PyTorch 模型图转换、图模式执行、模型适配及性能优化实践 | [TorchAir_development](./TorchAir_development) | ✅ 已发布 |
+@@ -20,7 +23,7 @@
+ ## 教程使用说明
+ 1. 已发布教程：点击链接可直接进入对应目录，包含教程文档、示例代码、实操步骤等完整内容；
+ 2. 开发中教程：将持续补充后续算子开发教程；
+-3. 规划中教程：将持续更新开发进度，优先覆盖 PyPTO 核心语法、Tile 分片实战、算子性能调优等内容；
++3. 规划中教程：将持续更新开发进度，优先覆盖 TileLang 等内容；
+ 4. 环境要求：各教程的 CANN 版本要求以对应教程 README 为准，最低支持 8.5.0+，如离线体验需自行安装配套版本。
+ 
+ ## 反馈与建议
+diff --git a/tutorials/TorchAir_development/01_basic_concepts/01.02_torch_compile_intro.ipynb b/tutorials/TorchAir_development/01_basic_concepts/01.02_torch_compile_intro.ipynb
+index 86649c7..c25fcc6 100644
+--- a/tutorials/TorchAir_development/01_basic_concepts/01.02_torch_compile_intro.ipynb
++++ b/tutorials/TorchAir_development/01_basic_concepts/01.02_torch_compile_intro.ipynb
+@@ -30,6 +30,34 @@
+     "<img src=\"./images/pytorch.png\" width=\"600\"> <a id=\"fig1\"></a>\n"
+    ]
+   },
++  {
++   "cell_type": "markdown",
++   "id": "torchair-version-check",
++   "metadata": {},
++   "source": [
++    "## 学习前准备：检查并更新环境版本\n",
++    "\n",
++    "为保证课程能够正常学习，请先运行下面的代码，将 PyTorch（`torch`）和 `torch_npu` 更新到配套版本。本课程使用 PyTorch `2.10.0` 和 `torch_npu` `2.10.0.post6`，同时请确认 CANN 与 Python 版本满足对应要求。"
++   ]
++  },
++  {
++   "cell_type": "code",
++   "execution_count": null,
++   "id": "update-torch-versions",
++   "metadata": {},
++   "outputs": [],
++   "source": [
++    "import subprocess\n",
++    "import sys\n",
++    "\n",
++    "subprocess.check_call([\n",
++    "    sys.executable, \"-m\", \"pip\", \"install\", \"--upgrade\",\n",
++    "    \"torch==2.10.0\",\n",
++    "    \"torch-npu==2.10.0.post6\",\n",
++    "])\n",
++    "print(\"更新完成。请重启当前 Notebook 内核后，再继续运行后续单元格。\")"
++   ]
++  },
+   {
+    "cell_type": "markdown",
+    "id": "9847672c",
+diff --git a/tutorials/TorchAir_development/README.md b/tutorials/TorchAir_development/README.md
+index 67973ab..664d8e5 100644
+--- a/tutorials/TorchAir_development/README.md
++++ b/tutorials/TorchAir_development/README.md
+@@ -102,24 +102,24 @@ TorchAir 需匹配对应版本的PyTorch、TorchNPU、CANN固件与Python 环境
+ 本小节为`npugraph_ex`常用的基础功能介绍，涉及 Host 侧与 Device 侧的异构内存优化、跨硬件流水线调度及算子硬件特化刷新等，帮助开发者了解 npugraph_ex 的内存分配机制与优化策略。
+ | Notebook        | Link | 状态   |
+ |:------------------| :--- |:-------|
+-| **3.1 章节介绍**      |   在线体验建设中   | 🚧 开发中 |
+-| **3.2 基础功能介绍**    | 在线体验建设中     | 🚧 开发中 |
+-| **3.3 原地算子优化**    | 在线体验建设中     | 🚧 开发中 |
+-| **3.4 内存复用**     | 在线体验建设中    | 🚧 开发中|
+-| **3.5 FX pass 优化** | 在线体验建设中     | 🚧 开发中|
+-| **3.6 章节练习**      | 在线体验建设中     | 🚧 开发中 |
++| **3.1 章节介绍**      |   在线体验   | ✅ 已发布 |
++| **3.2 基础功能介绍**    | 在线体验   | ✅ 已发布 |
++| **3.3 原地算子优化**    | 在线体验   | ✅ 已发布 |
++| **3.4 内存复用**     | 在线体验   | ✅ 已发布|
++| **3.5 FX pass 优化** | 在线体验   | ✅ 已发布|
++| **3.6 章节练习**      | 在线体验   | ✅ 已发布 |
+ 
+ #### 第四章节 深度优化
+ 本章节为`npugraph_ex`高阶功能的介绍，涉及编译产物持久化、芯片底层计算核资源的精细化调配及异构算子的生成与调度策略，针对大模型推理中的高并发、长序列等特殊场景优化效果明显。
+ | Notebook                      | Link | 状态 |
+ |:--------------------------------| :--- | :--- |
+-| **4.1 章节介绍**                    | 在线体验建设中     | 🚧 开发中 |
+-| **4.2 模型编译缓存功能**                | 在线体验建设中    | 🚧 开发中|
+-| **4.3 多流表达功能**                  | 在线体验建设中    | 🚧 开发中 |
+-| **4.4 AI-Core 和 Vector-Core 限核功能** | 在线体验建设中     | 🚧 开发中 |
+-|**4.5 静态 Kernel 编译功能**            |在线体验建设中     | 🚧 开发中 |
+-| **4.6 SuperKernel功能**           | 在线体验建设中    | 🚧 开发中 |
+-| **4.7 章节练习**                    | 在线体验建设中    | 🚧 开发中 |
++| **4.1 章节介绍**                    | 在线体验   | ✅ 已发布 |
++| **4.2 模型编译缓存功能**                | 在线体验   | ✅ 已发布|
++| **4.3 多流表达功能**                  | 在线体验   | ✅ 已发布|
++| **4.4 AI-Core 和 Vector-Core 限核功能** | 在线体验   | ✅ 已发布 |
++|**4.5 静态 Kernel 编译功能**            |在线体验   | ✅ 已发布 |
++| **4.6 SuperKernel功能**           | 在线体验   | ✅ 已发布 |
++| **4.7 章节练习**                    | 在线体验   | ✅ 已发布|
+ 
+ 
+ ### 第三部分 `npugraph_ex` 实践与问题定位篇
+diff --git a/tutorials/ge_development/README.md b/tutorials/ge_development/README.md
+index ed9e5b4..c4b5c84 100644
+--- a/tutorials/ge_development/README.md
++++ b/tutorials/ge_development/README.md
+@@ -59,24 +59,24 @@
+ 
+ | Notebook | Link | 状态 |
+ | --- | --- | --- |
+-| 3.1 章节介绍 | 在线体验建设中 | 🚧 建设中 |
+-| 3.2 图的构建与输入：AscendIR 构图与 Parser 解析 | 在线体验建设中 | 🚧 建设中 |
+-| 3.3 编译配置：融合、精度、buffer、stream 等选项 | 在线体验建设中 | 🚧 建设中 |
+-| 3.4 编译产物：OM 结构、外置权重、SO in OM、模型缓存 | 在线体验建设中 | 🚧 建设中 |
+-| 3.5 图编译扩展能力：自定义算子入图 | 在线体验建设中 | 🚧 建设中 |
+-| 3.6 图编译扩展能力：自定义融合 Pass | 在线体验建设中 | 🚧 建设中 |
+-| 3.7 章节练习 | 在线体验建设中 | 🚧 建设中 |
++| 3.1 章节介绍 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/03_graph_compilation/03.01_chapter_intro.ipynb) | ✅ 已发布 |
++| 3.2 图的构建与输入：AscendIR 构图与 Parser 解析 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/03_graph_compilation/03.02_graph_build_and_input.ipynb) | ✅ 已发布 |
++| 3.3 编译配置：融合、精度、buffer、stream 等选项 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/03_graph_compilation/03.03_compilation_config.ipynb) | ✅ 已发布 |
++| 3.4 编译产物：OM 结构、外置权重、SO in OM、模型缓存 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/03_graph_compilation/03.04_compilation_output.ipynb) | ✅ 已发布 |
++| 3.5 图编译扩展能力：自定义算子入图 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/03_graph_compilation/03.05_custom_op_integration.ipynb) | ✅ 已发布 |
++| 3.6 图编译扩展能力：自定义融合 Pass | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/03_graph_compilation/03.06_custom_fusion_pass.ipynb) | ✅ 已发布 |
++| 3.7 章节练习 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/03_graph_compilation/03.07_chapter_practice.ipynb) | ✅ 已发布 |
+ 
+ ### 第四章：模型执行与优化
+ 
+ | Notebook | Link | 状态 |
+ | --- | --- | --- |
+-| 4.1 章节介绍 | 在线体验建设中 | 🚧 建设中 |
+-| 4.2 静态 Shape 执行流程：整图下沉 | 在线体验建设中 | 🚧 建设中 |
+-| 4.3 动态 Shape 执行流程：Host 调度 | 在线体验建设中 | 🚧 建设中 |
+-| 4.4 静态 Shape 执行优化技术 | 在线体验建设中 | 🚧 建设中 |
+-| 4.5 动态 Shape 执行优化技术 | 在线体验建设中 | 🚧 建设中 |
+-| 4.6 章节练习 | 在线体验建设中 | 🚧 建设中 |
++| 4.1 章节介绍 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/04_model_execution_optimization/04.01_chapter_intro.ipynb) | ✅ 已发布 |
++| 4.2 静态 Shape 执行流程：整图下沉 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/04_model_execution_optimization/04.02_static_shape_execution.ipynb) | ✅ 已发布 |
++| 4.3 动态 Shape 执行流程：Host 调度 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/04_model_execution_optimization/04.03_dynamic_shape_execution.ipynb) | ✅ 已发布 |
++| 4.4 静态 Shape 执行优化技术 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/04_model_execution_optimization/04.04_static_shape_optimization.ipynb) | ✅ 已发布 |
++| 4.5 动态 Shape 执行优化技术 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/04_model_execution_optimization/04.05_dynamic_shape_optimization.ipynb) | ✅ 已发布 |
++| 4.6 章节练习 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ge_development&scanFilePath=tutorials/ge_development/04_model_execution_optimization/04.06_chapter_practice.ipynb) | ✅ 已发布 |
+ 
+ ## GE 图引擎开发系列（高阶应用）
+ 
+diff --git a/tutorials/llm_inference/README.md b/tutorials/llm_inference/README.md
+index 4523fa2..e47081a 100644
+--- a/tutorials/llm_inference/README.md
++++ b/tutorials/llm_inference/README.md
+@@ -1,6 +1,6 @@
+ # 大模型推理系列课程
+ 
+-本课程面向具备基础编程能力的高校学生，从大语言模型的基本工作过程出发，逐步介绍昇腾 CANN 大模型推理的部署、性能分析和优化方法。课程由五个主题课件和一套 Qwen3-8B 单卡实践组成，理论内容与工程实践按学习顺序组织。
++本课程面向具备基础编程能力的高校学生，从大语言模型的基本工作过程出发，逐步介绍昇腾 CANN 大模型推理的部署、性能分析和优化方法。课程由五个主题课件以及 Qwen3-1.7B、Qwen3-8B 单卡实践组成，理论内容与工程实践按学习顺序组织。
+ 
+ ## 课程内容
+ 
+@@ -12,18 +12,18 @@
+ | 04 | 大模型量化基础 | 量化的基本原理、常见精度格式、校准方法与效果评估 | [04_llm_quantization_fundamentals.pdf](./slides/04_llm_quantization_fundamentals.pdf) |
+ | 05 | Profiling 与性能瓶颈定位 | Baseline 建立、日志解读、Profiler 采集，以及 op_statistic、kernel_details 和 trace 分析 | [05_profiling_and_performance_bottleneck_analysis.pdf](./slides/05_profiling_and_performance_bottleneck_analysis.pdf) |
+ 
+-## Qwen3-8B 实践
++## Qwen3 实践
+ 
+-配套实践以 Qwen3-8B 单卡推理为主线，使用 cann-recipes-infer 的 YAML 配置和推理入口完成部署、Profiling、优化与量化验证。详细环境要求和运行说明见 [qwen3_8b/README.md](./qwen3_8b/README.md)。
++配套实践使用 cann-recipes-infer 的 YAML 配置和推理入口完成部署、Profiling 与优化验证。
+ 
+ <table>
+-<tr><th>序号</th><th>实践内容</th><th>在线体验</th></tr>
+-<tr><td>01</td><td>课程与实践流程介绍</td><td rowspan="6">在CANNLab中运行（<a href="../../docs/CANNLab_env_experience_guide.md">CANNLab运行教程指导书</a>）</td></tr>
+-<tr><td>02</td><td>Baseline 推理</td></tr>
+-<tr><td>03</td><td>Profiling 分析</td></tr>
+-<tr><td>04</td><td>Dense RMSNorm NPU 融合优化验证</td></tr>
+-<tr><td>05</td><td>Qwen3-8B 量化</td></tr>
+-<tr><td>06</td><td>自定义量化 MatMul 算子开发与模型接入</td></tr>
++<tr><th>序号</th><th>实践内容</th><th>Qwen3-1.7B</th><th>Qwen3-8B</th><th>在线体验</th></tr>
++<tr><td>01</td><td>课程与实践流程介绍</td><td>✅</td><td>✅</td><td rowspan="6">在CANNLab中运行（<a href="../../docs/CANNLab_env_experience_guide.md">CANNLab运行教程指导书</a>）</td></tr>
++<tr><td>02</td><td>Baseline 推理</td><td>✅</td><td>✅</td></tr>
++<tr><td>03</td><td>Profiling 分析</td><td>✅</td><td>✅</td></tr>
++<tr><td>04</td><td>Dense RMSNorm NPU 融合优化验证</td><td>✅</td><td>✅</td></tr>
++<tr><td>05</td><td>Qwen3 量化</td><td>—</td><td>✅</td></tr>
++<tr><td>06</td><td>自定义量化 MatMul 算子开发与模型接入</td><td>—</td><td>✅</td></tr>
+ </table>
+ 
+ ## 目录结构
+@@ -32,7 +32,8 @@
+ llm_inference/
+ ├── README.md
+ ├── slides/       # 按课程顺序编号的 PDF 课件
+-└── qwen3_8b/     # Notebook、实践代码与运行说明
++├── qwen3_1.7B/   # Qwen3-1.7B 第 01–04 章 Notebook、实践代码与运行说明
++└── qwen3_8b/     # Qwen3-8B 第 01–06 章 Notebook、实践代码与运行说明
+ ```
+ 
+-建议先按编号阅读课件，再依次运行 Qwen3-8B Notebook。实践所需的 CANN、Python 依赖、模型权重和硬件条件以 Qwen3-8B 实践说明为准。
++建议先按编号阅读课件，再根据硬件资源选择 Qwen3-1.7B 或 Qwen3-8B Notebook。实践所需的 CANN、Python 依赖、模型权重和硬件条件以所选实践目录的说明为准。
+diff --git a/tutorials/pypto_development/README.md b/tutorials/pypto_development/README.md
+index 1ebe02d..e269c43 100644
+--- a/tutorials/pypto_development/README.md
++++ b/tutorials/pypto_development/README.md
+@@ -34,6 +34,7 @@ Transformer 组合，帮助开发者建立使用 PyPTO
+ 5. 理解 vec / cube tile shapes，以及 shape、slice、transpose 等基础操作
+ 6. 看懂归一化、FFN、动态 shape、Attention 等中高级模块的 PyPTO 实现
+ 7. 可以看懂计算图和泳道图
++8. 学会使用 AI Coding Agent（OpenCode）完成算子开发：组织任务定义、驱动 Agent 生成算子与测试，并在真实 Ascend NPU 上完成精度验收
+ 
+ ## 软硬件配套说明
+ 
+@@ -135,6 +136,29 @@ Notebook 列表：
+ | `04.05_attention_and_transformer.ipynb` | Attention 与 Transformer 组合 |
+ | `04.06_chapter_practice.ipynb` | 章节实践 |
+ 
++### 第五章：基于 AI Coding Agent 的 PyPTO 算子开发
++
++目录：`05_ai_agent_operator_development`
++
++目标：
++
++- 把数学定义、输入输出、支持范围和精度标准组织为 Agent 可执行任务
++- 通过 OpenCode 运行 PyPTO 算子开发工作流并识别关键产物
++- 在真实 Ascend NPU 上独立重跑生成测试，依据逐输出 all-close 和退出码验收
++- 区分必做的正确性验证与正确性通过后的可选性能优化
++
++Notebook 列表：
++
++| Notebook | 说明 |
++| --- | --- |
++| `05.01_chapter_intro.ipynb` | 章节介绍：认识 PyPTO 算子开发 Agent |
++| `05.02_agent_architecture_and_usage.ipynb` | PyPTO Agent 架构与使用方法（团队架构、支撑体系、OpenCode 操作与独立验收） |
++| `05.03_chapter_practice.ipynb` | 章节实践：使用 OpenCode 开发行 Softmax 算子并完成真实 NPU 验收 |
++
++前置要求：已完成前四章。课程环境需装好 OpenCode、PyPTO、torch_npu 与
++Ascend NPU；PyPTO Agent 工程（技能库与编排器）需按 05.02 的部署步骤
++（`git clone pypto-gym` 后执行 `init.sh`）准备，教材中已给出完整指引。
++
+ 
+ ## 反馈与建议
+ 

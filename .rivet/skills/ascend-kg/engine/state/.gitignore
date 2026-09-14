@@ -1,0 +1,4 @@
+# 运行时产物（run_state/per_round/scripts_bak/agent_task/agent_result），不入库
+*
+!.gitignore
+!.gitkeep

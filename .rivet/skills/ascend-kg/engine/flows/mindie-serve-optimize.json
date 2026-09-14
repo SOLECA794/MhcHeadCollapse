@@ -1,0 +1,303 @@
+{
+  "flow_id": "mindie-serve-optimize",
+  "name": "MindIE 3.0.0 服务延迟优化闭环",
+  "backend": "mindie",
+  "mode": "auto",
+  "target": "ttft",
+  "max_rounds": 50,
+  "profiling": {
+    "enabled": false
+  },
+  "paths": {
+    "model_default": "glm4_9b",
+    "mindie_config_base": "/home/z60124773/mindie-opt/base-config-glm4.json",
+    "mindie_container": "mindie-opt",
+    "mindie_management_port": 1026
+  },
+  "model_dims": {
+    "n_layers": 40,
+    "hidden": 4096,
+    "inter": 13696,
+    "head_dim": 128,
+    "n_heads": 32,
+    "n_kv": 2
+  },
+  "perf": {
+    "mfu_peak_tflops": 294.91,
+    "hyst": 0.003,
+    "ttot_room": 1.1,
+    "ttft_room": 1.1,
+    "thr_hyst": 0.01
+  },
+  "decision": {
+    "consec_no_improve_stop": 3,
+    "high_risk_requires_signals": false,
+    "goal": "MindIE 3.0.0 服务延迟优化：从动作空间里选「下一轮要试的一个 config.json 参数改动」，或判断「该停止」。基于历史轮次与风险等级，优先低风险动作，勿重复已试参数。只把最终决策写进 agent_result.json 的 result 字段。",
+    "rules": [
+      "每轮只改一个参数，param 名须与动作空间完全一致",
+      "动作空间每个参数标了风险等级（低/中/高）：优先低风险",
+      "布尔开关 value 用 true/false；枚举参数 value 只能从枚举列表里选，数值只能在 min..max 内",
+      "TTFT 最敏感项是 maxQueueDelayMicroseconds（组 batch 前最长排队 μs，基线 5000；低时延口径压到 ≤50000，过小会伤吞吐）",
+      "低时延口径：supportSelectBatch 保持 false（prefill 优先）；templateType=Mix(SplitFuse) 是吞吐取向，试它要预期 TTFT 可能变差",
+      "prefillTimeMsPerReq/decodeTimeMsPerReq 仅 supportSelectBatch=true 时生效；减小 prefillTimeMsPerReq 倾向 Prefill 降 TTFT，增大倾向连续 Decode（吞吐取向）",
+      "maxSeqLen 减小→KV cache 需求降、短上下文吞吐升；增大→支持更长序列但吞吐降/显存升，且须 ≤ 模型 max（过大有精度风险）",
+      "maxInputTokenLen 是 maxPrefillTokens 的下限，且须 ≤ maxSeqLen-1；增大支持更长输入但 prefill 变慢",
+      "tokenizerProcessNumber 低风险（CPU 侧 tokenizer 进程数），CPU 核充足时可上调加快 prefill 数据准备",
+      "联动约束：maxPrefillBatchSize 不得超过 maxBatchSize；maxPrefillTokens 不得低于 maxInputTokenLen(2048)",
+      "改配置需重启 daemon 才生效（每轮分钟级成本），避免无意义地重复已试参数（见 history）",
+      "maxBatchSize/maxPrefillBatchSize 上限受 KV Block 总量约束，过大有 OOM/起不来风险（起不来会被确定性回滚，白费一轮）",
+      "停止时机：动作空间已穷尽、连续多轮无改善、或已有明显最优且无更优可试"
+    ]
+  },
+  "decision_throughput": {
+    "consec_no_improve_stop": 3,
+    "high_risk_requires_signals": false,
+    "goal": "MindIE 3.0.0 吞吐优化：从动作空间里选「下一轮要试的一个 config.json 参数改动」，或判断「该停止」。主指标=并发批聚合吞吐 thr_tok_s（↑优，Σout/max(ttot)），护栏=TTFT 不劣化超过 10%；TPOT/TPS 是解码侧参考。基于历史轮次与风险等级，优先低风险动作，勿重复已试参数。只把最终决策写进 agent_result.json 的 result 字段。",
+    "rules": [
+      "每轮只改一个参数，param 名须与动作空间完全一致",
+      "动作空间每个参数标了风险等级（低/中/高）：优先低风险",
+      "布尔开关 value 用 true/false；枚举参数 value 只能从枚举列表里选，数值只能在 min..max 内",
+      "吞吐取向：templateType=Mix(SplitFuse) 是首选吞吐杠杆（prefill/decode 并行化）；maxPrefillTokens/maxPrefillBatchSize/maxBatchSize 上调扩批容量（受 KV Block 总量约束，过大 OOM/起不来会被确定性回滚，白费一轮）",
+      "低时延口径参数（maxQueueDelayMicroseconds 压小、supportSelectBatch 开）对吞吐无益，勿为吞吐目标下调",
+      "吞吐取向：prefillTimeMsPerReq/decodeTimeMsPerReq（仅 supportSelectBatch=true 生效）增大→倾向连续 Decode 提吞吐，配合 templateType=Mix 更明显",
+      "maxSeqLen/maxInputTokenLen 减小→KV cache 需求降→同显存容纳更大 batch 提吞吐；maxInputTokenLen ≤ maxSeqLen-1 且是 maxPrefillTokens 下限",
+      "tokenizerProcessNumber 上调可解除高并发下 CPU 侧 tokenizer 瓶颈",
+      "联动约束：maxPrefillBatchSize 不得超过 maxBatchSize；maxPrefillTokens 不得低于 maxInputTokenLen(2048)",
+      "改配置需重启 daemon 才生效（每轮分钟级成本），避免无意义地重复已试参数（见 history）",
+      "keep 判定（引擎确定性执行）：thr_tok_s 改善 ≥1%（thr_hyst）且 TTFT 退化 ≤10%（ttft_room）才保留，否则自动回滚",
+      "停止时机：动作空间已穷尽、连续多轮无改善、或已有明显最优且无更优可试"
+    ]
+  },
+  "params": {
+    "defaults": {},
+    "domain": {
+      "maxQueueDelayMicroseconds": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "maxQueueDelayMicroseconds"
+        ],
+        "min": 500,
+        "max": 1000000,
+        "step": 500,
+        "risk": "low"
+      },
+      "maxFirstTokenWaitTime": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "maxFirstTokenWaitTime"
+        ],
+        "min": 0,
+        "max": 3600000,
+        "step": 100,
+        "risk": "low"
+      },
+      "maxBatchSize": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "maxBatchSize"
+        ],
+        "min": 1,
+        "max": 819200,
+        "step": 10,
+        "risk": "mid"
+      },
+      "maxPrefillBatchSize": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "maxPrefillBatchSize"
+        ],
+        "min": 0,
+        "max": 8192,
+        "step": 5,
+        "risk": "mid"
+      },
+      "maxPrefillTokens": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "maxPrefillTokens"
+        ],
+        "min": 2048,
+        "max": 65536,
+        "step": 1024,
+        "risk": "mid"
+      },
+      "maxPreemptCount": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "maxPreemptCount"
+        ],
+        "min": 0,
+        "max": 512,
+        "step": 1,
+        "risk": "mid"
+      },
+      "supportSelectBatch": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "supportSelectBatch"
+        ],
+        "flag": true,
+        "risk": "low"
+      },
+      "templateType": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "templateType"
+        ],
+        "values": [
+          "Standard",
+          "Mix"
+        ],
+        "risk": "mid"
+      },
+      "maxLinkNum": {
+        "kind": "json",
+        "path": [
+          "ServerConfig",
+          "maxLinkNum"
+        ],
+        "min": 1,
+        "max": 4096,
+        "step": 50,
+        "risk": "low"
+      },
+      "maxSeqLen": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ModelDeployConfig",
+          "maxSeqLen"
+        ],
+        "min": 128,
+        "max": 131072,
+        "step": 512,
+        "risk": "mid"
+      },
+      "maxInputTokenLen": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ModelDeployConfig",
+          "maxInputTokenLen"
+        ],
+        "min": 1,
+        "max": 131072,
+        "step": 256,
+        "risk": "mid"
+      },
+      "tokenizerProcessNumber": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "tokenizerProcessNumber"
+        ],
+        "min": 1,
+        "max": 32,
+        "step": 1,
+        "risk": "low"
+      },
+      "prefillTimeMsPerReq": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "prefillTimeMsPerReq"
+        ],
+        "min": 0,
+        "max": 1000,
+        "step": 10,
+        "risk": "mid"
+      },
+      "decodeTimeMsPerReq": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "decodeTimeMsPerReq"
+        ],
+        "min": 0,
+        "max": 1000,
+        "step": 10,
+        "risk": "mid"
+      },
+      "cacheBlockSize": {
+        "kind": "json",
+        "path": [
+          "BackendConfig",
+          "ScheduleConfig",
+          "cacheBlockSize"
+        ],
+        "min": 128,
+        "max": 128,
+        "step": 0,
+        "locked": true
+      }
+    },
+    "blocked": {
+      "cacheBlockSize": "官方建议保持 128，910B chunked prefill 语义锁定",
+      "maxIterTimes": "bench 输出 max_tokens=128，默认 512 无瓶颈，调它对 TTFT 无意义",
+      "cpuMemSize": "位于 BackendConfig.ModelDeployConfig.ModelConfig 数组内（非 dict），json-path 渲染器无法安全 patch；且需配合 maxPreemptCount>0 才生效",
+      "npuMemSize": "位于 ModelConfig 数组内；-1=按可用显存自动分配已是吞吐最优，显式调小只会缩 KV cache 无收益",
+      "backendType": "位于 ModelConfig 数组内；属部署时选型（atb 已最优），非运行时搜索项",
+      "maxN": "不在本机 base config 中（引擎不发明字段），且 bench 为 n=1 单序列请求无收益"
+    },
+    "max_changes_per_round": 1
+  },
+  "stages": [
+    {
+      "id": "capture",
+      "module": "engine.stages.capture"
+    },
+    {
+      "id": "validate",
+      "module": "engine.stages.validate"
+    },
+    {
+      "id": "analyze",
+      "module": "engine.stages.analyze"
+    },
+    {
+      "id": "apply",
+      "module": "engine.stages.apply"
+    },
+    {
+      "id": "verify",
+      "module": "engine.stages.verify"
+    },
+    {
+      "id": "decide",
+      "module": "engine.stages.decide"
+    },
+    {
+      "id": "orchestrate",
+      "module": "engine.stages.orchestrate"
+    }
+  ],
+  "interaction_priors": [
+    [
+      "maxBatchSize",
+      "maxPrefillBatchSize",
+      "maxPrefillTokens"
+    ],
+    [
+      "maxQueueDelayMicroseconds",
+      "maxFirstTokenWaitTime"
+    ]
+  ]
+}

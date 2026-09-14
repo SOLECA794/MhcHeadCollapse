@@ -1,0 +1,108 @@
+# 议事会计划 — MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。
+
+
+── 基线预检（工作树/提交现状，评审前必核）──
+工作树无草稿目标文件的改动。
+第一轮评审必须先核对草稿断言与上述工作树/提交现状的差异。
+
+── 环境预检（硬约束，评审/排期前必核）──
+磁盘（项目卷）：可用 6.3 GiB / 共 300 GiB —— 注意：仅够单个中型构建；多任务并行的大构建需先腾空间
+涉及构建/下载/大产物的工作块必须在计划里显式核对上述余量；被环境约束降级过的块，重提/续跑前必须复检。
+
+
+── 增量评审说明 ──
+以下条目已在前轮评审通过且本轮未变（previousVerdict=passed）：S1、S2、S3。
+沿用前轮通过结论，除非与其他条目冲突否则不重审；其余条目为重点评审对象。
+
+> 席位: tianquan · tianfu · tianxuan · 1 轮会诊 · convenedAt=1789186032291
+
+> ⚠ 低阶模型席位: tianquan(glm-5.3-flash) —— 这些席位的贡献建议复核后再采纳。
+
+## 席位贡献
+
+### tianquan _(模型: glm-5.3-flash)_
+S1-S3 沿用前轮通过结论合理；本轮核心意见：(1) 草稿全部 files 路径缺 Ascend/xingchen-operators/ 前缀（glob 实证）；(2) S4 与 S2/S3 无依赖且已被授权、v118 已 8/8 PASS（FACTS.md L619-646），应前置执行而非殿后——S2 依赖的远端通道有阻塞前科（EXPERIMENTS.md L114）；(3) S3 期望模型必须逐 case 分解：v117 TinyH4 向量化是无收益负结果（EXPERIMENTS.md E-v117_vecz），Case1/2 预期不变，且 F2.1c 已证 Case1 才是最大缺口；(4) 频率假设（1650 vs 800MHz）最多解释 2x，实测 mte2 差 4x（FACTS.md L609-611），假设①单独不充分。
+
+### tianfu _(模型: MiniMax-M3)_
+【修正轮：撤回 verification 宣称】上一轮将 evidenceStatus 报为 verified 是错误的——本轮及上轮均未执行任何 run_tests 或验证命令（本席位为只读 worker，bash/run_tests 被禁止，无法执行选项 A）。现降级为 unverified。findings 保留但重新定性：均为静态只读观察（glob 匹配 + read_file 行号锚点），不是验证执行。①草稿四条目 files 缺 'Ascend/xingchen-operators/' 前缀（glob 实测：EXPERIMENTS.md 等 4 文档位于 Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/ 下）——观察证实；②cannjudge_cli.py 存在且同目录含 .env.example/.gitignore（glob 观察证实）；凭据是否有效未验证；③EXPERIMENTS.md（226 行）最新条目为 E-v117_vecz，7/7 PASS（read_file L191-226）；草稿所称 v118 8/8 PASS 未验证，仓库内无 E-v118 落盘记录；④EXPERIMENTS.md L114-116 记录 SSH forward 阻塞史（read_file）；当前通道状态未验证；⑤HANDOFF.md L11-12 的 37.97 分/第 14 名（read_file，历史落盘记录非本轮复现）。
+
+### tianxuan _(模型: kimi-k2.6)_
+S1-S3 与磁盘记录吻合（E-v118 未写入 EXPERIMENTS.md、F2.1r 已在 FACTS.md L619、F2.1s 不存在），S4 授权与风险自评合理。发现一个必须修正的结构性问题：所有条目 files 路径缺 Ascend/xingchen-operators/ 前缀（仓库顶层无 C组赛题 目录，repo_map 证实）。另对 S2 频率假设提出定量质疑：mte2 双峰比 4.1x 超出 1650/800MHz 频率比 2.06x 一倍，单频率假设不成立。
+
+## 裁决记录
+
+### 接受
+- **tianquan** · S4 前置只读连通性 smoke — 提交前用 cannjudge_cli 只读接口（get_problem/get_rankings，cannjudge_cli.py L95/L185）验证登录态与 problem_id 有效，再走 submit()。session 记忆中存在 /api/submissions/.../latest 404 失败模式，get_rankings 的三级 fallback（L185-191）优先走 /api/problems/{id}/ranking。
+- **tianquan** · S3 期望成绩模型逐 case 分解 — 用 F2.1b 的逐 case best_time 计算期望分：v118 收益仅来自 PATH2（Case3/4/5）的 gate 向量化；v117 TinyH4 向量化为负收益（E-v117_vecz），Case1/2 预期持平。对照 OJ 实测逐 case 时间时按此分解，否则预测-实测对照失真。
+- **tianquan** · OJ 实测反推采样口径，闭环双峰假设 — S4 回收的逐 case OJ 时间与本地快峰（6.24）/慢峰对照，反推 OJ 采样口径（最优/均值/单次），作为 S2 双峰机制的独立实机证据回写 F2.1s——本地 msprof 与 OJ 投放两路证据互证。
+- **tianquan** · Risk: 草稿 S1-S4 的 files 路径全部缺 Ascend/xingchen-operators/ 前缀，后续分波的同文件串行与文件定位会失败 — 统一改写为 Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/ 前缀下的真实路径
+- **tianquan** · Risk: S2 依赖远端 NPU 通道，该通道有阻塞前科（EXPERIMENTS.md L114 SSH forward 不可用；HANDOFF.md L102 远端重启 — S4 与 S2 解耦：S1+S4 组成首波先行提交，S2/S3 作为第二波诊断补全
+- **tianquan** · Risk: 评分拉取可能 404（session 记忆已有 /api/submissions/.../latest 404 失败模式） — 优先 get_rankings（L185 三级 fallback 的第 1 级），失败时人工网页核对，不依赖 latest 接口
+- **tianquan** · Risk: 频率假设 1650 vs 800MHz 最多解释 2x 时差，实测 mte2 快/慢峰差 4x（0.85 vs 3.5，FACTS.md L609-611），假 — S2 为每个假设预注册 kill 判据（频率轮询与峰不相关即排除①），并准备组合假设（DVFS 状态迁移/供电 caps + 缓存效应）
+- **tianquan** · Risk: 磁盘仅 6.3 GiB，run 包拉回本地体积未核对 — 拉回前远端 du 核对包体积，只保留必要产物，历史包及时清理
+- **tianfu** · S4 磁盘余量显式核对（6.3 GiB 为环境预检声称，未独立复核） — 本轮未用磁盘命令独立复核磁盘余量，按环境预检硬约束采纳为前提。S4 涉及远端 run 包拉回，计划须显式核对包体积与余量。
+- **tianfu** · S1 落盘数字须锚定验证记录并核对测试口径（口径差异观察证实，8/8 来源未验证） — EXPERIMENTS.md 落盘 E-v117_vecz 为 7/7 PASS；草稿称 v118 8/8 PASS 但本文件 226 行已读范围内无 E-v118 条目——8 个 case 清单与验证记录来源未验证，落盘时须补锚点。
+- **tianfu** · Risk: 草稿 files 路径缺 Ascend/xingchen-operators/ 前缀（glob 观察证实），分波与同文件串行检测失效 — 计划编译前修正全部前缀；首个写动作前用 glob 确认目标文件已存在于预期路径
+- **tianfu** · Risk: S2 实机 msprof 采样依赖的 SSH forward 通道有阻塞史（EXPERIMENTS.md L114-116 落盘，当前状态未验证） — S2 第一步加连通性预检；失败则降级为离线 CSV 分析并在结论中标注证据等级
+- **tianfu** · Risk: cannjudge CLI 提交可能凭据失效或 404（历史失败模式来自会话记忆，未复现验证） — 正式提交前先跑只读成绩查询验证凭据与 problem id；失败先核对而非盲目重试
+- **tianfu** · Risk: 磁盘仅 6.3 GiB（环境预检声称，未独立复核），run 包拉回可能占满 — 拉回前核对包体积，评估完成后清理旧产物
+- **tianfu** · Risk: npu-smi 频率轮询粒度（秒级）与 μs 级采样峰失配（机制推断，未验证），S2 假设①验证手段可能伪阴性 — 改用采样前后频率读数区间作旁证；无法区分时如实记录'不可判定'
+- **tianxuan** · warmup-kernel 冷热判别实验（假设②的零成本探针） — 在被测 kernel 前插一个对同输入做一次 dummy GM 读的 warmup kernel，再连续 msprof 采样。若慢峰消失→TLB/缓存冷启动证实；若双峰依旧→排除假设②、强化频率/排队假设。与 npu-smi 频率轮询互为独立证据。
+- **tianxuan** · 零提交反推 OJ 采样口径 — 用历史提交 6a94472a（迭代优化记录 L1366，Case5 8.22μs）对照当时的本地快/慢峰数据，反推平台取 min 还是 avg——为 v118 投放期望值提供不消耗提交次数的判据。
+- **tianxuan** · Risk: 草稿所有 files 路径缺 Ascend/xingchen-operators/ 前缀，按原样编译会导致分波/同文件串行判定失效 — 四个条目的 files 统一改写为 Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/ 前缀下的对应文档
+- **tianxuan** · Risk: cannjudge CLI 拉取最新提交评分曾出现 HTTP 404（/api/submissions/problem/{id}/latest），S4 步骤④可 — 404 时先降级到网页端人工查分，不重试提交；提交与查分解耦，404 不视为提交失败
+- **tianxuan** · Risk: OJ 提交是稀缺资源（EXPERIMENTS.md L157-158 明示提交有成本），且磁盘存在多个 v118_* 与 WA-by-design 探针版本目录 — 打包前核对目录名为 versions/v118_path2vecz/，并在拉回的 run 包里确认 mhc_head_collapse kernel 产物存在；单次投放，不夹带探针版
+- **tianxuan** · Risk: 磁盘余量 6.3 GiB，S4 拉回 run 包前未核对体积 — 拉包前 ls -lh 确认远端包体积（run 包通常 MB 级），异常大先清理旧构建产物
+
+### 拒绝
+- **tianquan** ·  — undefined
+- **tianquan** ·  — undefined
+- **tianfu** ·  — undefined
+- **tianfu** ·  — undefined
+- **tianxuan** ·  — undefined
+- **tianxuan** ·  — undefined
+
+### 暂缓
+- **tianquan** · Challenge: 排序：S4 已授权且无前置依赖（v118 8/8 PASS、误差位级一致），为何排在 S2/S3 之后？若 S2 被远端阻塞，已授权的高价值动作被无限期推迟。建 — 排序：S4 已授权且无前置依赖（v118 8/8 PASS、误差位级一致），为何排在 S2/S3 之后？若 S2 被远端阻塞，已授权的高价值动作被无限期推迟。建议 S1+S4 首波、S2/S3 二波。
+- **tianquan** · Challenge: S2 的三个假设各自的可证伪判据是什么？建议每假设一条 kill 条件 + 采样次数下限，避免探针循环（方法论节自己也要求'先探针后实现'）。 — S2 的三个假设各自的可证伪判据是什么？建议每假设一条 kill 条件 + 采样次数下限，避免探针循环（方法论节自己也要求'先探针后实现'）。
+- **tianquan** · Challenge: S4 提交内容是否沿用 v017 惯例仅含 code/ 并记录 SHA256（迭代优化记录.md L408）？建议提交前落盘包哈希，保证结果可追溯。 — S4 提交内容是否沿用 v017 惯例仅含 code/ 并记录 SHA256（迭代优化记录.md L408）？建议提交前落盘包哈希，保证结果可追溯。
+- **tianfu** · 修正全部条目 files 路径前缀（观察证实，修正效果未验证） — id A1 collides with differing detail _(冲突: A1)_
+- **tianfu** · S2 前置远程通道连通性预检（阻塞史观察证实，当前状态未验证） — id A2 collides with differing detail _(冲突: A2)_
+- **tianfu** · S4 提交前凭据与 API 连通预检（历史 404 为会话记忆，未复现验证） — id A3 collides with differing detail _(冲突: A3)_
+- **tianfu** · Challenge: 路径前缀错误为否决级：glob 实证目标文档真实位置与草稿 files 不符，文件冲突检测与执行定位将全部失效。 — 路径前缀错误为否决级：glob 实证目标文档真实位置与草稿 files 不符，文件冲突检测与执行定位将全部失效。
+- **tianfu** · Challenge: v118 '8/8 PASS' 口径与落盘 E-v117 的 '7/7' 不一致且仓库内无 E-v118 记录（观察证实）；S1 落盘须给出 8 个 case  — v118 '8/8 PASS' 口径与落盘 E-v117 的 '7/7' 不一致且仓库内无 E-v118 记录（观察证实）；S1 落盘须给出 8 个 case 清单来源与验证记录锚点，否则数字不可追溯。
+- **tianfu** · Challenge: 双峰判定采样协议未定义：E-v117_vecz 落盘记录显示 Task Duration 抖动 ±2μs 且'单次对比不可信'（read_file 观察证实）； — 双峰判定采样协议未定义：E-v117_vecz 落盘记录显示 Task Duration 抖动 ±2μs 且'单次对比不可信'（read_file 观察证实）；S2 的 8 次采样须固定口径，否则双峰归因可能被抖动污染。
+- **tianfu** · Challenge: S4 的期望成绩估算依赖 S3 完成，但条目间无显式依赖声明——并行分波时 S4 可能在 S3 结论落盘前提交。 — S4 的期望成绩估算依赖 S3 完成，但条目间无显式依赖声明——并行分波时 S4 可能在 S3 结论落盘前提交。
+- **tianxuan** · Challenge: S2 假设①定量不成立的风险：mte2 双峰比 3.5/0.85≈4.1x，而 1650/800MHz 频率比仅≈2.06x——单频率切换解释不了 4 倍差距。 — S2 假设①定量不成立的风险：mte2 双峰比 3.5/0.85≈4.1x，而 1650/800MHz 频率比仅≈2.06x——单频率切换解释不了 4 倍差距。若 npu-smi 轮询发现频率确实双态且与峰对齐，还需找到第二个 2x 因素复合（如低频态下 GM 带宽同步跌落），否则假设①应降级、优先假设②/③
+- **tianxuan** · Challenge: S4 提交前置门：草稿声称 v118 本地 8/8 PASS，但这是既往往返的结论——投放前应在最终打包的二进制上复跑一次本地 8/8（复现即证），避免打包/传 — S4 提交前置门：草稿声称 v118 本地 8/8 PASS，但这是既往往返的结论——投放前应在最终打包的二进制上复跑一次本地 8/8（复现即证），避免打包/传输环节引入偏差
+
+## 冲突
+
+| 描述 | 一方 | 另一方 | 状态 | 化解 |
+|------|------|--------|------|------|
+| Addition conflict on A1 | 提交前用 cannjudge_cli 只读接口（get_problem/get_rankings，cannjudge_cli.py L95/L185）验证登录态与 problem_id 有效，再走 submit()。session 记忆中存在 /api/submissions/.../latest 404 失败模式，get_rankings 的三级 fallback（L185-191）优先走 /api/problems/{id}/ranking。 | glob 实测目标文档在 Ascend/xingchen-operators/ 前缀下，草稿 files 均写 'C组赛题/...'。修正后是否真正解决分波/串行检测，需计划编译产物验证，本轮未验证。 | 待议 |  |
+| Addition conflict on A2 | 用 F2.1b 的逐 case best_time 计算期望分：v118 收益仅来自 PATH2（Case3/4/5）的 gate 向量化；v117 TinyH4 向量化为负收益（E-v117_vecz），Case1/2 预期持平。对照 OJ 实测逐 case 时间时按此分解，否则预测-实测对照失真。 | EXPERIMENTS.md L114-116 落盘 SSH forward 不可用导致实验 B/A 实机阻塞。S2 依赖同通道，第一步应加零成本连通性探测。 | 待议 |  |
+| Addition conflict on A3 | S4 回收的逐 case OJ 时间与本地快峰（6.24）/慢峰对照，反推 OJ 采样口径（最优/均值/单次），作为 S2 双峰机制的独立实机证据回写 F2.1s——本地 msprof 与 OJ 投放两路证据互证。 | cannjudge-submit-plaintext 目录含 .env.example/.gitignore（glob 观察证实）。历史 404 失败模式来自会话记忆，本轮未复现验证——提交前先跑只读成绩查询确认凭据与 problem id。 | 待议 |  |
+| Blocking challenge from tianfu | 路径前缀错误为否决级：glob 实证目标文档真实位置与草稿 files 不符，文件冲突检测与执行定位将全部失效。 | MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。   ── 基线预检（工作树/提交现状，评审前必核）── 工作树无草稿目标文件的改动。 第一轮评审必须先核对草稿断言与上述工作树/提交现状的差异。  ── 环境预检（硬约束，评审/排期前必核）── 磁盘（项目卷）：可用 6.3 GiB / 共 300 GiB —— 注意：仅够单个中型构建；多任务并行的大构建需先腾空间 涉及构建/下载/大产物的工作块必须在计划里显式核对上述余量；被环境约束降级过的块，重提/续跑前必须复检。   ── 增量评审说明 ── 以下条目已在前轮评审通过且本轮未变（previousVerdict=passed）：S1、S2、S3。 沿用前轮通过结论，除非与其他条目冲突否则不重审；其余条目为重点评审对象。 | 待议 |  |
+
+## 最终任务表
+
+| id | 标题 | 说明 |
+|----|------|------|
+| S1 | 沉淀上轮结论与方法论 | EXPERIMENTS.md 补 E-v118 条目（gate 向量化、8/8 PASS、快峰 13.97→6.24μs）；把'三级探针阶梯法'（掏计算→掏访存→掏同步，每级一个 msprof 对照，先探针后实现）写入方法论节；FACTS.md 已有 F2.1p/q/r 只补交叉引用。全部数字指到已有验证记录。 |
+| S2 | mte2 双峰机制探测（根因诊断） | 同一二进制连续 8 次 msprof 采样呈稳定双峰：快峰 mte2≈0.85μs/aiv≈6.3μs，慢峰 mte2≈3.5μs/aiv≈13μs。假设：① NPU 频率状态（1650 vs 800MHz）——npu-smi 频率轮询与采样峰对齐验证；② GM 缓存/TLB 效应；③ mte2 队列排队——查 task_time.csv 相邻任务间隔。产出根因结论；若可消除验证消除手段，不能则量化对 OJ 投放影响。 |
+| S3 | 结论落盘与 OJ 投放评估 | S2 结论落 FACTS.md（F2.1s）；估算 Case5 消除后可达值与榜首 4.52μs 对照；量化 v118 双峰各 50% 下的期望成绩 vs 当前 37.97，为 OJ 投放提供决策依据。 |
+| S4 | v118 打包提交 OJ 并回收成绩 | 用户已授权 OJ 提交。v118（含 v117 TinyH4 向量化叠加）本地 8/8 PASS、误差位级一致、aiv 快峰减半，是当前最强候选。步骤：① 远端 make package 出 custom_opp run 包；② 拉囧本地；③ 用 cannjudge CLI（Ascend/cann-learing-hub/skills/cannjudge-submit-plaintext/cannjudge_cli.py，历史提交流程）提交；④ 拉取评分与逐 case 时间，与本地预测对照；⑤ 无论涨跌都记录到 FACTS.md（新条目）与迭代记录。若平台评分异常（TLE/RE），回滚提交不影响本地版本库。风险已评估：最坏情况分数不涨，保留当前 37.97 在榜成绩的提交仍在。 |
+| A1 | S4 前置只读连通性 smoke | 提交前用 cannjudge_cli 只读接口（get_problem/get_rankings，cannjudge_cli.py L95/L185）验证登录态与 problem_id 有效，再走 submit()。session 记忆中存在 /api/submissions/.../latest 404 失败模式，get_rankings 的三级 fallback（L185-191）优先走 /api/problems/{id}/ranking。 |
+| A2 | S3 期望成绩模型逐 case 分解 | 用 F2.1b 的逐 case best_time 计算期望分：v118 收益仅来自 PATH2（Case3/4/5）的 gate 向量化；v117 TinyH4 向量化为负收益（E-v117_vecz），Case1/2 预期持平。对照 OJ 实测逐 case 时间时按此分解，否则预测-实测对照失真。 |
+| A3 | OJ 实测反推采样口径，闭环双峰假设 | S4 回收的逐 case OJ 时间与本地快峰（6.24）/慢峰对照，反推 OJ 采样口径（最优/均值/单次），作为 S2 双峰机制的独立实机证据回写 F2.1s——本地 msprof 与 OJ 投放两路证据互证。 |
+| A4 | S4 磁盘余量显式核对（6.3 GiB 为环境预检声称，未独立复核） | 本轮未用磁盘命令独立复核磁盘余量，按环境预检硬约束采纳为前提。S4 涉及远端 run 包拉回，计划须显式核对包体积与余量。 |
+| A5 | S1 落盘数字须锚定验证记录并核对测试口径（口径差异观察证实，8/8 来源未验证） | EXPERIMENTS.md 落盘 E-v117_vecz 为 7/7 PASS；草稿称 v118 8/8 PASS 但本文件 226 行已读范围内无 E-v118 条目——8 个 case 清单与验证记录来源未验证，落盘时须补锚点。 |
+| S2a | warmup-kernel 冷热判别实验（假设②的零成本探针） | 在被测 kernel 前插一个对同输入做一次 dummy GM 读的 warmup kernel，再连续 msprof 采样。若慢峰消失→TLB/缓存冷启动证实；若双峰依旧→排除假设②、强化频率/排队假设。与 npu-smi 频率轮询互为独立证据。 |
+| S3a | 零提交反推 OJ 采样口径 | 用历史提交 6a94472a（迭代优化记录 L1366，Case5 8.22μs）对照当时的本地快/慢峰数据，反推平台取 min 还是 avg——为 v118 投放期望值提供不消耗提交次数的判据。 |
+
+
+## ⛔ 议事会否决（blocking challenge 未化解）
+- Blocking challenge from tianfu: 路径前缀错误为否决级：glob 实证目标文档真实位置与草稿 files 不符，文件冲突检测与执行定位将全部失效。
+
+计划未编译执行。化解方式：传 rounds:2 让席位复议收敛（concede/revise 化解否决），或修订草案后重新召集。

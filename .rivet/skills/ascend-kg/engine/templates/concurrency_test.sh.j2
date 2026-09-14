@@ -1,0 +1,40 @@
+#!/bin/bash
+# @CONC@ 并发压测（流式）：测真·TTFT / TTOT / 吞吐 / TPOT。
+# stream:true → 首字节(time_starttransfer)=首 token 时间（非完成时间）；
+# stream_options.include_usage → 末 chunk 含 completion_tokens，供吞吐/TPOT 计算。
+# prompt 池按并发序号取模轮换（L4）：同 prompt 全并命中前缀缓存会把 TTFT 测成单一测量面。
+# 注意：prompt 池变更只对新 run 生效（新 run 会重建基线，轮内对比仍同口径）。
+PROMPT_A='请写一段200字的关于机器学习基础概念介绍。'
+PROMPT_B='请解释什么是深度学习，并给出一个简单的例子。'
+PROMPT_C='用中文简要说明计算机的五个主要组成部分。'
+for i in $(seq 1 @CONC@); do
+  case $(( (i - 1) % 3 )) in
+    0) P="$PROMPT_A" ;;
+    1) P="$PROMPT_B" ;;
+    2) P="$PROMPT_C" ;;
+  esac
+  # 整行在子 shell 内一次 echo，避免并发交错打断 "reqN: ttft=...s total=...s out=Ntok"。
+  (
+    BODY=$(mktemp /tmp/vllm_resp.XXXXXX)
+    W=$(curl -s -N -m @TIMEOUT@ -o "$BODY" -w "ttft=%{time_starttransfer}s total=%{time_total}s" \
+      http://127.0.0.1:@PORT@/v1/chat/completions \
+      -H "Content-Type: application/json" \
+      -d "{\"model\":\"@MODEL@\",\"messages\":[{\"role\":\"user\",\"content\":\"$P\"}],\"max_tokens\":@OUTPUT_MAX@,\"temperature\":0,\"stream\":true,\"stream_options\":{\"include_usage\":true}}")
+    OUT=$(python3 -c "
+import json
+tok=0
+for line in open('$BODY'):
+    line=line.strip()
+    if line.startswith('data: ') and line!='data: [DONE]':
+        try:
+            o=json.loads(line[6:])
+            u=o.get('usage') or {}
+            if u.get('completion_tokens'): tok=u['completion_tokens']
+        except Exception: pass
+print(tok if tok else '')
+" 2>/dev/null)
+    rm -f "$BODY"
+    if [ -n "$OUT" ]; then echo "req$i: $W out=${OUT}tok"; else echo "req$i: $W"; fi
+  ) &
+done
+wait

@@ -1,0 +1,121 @@
+{
+  "objective": "MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。",
+  "runId": "b4a1406b8c127d0a",
+  "revision": 6,
+  "sessionId": "4f88bf50-bb3c-4628-8088-bbb422f2abd5",
+  "phase": "team",
+  "phases": {
+    "council": {
+      "status": "passed",
+      "summary": "# 议事会计划 — MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。",
+      "at": 1789189458711,
+      "elapsedMs": 434679,
+      "rawArtifactId": "starflow:4a548caa"
+    },
+    "team": {
+      "status": "blocked",
+      "summary": "team standard：派发 2，波次 8，阻塞 5",
+      "at": 1789189458932,
+      "elapsedMs": 2212011,
+      "rawArtifactId": "starflow:7443c51a"
+    }
+  },
+  "teamRetries": 1,
+  "updatedAt": 1789189458935,
+  "planJson": "{\"version\":1,\"objective\":\"MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。\",\"tasks\":[{\"id\":\"S1\",\"title\":\"沉淀上轮结论与方法论\",\"objective\":\"EXPERIMENTS.md 补 E-v118 条目（gate 向量化、8/8 PASS、快峰 13.97→6.24μs）；把'三级探针阶梯法'（掏计算→掏访存→掏同步，每级一个 msprof 对照，先探针后实现）写入方法论节；FACTS.md 已有 F2.1p/q/r 只补交叉引用。全部数字指到已有验证记录。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md\",\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md\"],\"dependsOn\":[],\"riskTier\":\"high\",\"metadata\":{\"proposedBy\":\"draft\"}},{\"id\":\"S2\",\"title\":\"mte2 双峰机制探测（根因诊断）\",\"objective\":\"同一二进制连续 8 次 msprof 采样呈稳定双峰：快峰 mte2≈0.85μs/aiv≈6.3μs，慢峰 mte2≈3.5μs/aiv≈13μs。假设：① NPU 频率状态——npu-smi 频率轮询与采样峰对齐验证；② GM 缓存/TLB 效应；③ mte2 队列排队——查 task_time.csv 相邻任务间隔。产出根因结论；若可消除验证消除手段，不能则量化对 OJ 投放影响。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md\"],\"dependsOn\":[\"S1\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"draft\"}},{\"id\":\"S3\",\"title\":\"结论落盘与 OJ 投放评估\",\"objective\":\"S2 结论落 FACTS.md（F2.1s）；估算 Case5 消除后可达值与榜首 4.52μs 对照；量化 v118 双峰各 50% 下的期望成绩 vs 当前 37.97，为 OJ 投放提供决策依据。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md\",\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md\"],\"dependsOn\":[\"S1\"],\"riskTier\":\"high\",\"verification\":[\"grep -c 'S2 未执行' FACTS.md 返回 0\"],\"metadata\":{\"proposedBy\":\"draft\"}},{\"id\":\"S4\",\"title\":\"v118 打包提交 OJ 并回收成绩\",\"objective\":\"用户已授权 OJ 提交。v118（含 v117 TinyH4 向量化叠加）本地 8/8 PASS、误差位级一致、aiv 快峰减半，是当前最强候选。步骤：① 远端 make package 出 custom_opp run 包；② 拉回本地；③ 用 cannjudge CLI（Ascend/cann-learing-hub/skills/cannjudge-submit-plaintext/cannjudge_cli.py，历史提交流程）提交；④ 拉取评分与逐 case 时间，与本地预测对照；⑤ 无论涨跌都记录到 FACTS.md（新条目）与迭代记录。风险已评估：最坏情况分数不涨，保留当前 37.97 在榜成绩的提交仍在。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md\",\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md\"],\"dependsOn\":[\"S1\",\"S3\"],\"riskTier\":\"high\",\"metadata\":{\"proposedBy\":\"draft\"}},{\"id\":\"A1\",\"title\":\"S1 改写为『核对补差』而非『新写』\",\"objective\":\"EXPERIMENTS.md L229-321 已含 S1 声称要写的全部两项内容，FACTS.md L650 已有交叉引用。S1 应只补缺失引用行，不新建条目——遵守 EXPERIMENTS.md L272-274『不重复维护同一数字』纪律。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md\"],\"dependsOn\":[\"S1\",\"S2\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianquan\"}},{\"id\":\"A2\",\"title\":\"S2 内部排序：离线假设③先行，实机假设①②挂通道条件\",\"objective\":\"HANDOFF L64-66 已注明假设③（task_time.csv 间隔分析）不依赖通道且优先做。疑点：task_time.csv 若仅在远端 /tmp，假设③也被阻塞——执行者应先核实 CSV 本地可读性。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md\"],\"dependsOn\":[\"S1\",\"S2\",\"A1\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianquan\"}},{\"id\":\"A3\",\"title\":\"S4 增加通道探测前置与成绩拉取降级路径\",\"objective\":\"打包前插入 SSH 20022 可达性探测；成绩拉取存在历史 404 失败模式，降级用 F2.1i 同源免登录 ranking API（FACTS.md L661 记载）。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md\",\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md\"],\"dependsOn\":[\"S1\",\"S3\",\"S4\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianquan\"}},{\"id\":\"S3a\",\"title\":\"机制结论落盘用新编号并消除文档矛盾\",\"objective\":\"E-S2 的 DVFS 裁决（根因结论本身未经本席验证）落 FACTS.md 新条目（建议 F2.1t），同步修正现存 F2.1s 开头『S2 未执行、不落机制结论』的表述与 HANDOFF.md P1 段『机制未查明』，避免单一事实源自相矛盾。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md\",\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md\"],\"dependsOn\":[\"S1\",\"S3\",\"S4\",\"A3\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianfu\"}},{\"id\":\"S3b\",\"title\":\"期望值量化按 E-S2 记载结论分场景重推\",\"objective\":\"替换草稿的『双峰各 50%』模型，按『OJ 是否预热』两场景（多迭代摊薄 vs 单次冷启动）重推期望区间；在榜分数引用必须带日期戳并注明『随 tbest 漂移』（依据 FACTS.md F2.1s① 记载，未经本席复现）。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md\"],\"dependsOn\":[\"S1\",\"S3\",\"S4\",\"A3\",\"S3a\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianfu\"}},{\"id\":\"S4a\",\"title\":\"S4 增补通道自检前置与拉分兜底\",\"objective\":\"步骤⓪实机通道自检（npu.py inst / SSH 20022，依据 HANDOFF.md L58/L151-152 记载，当前可达性未验证）；步骤④拉分遇 404 时用免登录 ranking API 兜底（GET /api/problems/{pid}/ranking，F2.1i 同源）；全程不落盘 cannjudge 凭据明文。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md\"],\"dependsOn\":[\"S4\",\"A3\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianfu\"}},{\"id\":\"T1\",\"title\":\"文档状态收敛：把 E-S2 结论同步进 FACTS.md，修正失效前提\",\"objective\":\"EXPERIMENTS.md L305 起的 E-S2 节（三假设裁决、DVFS 根因、98.2% 稳态）已是完成态，但 FACTS.md F2.1s④ L706 仍写『慢峰机制未查明（S2 未执行）』。需：① 修正 F2.1s④ 为引用 E-S2 结论（慢峰=降频态伪影，不可消除，代码层无手段）；② 重算 ⑤ 的期望值——『双峰各 50%』口径被 98.2% 稳态占比推翻，若 OJ 多迭代采样则 v118 Case5 预期≈快峰口径 6.24μs 而非 50/50 混合；③ HANDOFF.md 一句话现状段（L11-18）同步『S2 已完成、双峰根因=DVFS』。全部改动是文档同步，不产出新实验数据。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md\",\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md\"],\"dependsOn\":[\"S1\",\"S3\",\"S4\",\"A3\",\"S3a\",\"S3b\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianxuan\"}},{\"id\":\"T2\",\"title\":\"S4 前置阻塞显式化：通道自检 + A1 离线编译裁决\",\"objective\":\"HANDOFF.md L58 明确记录『实机通道 SSH 20022 不可达，make binary 离线裁决做不了——通道恢复后先跑 A1 再打包』。草稿 S4 的步骤①（远端 make package）直接依赖该通道。需在 S4 前插入：① npu.py inst / SSH 20022 通道自检；② 通道死了按 session-handoff.md 恢复流程走；③ 通道活了先跑 A1（source set_env.sh && cd build && cmake ../code && make binary，参照迭代优化记录 L1601 已验证命令）再做打包。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md\"],\"dependsOn\":[\"S3\",\"S3a\",\"T1\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianxuan\"}},{\"id\":\"T3\",\"title\":\"S4 提交后 TX1 反推升级为双口径侦察\",\"objective\":\"原 TX1（逐 case 时间反推采样峰）在 E-S2 后有了更明确的判据：若 OJ 多迭代采样，v118 Case5 应落在 ~6.24μs 快峰口径（稳态 98.2%）；若单次冷启动，则被 P0 拖累（aiv 12~15μs，icache miss ~5.8μs 贡献）。提交回收的逐 case 时间本身就是对 OJ 评测口径的一次实验测量——无论分数涨跌都有信息收益，写进迭代记录时按此框架归档。\",\"profile\":\"patcher\",\"kind\":\"patch_proposal\",\"files\":[\"Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md\"],\"dependsOn\":[\"S4\",\"A3\",\"S4a\"],\"riskTier\":\"medium\",\"metadata\":{\"proposedBy\":\"tianxuan\"}}],\"source\":\"manual\",\"createdAt\":1789189024033,\"nonGoals\":[\"\",\"\",\"\",\"\",\"\",\"\"],\"obligations\":[{\"id\":\"deferred_decision:0\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: 【A 类】S1 与磁盘现状冲突：EXPERIMENTS.md L229-321 已含全部内容，计划疑似基于过时仓库快照起草，建议编译前重新对齐 HANDOFF 」（【A 类】S1 与磁盘现状冲突：EXPERIMENTS.md L229-321 已含全部内容，计划疑似基于过时仓库快照起草，建议编译前重新对齐 HANDOFF L147-149 下一步清单。）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianquan\"},{\"id\":\"deferred_decision:1\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: 【B 类疑点】task_time.csv 若仅在远端 /tmp，S2 假设③『离线可做』不成立，直接改变 S2 波次编排——执行者先核实 CSV 本地可读性。」（【B 类疑点】task_time.csv 若仅在远端 /tmp，S2 假设③『离线可做』不成立，直接改变 S2 波次编排——执行者先核实 CSV 本地可读性。）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianquan\"},{\"id\":\"deferred_decision:2\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: 【A 类引用+B 类数值】期望分数量级 40±8 系 F2.1s 落盘的量级估计（公式未知），S3 应显式写明『用户已授权、期望≥0、跌分不覆盖在榜最优』三要素」（【A 类引用+B 类数值】期望分数量级 40±8 系 F2.1s 落盘的量级估计（公式未知），S3 应显式写明『用户已授权、期望≥0、跌分不覆盖在榜最优』三要素避免决策悬空。）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianquan\"},{\"id\":\"deferred_decision:3\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: 【证据闸门自省】上一轮 evidenceStatus 报 verified 是越级宣称：文档观察（read_file/grep，可复核）≠ 运行时状态复现（未做」（【证据闸门自省】上一轮 evidenceStatus 报 verified 是越级宣称：文档观察（read_file/grep，可复核）≠ 运行时状态复现（未做）。本报告已按 A/B 类重标，后续消费方引用时 A 类可直接采信，B 类须自行复现。）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianquan\"},{\"id\":\"deferred_decision:4\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: E-S2 的 DVFS 根因裁决虽逻辑自洽（cycles 不变量 + 频率比吻合），但属他人落盘记录——后续若以其为投放决策依据，建议由可运行验证的席位抽验一次」（E-S2 的 DVFS 根因裁决虽逻辑自洽（cycles 不变量 + 频率比吻合），但属他人落盘记录——后续若以其为投放决策依据，建议由可运行验证的席位抽验一次 msprof 原始 CSV（.rivet/scratch/s2_*.csv）后再升级为已验证）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianfu\"},{\"id\":\"deferred_decision:5\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: OJ 评测是否预热本地不可解，v118 投放期望落在快峰还是冷启动口径完全取决于此——S4 步骤④的 TX1 反推应作为强制收尾」（OJ 评测是否预热本地不可解，v118 投放期望落在快峰还是冷启动口径完全取决于此——S4 步骤④的 TX1 反推应作为强制收尾）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianfu\"},{\"id\":\"deferred_decision:6\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: S4 的 make package 与提交属不可逆外部动作，执行时须逐条向用户回显版本与预期，确认后推进」（S4 的 make package 与提交属不可逆外部动作，执行时须逐条向用户回显版本与预期，确认后推进）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianfu\"},{\"id\":\"deferred_decision:7\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: 草稿 S1 与磁盘现实冲突：EXPERIMENTS.md 已含 E-v118 条目（L229）与三级探针阶梯法节（L263），FACTS.md L650 已交叉」（草稿 S1 与磁盘现实冲突：EXPERIMENTS.md 已含 E-v118 条目（L229）与三级探针阶梯法节（L263），FACTS.md L650 已交叉引用——S1 的『补条目』还剩什么实际工作？建议执行者以『diff 检查缺什么』替代『重写条目』）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianxuan\"},{\"id\":\"deferred_decision:8\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: 草稿 S2 的三个假设已被 E-S2 节全部裁决（频率坐实/缓存排除/队列排除），S2 作为『探测实验』已死，剩余价值仅是把结论从 EXPERIMENTS.md」（草稿 S2 的三个假设已被 E-S2 节全部裁决（频率坐实/缓存排除/队列排除），S2 作为『探测实验』已死，剩余价值仅是把结论从 EXPERIMENTS.md 同步到 FACTS.md（即 T1）——计划应显式承认这一点，避免执行者重新采样一轮）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianxuan\"},{\"id\":\"deferred_decision:9\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: 若 OJ 是单次冷启动计时，P0 的 icache miss（~5.8μs，仅前 ~5 次调用）成为 Case5 新的最后障碍。提交前是否值得评估廉价的 ica」（若 OJ 是单次冷启动计时，P0 的 icache miss（~5.8μs，仅前 ~5 次调用）成为 Case5 新的最后障碍。提交前是否值得评估廉价的 icache 预热手段（首调用触发指令路径覆盖）？开放问题，不阻塞本轮——建议作为 TX1 反推出 OJ 是冷启动口径后的下一轮候选）——交付前需有着落：采纳或明确放弃\",\"source\":\"tianxuan\"},{\"id\":\"deferred_decision:10\",\"kind\":\"deferred_decision\",\"text\":\"暂缓项「Challenge: T1 完成的验收：FACTS.md 中不再存在『S2 未执行』字样（grep 'S2 未执行' 返回 0），且 F2.1s④/⑤ 引用 E-S2 的三阶段数据（」（T1 完成的验收：FACTS.md 中不再存在『S2 未执行』字样（grep 'S2 未执行' 返回 0），且 F2.1s④/⑤ 引用 E-S2 的三阶段数据（P0/P1/P2、98.2%））——交付前需有着落：采纳或明确放弃\",\"source\":\"tianxuan\"},{\"id\":\"high_risk_mitigation:11\",\"kind\":\"high_risk_mitigation\",\"text\":\"高危风险「S1 按原文执行会重复创建已存在的 E-v118 条目与方法论节，违反 EXPERIMENTS.md L272-274 既有纪律」的缓解承诺：改为核对补差，只补交叉引用缺口\",\"source\":\"tianquan\"},{\"id\":\"high_risk_mitigation:12\",\"kind\":\"high_risk_mitigation\",\"text\":\"高危风险「F2.1s 编号已被占用（FACTS.md L652-690），S2 结论写入该编号会覆盖既有 OJ 决策事实」的缓解承诺：S2 结论改用下一可用编号（如 F2.1t）并在 F2.1s 末尾补指回\",\"source\":\"tianquan\"},{\"id\":\"high_risk_mitigation:13\",\"kind\":\"high_risk_mitigation\",\"text\":\"高危风险「S4 步骤①远端 make package 依赖实机通道 SSH 20022，按 HANDOFF.md L58 记载此前不可达（当前状态未验证）」的缓解承诺：S4 执行前先做通道自检，不可达则 S4 挂起，先做 S3a/S3b 离线文档修订\",\"source\":\"tianfu\"},{\"id\":\"high_risk_mitigation:14\",\"kind\":\"high_risk_mitigation\",\"text\":\"高危风险「F2.1s④ 的失效前提（『S2 未执行』）若不同步修正，S4 提交后反推采样峰时引用的期望值依据是错的」的缓解承诺：T1 必须排在 S4 提交之前完成——文档收敛是提交决策的前置，不是事后整理\",\"source\":\"tianxuan\"},{\"id\":\"high_risk_mitigation:15\",\"kind\":\"high_risk_mitigation\",\"text\":\"高危风险「SSH 20022 通道不可达会直接卡死 S4 步骤①（远端 make package），草稿无恢复预案」的缓解承诺：T2 把通道自检插为 S4 第一子步骤；通道死则本轮只做 T1+T3 文档收敛，S4 顺延，不空转\",\"source\":\"tianxuan\"},{\"id\":\"advisory_gate:16\",\"kind\":\"advisory_gate\",\"text\":\"T1 完成的验收：FACTS.md 中不再存在『S2 未执行』字样（grep 'S2 未执行' 返回 0），且 F2.1s④/⑤ 引用 E-S2 的三阶段数据（P0/P1/P2、98.2%）\",\"source\":\"tianxuan\",\"gate\":\"grep -c 'S2 未执行' FACTS.md 返回 0\"}],\"seal\":{\"version\":1,\"digest\":\"e845413025192c98\",\"sealedAt\":1789189458711,\"exemptions\":[]}}",
+  "blockedReason": "波次 worker 全部失败",
+  "teamBlocks": [
+    {
+      "id": "team:A2",
+      "task": "A2",
+      "status": "failed",
+      "summary": "Write worker requires an explicit scope.files — refusing to dispatch a writer with no file boundary",
+      "changedCount": 0,
+      "evidenceStatus": "blocked",
+      "durationMs": 37,
+      "wave": 0
+    },
+    {
+      "id": "team:A1",
+      "task": "A1",
+      "status": "failed",
+      "summary": "Task blocked — dependency never completed: team:S1, team:S2",
+      "changedCount": 0,
+      "evidenceStatus": "blocked",
+      "wave": 2
+    },
+    {
+      "id": "team:S1",
+      "task": "S1",
+      "status": "passed",
+      "summary": "纯文档工单完成：EXPERIMENTS.md 追加 E-v118 条目（探针→实现兑现路径，数字全部指向 FACTS.md F2.1r 既有验证记录）与「三级探针阶梯法」方法论节；FACTS.md …",
+      "objective": "你是天梁执行者。只执行本 task，不扩展范围，不重写计划。",
+      "changedCount": 6,
+      "changedFiles": [
+        "EXPERIMENTS.md",
+        "FACTS.md",
+        "EXPERIMENTS.md"
+      ],
+      "evidenceStatus": "unverified",
+      "usage": {
+        "input": 383704,
+        "output": 9178
+      },
+      "durationMs": 161488,
+      "wave": 0
+    },
+    {
+      "id": "team:A3",
+      "task": "A3",
+      "status": "failed",
+      "summary": "Write worker requires an explicit scope.files — refusing to dispatch a writer with no file boundary",
+      "changedCount": 0,
+      "evidenceStatus": "blocked",
+      "durationMs": 34,
+      "wave": 1
+    },
+    {
+      "id": "team:S2",
+      "task": "S2",
+      "status": "passed",
+      "summary": "S2 双峰根因裁决完成：三候选假设中「NPU 频率状态」坐实——1220 次 msprof 全量数据显示双峰实为确定性三阶段热身曲线（P0 冷启动 aiv 12.17μs → P1 暖机 6.36μ…",
+      "objective": "你是天梁执行者。只执行本 task，不扩展范围，不重写计划。",
+      "changedCount": 1,
+      "changedFiles": [
+        "EXPERIMENTS.md"
+      ],
+      "evidenceStatus": "unverified",
+      "usage": {
+        "input": 1687267,
+        "output": 30249
+      },
+      "durationMs": 840534,
+      "wave": 1
+    },
+    {
+      "id": "team:S3",
+      "task": "S3",
+      "status": "passed",
+      "summary": "S3 完成（纯文档工单）：FACTS.md 新增 F2.1s「OJ 投放决策依据」条目（约 100 行，L652 起）并全面更新 HANDOFF.md。基于 2026-09-12 实时抓取的排行榜与…",
+      "objective": "你是天梁执行者。只执行本 task，不扩展范围，不重写计划。",
+      "changedCount": 2,
+      "changedFiles": [
+        "FACTS.md",
+        "HANDOFF.md"
+      ],
+      "evidenceStatus": "unverified",
+      "durationMs": 988235,
+      "wave": 1
+    },
+    {
+      "id": "team:S4",
+      "task": "S4",
+      "status": "failed",
+      "summary": "Task blocked — dependency never completed: team:S1, team:S3",
+      "changedCount": 0,
+      "evidenceStatus": "blocked",
+      "wave": 2
+    }
+  ],
+  "completedTeamWaves": 1
+}

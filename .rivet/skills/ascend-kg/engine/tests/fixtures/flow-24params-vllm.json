@@ -1,0 +1,291 @@
+{
+  "flow_id": "case5-vllm-llama31",
+  "name": "vLLM Llama-3.1-8B 服务性能调优闭环（案例5）",
+  "backend": "vllm-ascend",
+  "mode": "auto",
+  "target": "ttft",
+  "max_rounds": 50,
+  "profiling": {
+    "enabled": true
+  },
+  "paths": {
+    "atb_env": "/home/z60124773/Ascend/nnal/atb/set_env.sh",
+    "model_default": "/home/z60124773/models/Llama-3.1-8B-Instruct",
+    "vllm_prof_dir": "/tmp/vllm-prof",
+    "optix_script": "/home/z60124773/projects/msagent-proj/msagent/skills/msmodeling-optix-param-recommend/scripts/recommend_params.py",
+    "prof_db_explorer": "/home/z60124773/projects/msagent-proj/msagent/skills/ascend-profiler-db-explorer/scripts/get_schema.py",
+    "msot_skill": "/home/z60124773/projects/msagent-proj/msagent/skills/msot-msopprof-operator-profiler/SKILL.md",
+    "mfu_skill": "/home/z60124773/projects/msagent-proj/msagent/skills/op-mfu-calculator/SKILL.md"
+  },
+  "model_dims": {
+    "n_layers": 32,
+    "hidden": 4096,
+    "inter": 14336,
+    "head_dim": 128,
+    "n_heads": 32,
+    "n_kv": 8
+  },
+  "perf": {
+    "mfu_peak_tflops": 294.91,
+    "hyst": 0.003,
+    "ttot_room": 1.1,
+    "accuracy": {
+      "prompts": 8,
+      "max_tokens": 64,
+      "ppl_drift_soft": 0.05,
+      "ppl_drift_hard": 0.3
+    }
+  },
+  "decision": {
+    "consec_no_improve_stop": 3,
+    "critic_prio_gate": 7,
+    "high_risk_requires_signals": true,
+    "goal": "vLLM-Ascend 服务延迟优化：从动作空间里选「下一轮要试的一个参数改动」，或判断「该停止」。基于 profiling 信号 + 历史轮次 + 风险等级，优先低风险动作，勿重复已试参数。只把最终决策写进 agent_result.json 的 result 字段。",
+    "rules": [
+      "每轮只改一个参数，param 名须与动作空间完全一致",
+      "动作空间每个参数标了风险等级（低/中/高）：优先低风险；高风险（改 dtype/图模式）仅当低风险已穷尽且确信不破坏精度才试",
+      "布尔开关 value 用 true/false；枚举参数 value 只能从枚举列表里选，不能自造",
+      "高风险动作（risk=high）仅当本轮有 profiling 信号（signals 非空）才允许，否则被确定性拒绝并白费一轮",
+      "环境变量参数只能显式设值（布尔 False 渲染为 0 而非 unset）；需要撤销已试的 env 改动由回滚恢复",
+      "不要重复「已试过」的参数（见 history）",
+      "图模式互斥：cudagraph-mode（非 NONE = 开图）与 enforce-eager（开 eager = 关图）不要同时启用；cudagraph-mode=NONE 用于 A/B 关图对照",
+      "融合开关（fuse-norm-quant/fuse-qknorm-rope/fuse-muls-add/fusion-gmmswigluquant）默认全开，关闭仅用于隔离劣化 pass；图/融合动作后 verify 会检查图捕获是否生效，未生效判不 keep 并回滚",
+      "何时回传无推荐(value=null)：当你判断继续试不会有益时（瓶颈不在动作空间作用域、已有明显最优、或动作空间已穷尽）。引擎另有确定性早停（连续多轮无改善即停），你的语义洞察是提前止损、避免注定白跑的轮次"
+    ]
+  },
+  "decision_throughput": {
+    "consec_no_improve_stop": 3,
+    "critic_prio_gate": 7,
+    "high_risk_requires_signals": true,
+    "goal": "vLLM-Ascend 服务吞吐优化：从动作空间里选「下一轮要试的一个参数改动」，或判断「该停止」。基于 profiling 信号 + 历史轮次 + 风险等级，优先低风险动作，勿重复已试参数。吞吐口径噪声大于首 token，改善门槛更宽松，需多观察一轮再停。只把最终决策写进 agent_result.json 的 result 字段。",
+    "rules": [
+      "每轮只改一个参数，param 名须与动作空间完全一致",
+      "动作空间每个参数标了风险等级（低/中/高）：优先低风险；高风险（改 dtype/图模式）仅当低风险已穷尽且确信不破坏精度才试",
+      "布尔开关 value 用 true/false；枚举参数 value 只能从枚举列表里选，不能自造",
+      "高风险动作（risk=high）仅当本轮有 profiling 信号（signals 非空）才允许，否则被确定性拒绝并白费一轮",
+      "环境变量参数只能显式设值（布尔 False 渲染为 0 而非 unset）；需要撤销已试的 env 改动由回滚恢复",
+      "不要重复「已试过」的参数（见 history）",
+      "图模式互斥：cudagraph-mode（非 NONE = 开图）与 enforce-eager（开 eager = 关图）不要同时启用；cudagraph-mode=NONE 用于 A/B 关图对照",
+      "融合开关（fuse-norm-quant/fuse-qknorm-rope/fuse-muls-add/fusion-gmmswigluquant）默认全开，关闭仅用于隔离劣化 pass；图/融合动作后 verify 会检查图捕获是否生效，未生效判不 keep 并回滚",
+      "何时回传无推荐(value=null)：当你判断继续试不会有益时（瓶颈不在动作空间作用域、已有明显最优、或动作空间已穷尽）。引擎另有确定性早停（连续多轮无改善即停），你的语义洞察是提前止损、避免注定白跑的轮次"
+    ]
+  },
+  "params": {
+    "defaults": {
+      "max-model-len": 8192,
+      "max-num-seqs": 128,
+      "block-size": 128,
+      "gpu-memory-utilization": 0.9
+    },
+    "domain": {
+      "max-model-len": {
+        "min": 2048,
+        "max": 32768,
+        "step": 2048
+      },
+      "max-num-seqs": {
+        "min": 32,
+        "max": 512,
+        "step": 32
+      },
+      "max-num-batched-tokens": {
+        "min": 4096,
+        "max": 32768,
+        "step": 4096
+      },
+      "gpu-memory-utilization": {
+        "min": 0.8,
+        "max": 0.92,
+        "step": 0.02
+      },
+      "block-size": {
+        "min": 128,
+        "max": 128,
+        "step": 0,
+        "locked": true
+      },
+      "max-num-partial-prefills": {
+        "min": 1,
+        "max": 64,
+        "step": 1
+      },
+      "long-prefill-token-threshold": {
+        "min": 2048,
+        "max": 32768,
+        "step": 2048
+      },
+      "enforce-eager": {
+        "min": 0,
+        "max": 1,
+        "step": 1,
+        "flag": true
+      },
+      "VLLM_USE_V1": {
+        "kind": "env",
+        "flag": true,
+        "risk": "low"
+      },
+      "TASK_QUEUE_ENABLE": {
+        "kind": "env",
+        "min": 0,
+        "max": 2,
+        "step": 1,
+        "risk": "mid"
+      },
+      "CPU_AFFINITY_CONF": {
+        "kind": "env",
+        "flag": true,
+        "risk": "low"
+      },
+      "VLLM_ASCEND_ENABLE_DENSE_OPTIMIZE": {
+        "kind": "env",
+        "flag": true,
+        "risk": "low"
+      },
+      "VLLM_ASCEND_ENABLE_PREFETCH_MLP": {
+        "kind": "env",
+        "flag": true,
+        "risk": "mid"
+      },
+      "cudagraph-mode": {
+        "kind": "sub",
+        "values": [
+          "FULL_AND_PIECEWISE",
+          "FULL_DECODE_ONLY",
+          "PIECEWISE",
+          "NONE"
+        ],
+        "risk": "mid"
+      },
+      "enable-static-kernel": {
+        "kind": "sub",
+        "flag": true,
+        "risk": "mid"
+      },
+      "fuse-norm-quant": {
+        "kind": "sub",
+        "flag": true,
+        "risk": "low"
+      },
+      "fuse-qknorm-rope": {
+        "kind": "sub",
+        "flag": true,
+        "risk": "low"
+      },
+      "fuse-muls-add": {
+        "kind": "sub",
+        "flag": true,
+        "risk": "low"
+      },
+      "fusion-gmmswigluquant": {
+        "kind": "sub",
+        "flag": true,
+        "risk": "mid"
+      },
+      "compilation-config": {
+        "kind": "cli",
+        "compose": {
+          "cudagraph_mode": "cudagraph-mode"
+        }
+      },
+      "additional-config": {
+        "kind": "cli",
+        "compose": {
+          "ascend_compilation_config": {
+            "enable_static_kernel": "enable-static-kernel",
+            "fuse_norm_quant": "fuse-norm-quant",
+            "fuse_qknorm_rope": "fuse-qknorm-rope",
+            "fuse_muls_add": "fuse-muls-add"
+          },
+          "ascend_fusion_config": {
+            "fusion_ops_gmmswigluquant": "fusion-gmmswigluquant"
+          }
+        }
+      },
+      "kv-cache-dtype": {
+        "kind": "cli",
+        "values": [
+          "fp8",
+          "bf16",
+          "auto"
+        ],
+        "risk": "high"
+      },
+      "enable-chunked-prefill": {
+        "kind": "cli",
+        "flag": true,
+        "risk": "low"
+      },
+      "async-scheduling": {
+        "kind": "cli",
+        "flag": true,
+        "risk": "low"
+      }
+    },
+    "blocked": {
+      "max-model-len": "8192 已匹配负载，调大只浪费 KV 预留",
+      "block-size": "910B chunked prefill 强制 128，调 16 无效"
+    },
+    "max_changes_per_round": 1
+  },
+  "stages": [
+    {
+      "id": "capture",
+      "module": "engine.stages.capture"
+    },
+    {
+      "id": "validate",
+      "module": "engine.stages.validate"
+    },
+    {
+      "id": "analyze",
+      "module": "engine.stages.analyze"
+    },
+    {
+      "id": "diagnose",
+      "module": "engine.stages.diagnose"
+    },
+    {
+      "id": "recommend",
+      "module": "engine.stages.recommend",
+      "kg_correct": true
+    },
+    {
+      "id": "critic",
+      "module": "engine.stages.critic"
+    },
+    {
+      "id": "apply",
+      "module": "engine.stages.apply",
+      "gate": {
+        "rollback": true
+      }
+    },
+    {
+      "id": "verify",
+      "module": "engine.stages.verify"
+    },
+    {
+      "id": "decide",
+      "module": "engine.stages.decide",
+      "gate": {
+        "hysteresis": true
+      }
+    },
+    {
+      "id": "orchestrate",
+      "module": "engine.stages.orchestrate"
+    }
+  ],
+  "interaction_priors": [
+    [
+      "VLLM_ASCEND_ENABLE_DENSE_OPTIMIZE",
+      "VLLM_ASCEND_ENABLE_PREFETCH_MLP"
+    ],
+    [
+      "max-num-batched-tokens",
+      "max-num-partial-prefills",
+      "long-prefill-token-threshold"
+    ]
+  ]
+}

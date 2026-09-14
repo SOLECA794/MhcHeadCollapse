@@ -1,0 +1,13 @@
+#!/bin/bash
+# SGLang-NPU 主服务模板（由 orchestrator 按 current_params 渲染）。真机实测通过形态：
+# conda 环境 @ENV_NAME@（py3.11 + torch 2.10.0 + torch_npu 2.10.0.post4）+ sglang v0.5.16
+# 源码装（pyproject_npu.toml）+ sgl-kernel-npu 三件套（wheel + custom-ops/ops-transformer
+# .run 装入家目录 CANN opp）+ triton-ascend。环境细节全部封装在 conda 激活脚本
+# envs/@ENV_NAME@/etc/conda/activate.d/cann.sh（CANN set_env + ATB + vendor 算子 + torch libs，
+# 并 unset 宿主残留 LD_LIBRARY_PATH 防 torch ABI 错配）。
+source @CONDA_SH@ && conda activate @ENV_NAME@ || { echo "FATAL: conda 环境 @ENV_NAME@ 激活失败"; exit 1; }
+python3 -c "import sglang" 2>/dev/null || { echo "FATAL: sglang 不可导入——@ENV_NAME@ 未完成 NPU 源码安装？"; exit 1; }
+export ASCEND_RT_VISIBLE_DEVICES=@DEVICE@
+@SGLANG_ENV@
+exec python3 -m sglang.launch_server --model-path @MODEL@ \
+  @SGLANG_ARGS@

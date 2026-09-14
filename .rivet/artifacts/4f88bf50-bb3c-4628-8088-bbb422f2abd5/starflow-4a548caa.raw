@@ -1,0 +1,196 @@
+# 议事会计划 — MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。
+
+
+── 基线预检（工作树/提交现状，评审前必核）──
+工作树无草稿目标文件的改动。
+第一轮评审必须先核对草稿断言与上述工作树/提交现状的差异。
+
+── 环境预检（硬约束，评审/排期前必核）──
+磁盘（项目卷）：可用 6.3 GiB / 共 300 GiB —— 注意：仅够单个中型构建；多任务并行的大构建需先腾空间
+涉及构建/下载/大产物的工作块必须在计划里显式核对上述余量；被环境约束降级过的块，重提/续跑前必须复检。
+
+> 席位: tianquan · tianfu · tianxuan · 1 轮会诊 · convenedAt=1789186903753
+
+> ⚠ 低阶模型席位: tianquan(glm-5.3-flash) —— 这些席位的贡献建议复核后再采纳。
+
+## 席位贡献
+
+### tianquan _(模型: glm-5.3-flash)_
+四项条目全部核到真实锚点：FACTS.md L619-L662 已含 F2.1r 完整验证（8/8 PASS、aiv 13.97→6.24μs、scalar 3.76 快峰），v118 实现目录与 op_host L111 AddConfig(ascend910b) 均在磁盘，EXPERIMENTS.md L191-222 有 E-v117 前置记录，榜首 4.52/本队 37.97/Case5 7.74 均有行号。计划内容真实、可执行。方向性异议一条：S4 与 S2/S3 无依赖且 OJ 排名动态（榜首已 69.04→78.69），v118 的 OJ 逐 case 实测本身就是双峰假设的最硬检验——建议 S4 提前，勿用可锁定收益换不确定诊断。
+
+### tianfu _(模型: MiniMax-M3)_
+四条草稿数字全部锚到真实落盘记录（FACTS.md L619-L646 F2.1r：8/8 PASS、aiv 13.97→6.24μs、双峰 mte2 0.85/3.5μs；EXPERIMENTS.md L191 E-v117_vecz 确为末条，E-v118 确实缺失），files 列表经 glob 逐一核实存在。计划方向成立，但有一处未证实的兜底断言构成最大风险：『最坏情况 37.97 在榜成绩保留』——全仓 grep 无任何证据表明 OJ 取历史最高而非最新，且 FACTS.md 自己（L643-L646、L78-L81）承认 OJ 计分口径未确定、不可预测绝对分数。此断言不修正，S4 的风险评估是建在假设上的。
+
+### tianxuan _(模型: kimi-k2.6)_
+从方案空间视角单轮会诊 S1-S4 计划草稿：全部关键断言经磁盘核实为真（v118 实现、F2.1r 落盘、双峰数据、OJ 现状、提交工具在位）。核心意见：S4 OJ 提交的信息价值被排低了——建议提前到 S2 之前或并行，因为 OJ 采样口径（快峰/慢峰）只有提交才能确证，本地双峰探测无法替代。
+
+## 裁决记录
+
+### 接受
+- **tianquan** · S4 前置：实机离线编译复验 — 迭代记录 L1599 已验证本机 atomgit 910b 编译链与 OJ 同源（fp16 CE 行号逐字一致）。v118 打包前先在实机跑一次 make binary 离线裁决编译问题，避免把 CE/链接类失败消耗到 OJ 提交次数上。
+- **tianquan** · OJ 计分口径核查（S3/S4 前置） — S3 的'双峰各 50% 期望成绩'隐含 OJ 采样口径假设（单次/多次/min/mean），未经验证。用历史提交数据反推：迭代记录 L1285 有提交 ID 6a94241b9856135024adcfa1 逐 case 时间（4.88/6.00/6.30/6.54/11.14，32.88 分），与在榜 37.97 的那次提交逐 case 对照，可先钉死计分是取最优还是最新。这是 S4 '保留 37.97'断言成立与否的判据。
+- **tianquan** · S2 假设③优先：离线分析已有 profiler 数据 — 假设③（mte2 队列排队、task_time.csv 相邻任务间隔）不需要新增 NPU 权限或采样，已有 8 次采样 CSV 可先离线分析。假设①（npu-smi 频率轮询）依赖远端权限与实时采样，成本高、成功率未知——排最后，若前两个假设已解释双峰则可裁剪。
+- **tianquan** · Risk: 草稿断言'最坏情况保留 37.97 在榜成绩'未经验证——若 OJ 计分取最新提交而非最优，v118 跌分会覆盖在榜分数（历史上 32.88 提交与 42.66 — S4 执行前先完成 A2 计分口径核查；若确认取最新且无回滚机制，需用户在提交前明确接受覆盖风险
+- **tianquan** · Risk: cannjudge CLI 拉取评分接口曾 HTTP 404，评分回收环节可能失败 — 准备兜底路径：ascend-npu-console 浏览器控制或网页端手动查询；404 时改用提交 ID 直接查询接口
+- **tianquan** · Risk: OJ 有速率限制，频繁提交返回 429（迭代记录 L60，需等 30s~5min） — 提交间隔≥5min，429 不立即重试，单次提交失败先查原因再重发
+- **tianquan** · Risk: 磁盘仅余 6.3 GiB，S2 多轮 msprof 采样产物可能吃紧（单次 profiler output 含完整 trace 可达数百 MB） — 每轮采样后只保留 task_time.csv 与摘要，profiler 完整输出即采即删
+- **tianquan** · Risk: EXPERIMENTS.md L221-222 已记录平台 Task Duration 本身抖动 ±2μs（7.5↔10.9 交替）——S2 的三个假设可能全部 — S2 条目已写明'不能消除则量化对 OJ 投放影响'，此为有效负结果；但 S3 的期望成绩计算必须把'不可消除'作为主情景之一，勿只算消除后的乐观值
+- **tianfu** · Risk: S4 断言『最坏情况分数不涨，保留当前 37.97 在榜成绩』无落盘证据支撑；F2.1k/F2.1m 已证实本地不可预测 OJ 绝对分数，且 OJ 采样落在快峰 — 按 A1 在提交前核实计分规则；若无法确认，把『可能掉分』场景写入 S3 的期望值计算并让用户知情后再提交
+- **tianfu** · Risk: S2 根因结论仅基于 8 次采样的双峰分布；npu-smi 轮询时钟与 msprof 采样时钟若不对齐，频率假设会产生伪相关，得出错误根因 — 复采样加大到 ≥24 次并记录 npu-smi 时间戳；无法对齐时结论降级为『相关性观察』而非『根因』，避免污染 F2.1s
+- **tianfu** · Risk: S3 的『期望成绩 vs 当前 37.97』若给单点数字，会违反 F2.1m 已证实的口径边界（本地≠OJ 口径） — 期望值给上下界区间（全快峰/全慢峰两种极端）并标注『方向性参考，非预测』
+- **tianfu** · Risk: S4 远端 make package + 包回拉在磁盘仅 6.3 GiB 余量下未显式核对；且 msprof 多轮采样产物会累积 — S4 步骤①前加磁盘余量检查，清理旧 prof 输出目录
+- **tianfu** · Risk: FACTS.md 已 660+ 行、F2.1o 自己建议折叠 F2.1a~m；S1/S3 继续追加条目加剧膨胀，新会话读取成本上升 — S1 落盘时顺带执行 F2.1o 建议的折叠或至少补目录锚点
+- **tianxuan** · OJ 提交本身作为双峰实验的免费探针 — S4 提交后 OJ 返回的逐 case time 直接回答 OJ 采样落在快峰还是慢峰（F2.1r 中未验证的悬念），比本地 npu-smi 推断更硬。建议 S4 完成后在 F2.1s 加一节 OJ 采样口径实测。
+- **tianxuan** · Risk: S3 本地数字→OJ 分数外推违反 HANDOFF.md:144 明文警告（OJ 计时口径未确定） — S3 产出必须标注为情景推测（快峰/慢峰/混合三档），不得写成预测
+- **tianxuan** · Risk: S4 远端构建通路未复检，EXPERIMENTS.md:114 记录过 SSH forward 阻塞历史 — S4 前加远端连通性前置探针，失败则提前止损
+- **tianxuan** · Risk: npu-smi 频率轮询秒级粒度对 μs 级采样峰只能做旁证 — 假设按成本排序：③查 task_time.csv（零成本）→①npu-smi 快照（旁证）→②GM 缓存/TLB（最后）
+- **tianxuan** · Risk: FACTS.md 已 660 行/15 条目难读（F2.1o 自评），S2/S3 再各加一条加剧膨胀 — F2.1s 写紧凑，方法论长文放 EXPERIMENTS.md，FACTS 只留结论+指针
+
+### 拒绝
+- **tianquan** ·  — undefined
+- **tianquan** ·  — undefined
+- **tianfu** ·  — undefined
+- **tianxuan** ·  — undefined
+- **tianxuan** ·  — undefined
+- **tianxuan** ·  — undefined
+
+### 暂缓
+- **tianquan** · Challenge: S4 与 S2/S3 无数据依赖，且 OJ 排名动态（榜首 69.04→78.69，FACTS L100）。v118 的 OJ 逐 case 实测数据是检验双峰 — S4 与 S2/S3 无数据依赖，且 OJ 排名动态（榜首 69.04→78.69，FACTS L100）。v118 的 OJ 逐 case 实测数据是检验双峰假设（快峰落在 OJ 采样上的概率）最直接的证据，比本地 8 次采样推演更硬。建议顺序改为 S1→S4→S2→S3，或 S4 与 S2 并行
+- **tianquan** · Challenge: S3'双峰各 50% 期望成绩'的先验分布未验证——50/50 是猜测。已有提交的逐 case 时间（如 11.14μs 的 Case5 那次）可先反推 OJ  — S3'双峰各 50% 期望成绩'的先验分布未验证——50/50 是猜测。已有提交的逐 case 时间（如 11.14μs 的 Case5 那次）可先反推 OJ 采样落在哪个峰
+- **tianquan** · Challenge: S1 说'EXPERIMENTS.md 补 E-v118 条目'，但 FACTS.md F2.1r 已含完整 v118 记录——EXPERIMENTS 条目应只 — S1 说'EXPERIMENTS.md 补 E-v118 条目'，但 FACTS.md F2.1r 已含完整 v118 记录——EXPERIMENTS 条目应只写实验过程与对照（探针→实现的兑现路径），避免与 FACTS 重复维护同一数字
+- **tianfu** · S4 前置：OJ 计分规则确认 — id A1 collides with differing detail _(冲突: A1)_
+- **tianfu** · S2 环境前置检查 — id A2 collides with differing detail _(冲突: A2)_
+- **tianfu** · S3 同步更新会话级 HANDOFF — id A3 collides with differing detail _(冲突: A3)_
+- **tianfu** · Challenge: F2.1c（FACTS.md L102）判定 Case1 是最大缺口（+3.58 vs 榜首），S2/S3 却全押 Case5（+3.22）。F2.1q L59 — F2.1c（FACTS.md L102）判定 Case1 是最大缺口（+3.58 vs 榜首），S2/S3 却全押 Case5（+3.22）。F2.1q L598 说双峰『与路径/shape 无关』——若成立，消除 mte2 慢峰应同时改善 Case1，但 S3 的估算模型未写这条链路，只估 Case5。请补全或说明为何排除。
+- **tianfu** · Challenge: S4 步骤④『与本地预测对照』应升级为逐 case 对照表（历史格式见迭代优化记录.md L875）：若 OJ 上 Case1/2 无变化而 Case5 变化， — S4 步骤④『与本地预测对照』应升级为逐 case 对照表（历史格式见迭代优化记录.md L875）：若 OJ 上 Case1/2 无变化而 Case5 变化，可反推双峰机制在 OJ 端的分布，这是比总分更有信息量的观测。
+- **tianxuan** · Challenge: S2 产出标准建议显式化：若三假设都排不出决定性证据，允许产出为排除法+量化影响而非硬凑机制解释 — S2 产出标准建议显式化：若三假设都排不出决定性证据，允许产出为排除法+量化影响而非硬凑机制解释
+- **tianxuan** · Challenge: 建议 S4 提前到 S2 之前或并行：OJ 采样口径问题只有提交能回答，v118 已 8/8 PASS 且最坏情况仅分数不涨。若保持原顺序，S2 应设硬性时间盒 — 建议 S4 提前到 S2 之前或并行：OJ 采样口径问题只有提交能回答，v118 已 8/8 PASS 且最坏情况仅分数不涨。若保持原顺序，S2 应设硬性时间盒（如 task_time.csv 分析+npu-smi 快照各 30 分钟内）
+
+## 冲突
+
+| 描述 | 一方 | 另一方 | 状态 | 化解 |
+|------|------|--------|------|------|
+| Addition conflict on A1 | 迭代记录 L1599 已验证本机 atomgit 910b 编译链与 OJ 同源（fp16 CE 行号逐字一致）。v118 打包前先在实机跑一次 make binary 离线裁决编译问题，避免把 CE/链接类失败消耗到 OJ 提交次数上。 | 提交前从历史提交数据（迭代优化记录.md 存多轮提交逐点耗时，如 L875/L1066）或 cannjudge CLI 接口核实：榜单保留最高分还是最新分。若取最新，v118 双峰慢峰（5.3~5.6μs scalar）下存在掉分可能，37.97 无兜底。 | 待议 |  |
+| Addition conflict on A2 | S3 的'双峰各 50% 期望成绩'隐含 OJ 采样口径假设（单次/多次/min/mean），未经验证。用历史提交数据反推：迭代记录 L1285 有提交 ID 6a94241b9856135024adcfa1 逐 case 时间（4.88/6.00/6.30/6.54/11.14，32.88 分），与在榜 37.97 的那次提交逐 case 对照，可先钉死计分是取最优还是最新。这是 S4 '保留 37.97'断言成立与否的判据。 | S2 的 npu-smi 频率轮询与 msprof 复采样依赖远端 Notebook 存活（HANDOFF.md L140：先 npu.py inst 确认）与磁盘余量（环境预检 6.3 GiB）。条目应显式写入这两个前置门，失败时降级为仅用已有 task_time.csv 做假设③排查。 | 待议 |  |
+| Addition conflict on A3 | 假设③（mte2 队列排队、task_time.csv 相邻任务间隔）不需要新增 NPU 权限或采样，已有 8 次采样 CSV 可先离线分析。假设①（npu-smi 频率轮询）依赖远端权限与实时采样，成本高、成功率未知——排最后，若前两个假设已解释双峰则可裁剪。 | S3 只更新赛题目录 HANDOFF.md，但 F2.1o 明确记录会话交接载体 Ascend/.rivet/HANDOFF.md 停在 9-09 已过期。本轮双峰根因结论若不进入会话级 HANDOFF，下个会话恢复时接不上。 | 待议 |  |
+
+## 最终任务表
+
+| id | 标题 | 说明 |
+|----|------|------|
+| S1 | 沉淀上轮结论与方法论 | EXPERIMENTS.md 补 E-v118 条目（gate 向量化、8/8 PASS、快峰 13.97→6.24μs）；把'三级探针阶梯法'（掏计算→掏访存→掏同步，每级一个 msprof 对照，先探针后实现）写入方法论节；FACTS.md 已有 F2.1p/q/r 只补交叉引用。全部数字指到已有验证记录。 |
+| S2 | mte2 双峰机制探测（根因诊断） | 同一二进制连续 8 次 msprof 采样呈稳定双峰：快峰 mte2≈0.85μs/aiv≈6.3μs，慢峰 mte2≈3.5μs/aiv≈13μs。假设：① NPU 频率状态——npu-smi 频率轮询与采样峰对齐验证；② GM 缓存/TLB 效应；③ mte2 队列排队——查 task_time.csv 相邻任务间隔。产出根因结论；若可消除验证消除手段，不能则量化对 OJ 投放影响。 |
+| S3 | 结论落盘与 OJ 投放评估 | S2 结论落 FACTS.md（F2.1s）；估算 Case5 消除后可达值与榜首 4.52μs 对照；量化 v118 双峰各 50% 下的期望成绩 vs 当前 37.97，为 OJ 投放提供决策依据。 |
+| S4 | v118 打包提交 OJ 并回收成绩 | 用户已授权 OJ 提交。v118（含 v117 TinyH4 向量化叠加）本地 8/8 PASS、误差位级一致、aiv 快峰减半，是当前最强候选。步骤：① 远端 make package 出 custom_opp run 包；② 拉回本地；③ 用 cannjudge CLI（Ascend/cann-learing-hub/skills/cannjudge-submit-plaintext/cannjudge_cli.py，历史提交流程）提交；④ 拉取评分与逐 case 时间，与本地预测对照；⑤ 无论涨跌都记录到 FACTS.md（新条目）与迭代记录。风险已评估：最坏情况分数不涨，保留当前 37.97 在榜成绩的提交仍在。 |
+| A1 | S4 前置：实机离线编译复验 | 迭代记录 L1599 已验证本机 atomgit 910b 编译链与 OJ 同源（fp16 CE 行号逐字一致）。v118 打包前先在实机跑一次 make binary 离线裁决编译问题，避免把 CE/链接类失败消耗到 OJ 提交次数上。 |
+| A2 | OJ 计分口径核查（S3/S4 前置） | S3 的'双峰各 50% 期望成绩'隐含 OJ 采样口径假设（单次/多次/min/mean），未经验证。用历史提交数据反推：迭代记录 L1285 有提交 ID 6a94241b9856135024adcfa1 逐 case 时间（4.88/6.00/6.30/6.54/11.14，32.88 分），与在榜 37.97 的那次提交逐 case 对照，可先钉死计分是取最优还是最新。这是 S4 '保留 37.97'断言成立与否的判据。 |
+| A3 | S2 假设③优先：离线分析已有 profiler 数据 | 假设③（mte2 队列排队、task_time.csv 相邻任务间隔）不需要新增 NPU 权限或采样，已有 8 次采样 CSV 可先离线分析。假设①（npu-smi 频率轮询）依赖远端权限与实时采样，成本高、成功率未知——排最后，若前两个假设已解释双峰则可裁剪。 |
+| TX1 | OJ 提交本身作为双峰实验的免费探针 | S4 提交后 OJ 返回的逐 case time 直接回答 OJ 采样落在快峰还是慢峰（F2.1r 中未验证的悬念），比本地 npu-smi 推断更硬。建议 S4 完成后在 F2.1s 加一节 OJ 采样口径实测。 |
+
+
+```council-plan-json
+{"version":1,"objective":"MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。\n\n\n── 基线预检（工作树/提交现状，评审前必核）──\n工作树无草稿目标文件的改动。\n第一轮评审必须先核对草稿断言与上述工作树/提交现状的差异。\n\n── 环境预检（硬约束，评审/排期前必核）──\n磁盘（项目卷）：可用 6.3 GiB / 共 300 GiB —— 注意：仅够单个中型构建；多任务并行的大构建需先腾空间\n涉及构建/下载/大产物的工作块必须在计划里显式核对上述余量；被环境约束降级过的块，重提/续跑前必须复检。","tasks":[{"id":"S1","title":"沉淀上轮结论与方法论","objective":"EXPERIMENTS.md 补 E-v118 条目（gate 向量化、8/8 PASS、快峰 13.97→6.24μs）；把'三级探针阶梯法'（掏计算→掏访存→掏同步，每级一个 msprof 对照，先探针后实现）写入方法论节；FACTS.md 已有 F2.1p/q/r 只补交叉引用。全部数字指到已有验证记录。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md"],"dependsOn":[],"riskTier":"low","metadata":{"proposedBy":"draft"}},{"id":"S2","title":"mte2 双峰机制探测（根因诊断）","objective":"同一二进制连续 8 次 msprof 采样呈稳定双峰：快峰 mte2≈0.85μs/aiv≈6.3μs，慢峰 mte2≈3.5μs/aiv≈13μs。假设：① NPU 频率状态——npu-smi 频率轮询与采样峰对齐验证；② GM 缓存/TLB 效应；③ mte2 队列排队——查 task_time.csv 相邻任务间隔。产出根因结论；若可消除验证消除手段，不能则量化对 OJ 投放影响。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md"],"dependsOn":["S1"],"riskTier":"medium","metadata":{"proposedBy":"draft"}},{"id":"S3","title":"结论落盘与 OJ 投放评估","objective":"S2 结论落 FACTS.md（F2.1s）；估算 Case5 消除后可达值与榜首 4.52μs 对照；量化 v118 双峰各 50% 下的期望成绩 vs 当前 37.97，为 OJ 投放提供决策依据。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md"],"dependsOn":["S1"],"riskTier":"medium","verification":["用历史提交逐 case 数据（迭代记录 L1285）对照本地 msprof 双峰分布，写出 OJ 采样口径结论后再算期望"],"metadata":{"proposedBy":"draft"}},{"id":"S4","title":"v118 打包提交 OJ 并回收成绩","objective":"用户已授权 OJ 提交。v118（含 v117 TinyH4 向量化叠加）本地 8/8 PASS、误差位级一致、aiv 快峰减半，是当前最强候选。步骤：① 远端 make package 出 custom_opp run 包；② 拉回本地；③ 用 cannjudge CLI（Ascend/cann-learing-hub/skills/cannjudge-submit-plaintext/cannjudge_cli.py，历史提交流程）提交；④ 拉取评分与逐 case 时间，与本地预测对照；⑤ 无论涨跌都记录到 FACTS.md（新条目）与迭代记录。风险已评估：最坏情况分数不涨，保留当前 37.97 在榜成绩的提交仍在。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md"],"dependsOn":["S1","S3"],"riskTier":"high","metadata":{"proposedBy":"draft"}},{"id":"A1","title":"S4 前置：实机离线编译复验","objective":"迭代记录 L1599 已验证本机 atomgit 910b 编译链与 OJ 同源（fp16 CE 行号逐字一致）。v118 打包前先在实机跑一次 make binary 离线裁决编译问题，避免把 CE/链接类失败消耗到 OJ 提交次数上。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code"],"dependsOn":[],"riskTier":"medium","metadata":{"proposedBy":"tianquan"}},{"id":"A2","title":"OJ 计分口径核查（S3/S4 前置）","objective":"S3 的'双峰各 50% 期望成绩'隐含 OJ 采样口径假设（单次/多次/min/mean），未经验证。用历史提交数据反推：迭代记录 L1285 有提交 ID 6a94241b9856135024adcfa1 逐 case 时间（4.88/6.00/6.30/6.54/11.14，32.88 分），与在榜 37.97 的那次提交逐 case 对照，可先钉死计分是取最优还是最新。这是 S4 '保留 37.97'断言成立与否的判据。","profile":"patcher","kind":"patch_proposal","files":[],"dependsOn":[],"riskTier":"medium","metadata":{"proposedBy":"tianquan"}},{"id":"A3","title":"S2 假设③优先：离线分析已有 profiler 数据","objective":"假设③（mte2 队列排队、task_time.csv 相邻任务间隔）不需要新增 NPU 权限或采样，已有 8 次采样 CSV 可先离线分析。假设①（npu-smi 频率轮询）依赖远端权限与实时采样，成本高、成功率未知——排最后，若前两个假设已解释双峰则可裁剪。","profile":"patcher","kind":"patch_proposal","files":[],"dependsOn":[],"riskTier":"medium","metadata":{"proposedBy":"tianquan"}},{"id":"TX1","title":"OJ 提交本身作为双峰实验的免费探针","objective":"S4 提交后 OJ 返回的逐 case time 直接回答 OJ 采样落在快峰还是慢峰（F2.1r 中未验证的悬念），比本地 npu-smi 推断更硬。建议 S4 完成后在 F2.1s 加一节 OJ 采样口径实测。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md"],"dependsOn":["S1","S3","S4"],"riskTier":"medium","metadata":{"proposedBy":"tianxuan"}}],"source":"manual","createdAt":1789186903753,"nonGoals":["","","","","",""],"obligations":[{"id":"deferred_decision:0","kind":"deferred_decision","text":"暂缓项「Challenge: S4 与 S2/S3 无数据依赖，且 OJ 排名动态（榜首 69.04→78.69，FACTS L100）。v118 的 OJ 逐 case 实测数据是检验双峰」（S4 与 S2/S3 无数据依赖，且 OJ 排名动态（榜首 69.04→78.69，FACTS L100）。v118 的 OJ 逐 case 实测数据是检验双峰假设（快峰落在 OJ 采样上的概率）最直接的证据，比本地 8 次采样推演更硬。建议顺序改为 S1→S4→S2→S3，或 S4 与 S2 并行）——交付前需有着落：采纳或明确放弃","source":"tianquan"},{"id":"deferred_decision:1","kind":"deferred_decision","text":"暂缓项「Challenge: S3'双峰各 50% 期望成绩'的先验分布未验证——50/50 是猜测。已有提交的逐 case 时间（如 11.14μs 的 Case5 那次）可先反推 OJ 」（S3'双峰各 50% 期望成绩'的先验分布未验证——50/50 是猜测。已有提交的逐 case 时间（如 11.14μs 的 Case5 那次）可先反推 OJ 采样落在哪个峰）——交付前需有着落：采纳或明确放弃","source":"tianquan"},{"id":"deferred_decision:2","kind":"deferred_decision","text":"暂缓项「Challenge: S1 说'EXPERIMENTS.md 补 E-v118 条目'，但 FACTS.md F2.1r 已含完整 v118 记录——EXPERIMENTS 条目应只」（S1 说'EXPERIMENTS.md 补 E-v118 条目'，但 FACTS.md F2.1r 已含完整 v118 记录——EXPERIMENTS 条目应只写实验过程与对照（探针→实现的兑现路径），避免与 FACTS 重复维护同一数字）——交付前需有着落：采纳或明确放弃","source":"tianquan"},{"id":"deferred_decision:3","kind":"deferred_decision","text":"暂缓项「S4 前置：OJ 计分规则确认」（id A1 collides with differing detail）——交付前需有着落：采纳或明确放弃","source":"tianfu"},{"id":"deferred_decision:4","kind":"deferred_decision","text":"暂缓项「S2 环境前置检查」（id A2 collides with differing detail）——交付前需有着落：采纳或明确放弃","source":"tianfu"},{"id":"deferred_decision:5","kind":"deferred_decision","text":"暂缓项「S3 同步更新会话级 HANDOFF」（id A3 collides with differing detail）——交付前需有着落：采纳或明确放弃","source":"tianfu"},{"id":"deferred_decision:6","kind":"deferred_decision","text":"暂缓项「Challenge: F2.1c（FACTS.md L102）判定 Case1 是最大缺口（+3.58 vs 榜首），S2/S3 却全押 Case5（+3.22）。F2.1q L59」（F2.1c（FACTS.md L102）判定 Case1 是最大缺口（+3.58 vs 榜首），S2/S3 却全押 Case5（+3.22）。F2.1q L598 说双峰『与路径/shape 无关』——若成立，消除 mte2 慢峰应同时改善 Case1，但 S3 的估算模型未写这条链路，只估 Case5。请补全或说明为何排除。）——交付前需有着落：采纳或明确放弃","source":"tianfu"},{"id":"deferred_decision:7","kind":"deferred_decision","text":"暂缓项「Challenge: S4 步骤④『与本地预测对照』应升级为逐 case 对照表（历史格式见迭代优化记录.md L875）：若 OJ 上 Case1/2 无变化而 Case5 变化，」（S4 步骤④『与本地预测对照』应升级为逐 case 对照表（历史格式见迭代优化记录.md L875）：若 OJ 上 Case1/2 无变化而 Case5 变化，可反推双峰机制在 OJ 端的分布，这是比总分更有信息量的观测。）——交付前需有着落：采纳或明确放弃","source":"tianfu"},{"id":"deferred_decision:8","kind":"deferred_decision","text":"暂缓项「Challenge: S2 产出标准建议显式化：若三假设都排不出决定性证据，允许产出为排除法+量化影响而非硬凑机制解释」（S2 产出标准建议显式化：若三假设都排不出决定性证据，允许产出为排除法+量化影响而非硬凑机制解释）——交付前需有着落：采纳或明确放弃","source":"tianxuan"},{"id":"deferred_decision:9","kind":"deferred_decision","text":"暂缓项「Challenge: 建议 S4 提前到 S2 之前或并行：OJ 采样口径问题只有提交能回答，v118 已 8/8 PASS 且最坏情况仅分数不涨。若保持原顺序，S2 应设硬性时间盒」（建议 S4 提前到 S2 之前或并行：OJ 采样口径问题只有提交能回答，v118 已 8/8 PASS 且最坏情况仅分数不涨。若保持原顺序，S2 应设硬性时间盒（如 task_time.csv 分析+npu-smi 快照各 30 分钟内））——交付前需有着落：采纳或明确放弃","source":"tianxuan"},{"id":"high_risk_mitigation:10","kind":"high_risk_mitigation","text":"高危风险「草稿断言'最坏情况保留 37.97 在榜成绩'未经验证——若 OJ 计分取最新提交而非最优，v118 跌分会覆盖在榜分数（历史上 32.88 提交与 42.66 的 v056 并存暗示取最优，但无明文证据）」的缓解承诺：S4 执行前先完成 A2 计分口径核查；若确认取最新且无回滚机制，需用户在提交前明确接受覆盖风险","source":"tianquan"},{"id":"advisory_gate:11","kind":"advisory_gate","text":"S3'双峰各 50% 期望成绩'的先验分布未验证——50/50 是猜测。已有提交的逐 case 时间（如 11.14μs 的 Case5 那次）可先反推 OJ 采样落在哪个峰","source":"tianquan","gate":"用历史提交逐 case 数据（迭代记录 L1285）对照本地 msprof 双峰分布，写出 OJ 采样口径结论后再算期望"},{"id":"high_risk_mitigation:12","kind":"high_risk_mitigation","text":"高危风险「S4 断言『最坏情况分数不涨，保留当前 37.97 在榜成绩』无落盘证据支撑；F2.1k/F2.1m 已证实本地不可预测 OJ 绝对分数，且 OJ 采样落在快峰还是慢峰未知（FACTS.md L643-L646）」的缓解承诺：按 A1 在提交前核实计分规则；若无法确认，把『可能掉分』场景写入 S3 的期望值计算并让用户知情后再提交","source":"tianfu"}],"seal":{"version":1,"digest":"aad21fe34bfb0d1d","sealedAt":1789187246916,"exemptions":[]}}
+```
+
+✅ 计划已存入会话 — 用户确认后直接调用 `team_orchestrate({ objective })` 即可执行（不要传 planJson/planMarkdown，存储的计划会被自动消费）。上方 JSON 块仅作可读审计。
+
+--- phase output ---
+
+# 议事会计划 — MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。
+
+> 席位: tianquan · tianfu · tianxuan · 1 轮会诊 · convenedAt=1789189024033
+
+> ⚠ 低阶模型席位: tianquan(glm-5.3-flash) —— 这些席位的贡献建议复核后再采纳。
+
+## 席位贡献
+
+### tianquan _(模型: glm-5.3-flash)_
+【evidenceStatus=unverified（执行级）：本席位只读，无 run_tests/命令执行，未做任何运行时验证。发现分两类：A 类=本人真实读取的文档观察（行号可复核）；B 类=仓库文档记载的运行时状态（未复现，引用须带来源与日期戳）。】方向判断成立（与 HANDOFF L52-66 P0/P1 排序一致，A 类）；三处锚点漂移均为 A 类：①S1 要写的内容已存在于 EXPERIMENTS.md（E-v118 条目 L229 起、三级探针阶梯法方法论节 L289 起）；②S3 指定的 F2.1s 已被 OJ 投放决策条目占用（FACTS.md L652，L654 明文记载 S2 未执行）；③S4 依赖的 SSH 20022 在 HANDOFF L58-59 记载不可达（B 类：当前可达性未探测）。基准分数 37.97→37.02 系 FACTS.md L663 记载的 2026-09-12 时点实测（B 类：tbest 持续重算，当前值未知）。
+
+### tianfu _(模型: MiniMax-M3)_
+【修正版：撤回过强宣称】本席完成单轮只读文档会诊，所有发现均为『读取核实』级（grep/read_file 有行号可查），不含任何运行类验证。读取核实的发现：(1) 草稿 S1/S2 主体内容已存在于 EXPERIMENTS.md——E-v118 条目 L229、三级探针阶梯法 L266、E-S2 双峰根因探测 L304，其内容记载了他人（非本席）对 DVFS 800↔1650MHz 频率切换根因的裁决；(2) FACTS.md L652 已存在 F2.1s ★★★（OJ 投放决策），草稿 S3 计划的『落 F2.1s』编号冲突；(3) HANDOFF.md L58 记载 S4 前置 A1 被实机通道 SSH 20022 不可达阻塞，草稿未列通道自检。【未验证声明】DVFS 根因结论、v118 8/8 PASS、13.97→6.24μs、37.97→37.02 漂移等数字均为仓库文档中的他人记录，本席未用 run_tests 或任何命令复现，一律视为『文档记载、未经本席验证』。
+
+### tianxuan _(模型: kimi-k2.6)_
+磁盘状态领先草稿：S1 已完成（EXPERIMENTS.md L229 E-v118 条目 + L263 三级探针阶梯法节均在盘上，FACTS.md L650 已交叉引用）；S2 已完成（EXPERIMENTS.md L305 起 E-S2 节：三假设裁决，频率 DVFS 坐实 800→1650MHz，稳态占 98.2%）但结论未同步回 FACTS.md——F2.1s④(L706) 仍写『S2 未执行』，前提失效且污染 ⑤ 的期望值口径。S4 是唯一真正的主任务，但草稿漏了 HANDOFF L58/L151 记录的硬阻塞：SSH 20022 不可达、前置 A1 离线编译裁决未跑。真实计划应重排为：先文档状态收敛，再做通道自检→A1→打包提交。
+
+## 裁决记录
+
+### 接受
+- **tianquan** · S1 改写为『核对补差』而非『新写』 — EXPERIMENTS.md L229-321 已含 S1 声称要写的全部两项内容，FACTS.md L650 已有交叉引用。S1 应只补缺失引用行，不新建条目——遵守 EXPERIMENTS.md L272-274『不重复维护同一数字』纪律。
+- **tianquan** · S2 内部排序：离线假设③先行，实机假设①②挂通道条件 — HANDOFF L64-66 已注明假设③（task_time.csv 间隔分析）不依赖通道且优先做。疑点：task_time.csv 若仅在远端 /tmp，假设③也被阻塞——执行者应先核实 CSV 本地可读性。
+- **tianquan** · S4 增加通道探测前置与成绩拉取降级路径 — 打包前插入 SSH 20022 可达性探测；成绩拉取存在历史 404 失败模式，降级用 F2.1i 同源免登录 ranking API（FACTS.md L661 记载）。
+- **tianquan** · Risk: S1 按原文执行会重复创建已存在的 E-v118 条目与方法论节，违反 EXPERIMENTS.md L272-274 既有纪律 — 改为核对补差，只补交叉引用缺口
+- **tianquan** · Risk: F2.1s 编号已被占用（FACTS.md L652-690），S2 结论写入该编号会覆盖既有 OJ 决策事实 — S2 结论改用下一可用编号（如 F2.1t）并在 F2.1s 末尾补指回
+- **tianquan** · Risk: S3 以 37.97 为基准过时（L663 记载 2026-09-12 已漂移至 37.02，当前值未知未复现） — 改用『在榜最优（带日期戳，随 tbest 漂移）』口径，投放前用 ranking API 拉实时值
+- **tianquan** · Risk: S4 打包可能被 SSH 20022 阻塞（HANDOFF L58-59 记载，当前状态未验证） — 开工前一次连接尝试探测；不可达时先做离线条目，通道恢复后先跑 A1 再打包
+- **tianquan** · Risk: S4 成绩拉取存在历史 404 失败模式（session 失败记录，未复现） — 降级用 ranking API；两条路径都失败时如实记录『成绩未回收』
+- **tianfu** · 机制结论落盘用新编号并消除文档矛盾 — E-S2 的 DVFS 裁决（根因结论本身未经本席验证）落 FACTS.md 新条目（建议 F2.1t），同步修正现存 F2.1s 开头『S2 未执行、不落机制结论』的表述与 HANDOFF.md P1 段『机制未查明』，避免单一事实源自相矛盾。
+- **tianfu** · 期望值量化按 E-S2 记载结论分场景重推 — 替换草稿的『双峰各 50%』模型，按『OJ 是否预热』两场景（多迭代摊薄 vs 单次冷启动）重推期望区间；在榜分数引用必须带日期戳并注明『随 tbest 漂移』（依据 FACTS.md F2.1s① 记载，未经本席复现）。
+- **tianfu** · S4 增补通道自检前置与拉分兜底 — 步骤⓪实机通道自检（npu.py inst / SSH 20022，依据 HANDOFF.md L58/L151-152 记载，当前可达性未验证）；步骤④拉分遇 404 时用免登录 ranking API 兜底（GET /api/problems/{pid}/ranking，F2.1i 同源）；全程不落盘 cannjudge 凭据明文。
+- **tianfu** · Risk: S4 步骤①远端 make package 依赖实机通道 SSH 20022，按 HANDOFF.md L58 记载此前不可达（当前状态未验证） — S4 执行前先做通道自检，不可达则 S4 挂起，先做 S3a/S3b 离线文档修订
+- **tianfu** · Risk: S3 按草稿原文落 F2.1s 撞已占用编号（读取核实：FACTS.md L652 现存该编号） — 机制结论改用新编号 F2.1t，并同步修正 F2.1s 与 HANDOFF.md 的『S2 未执行』表述
+- **tianfu** · Risk: S3 的『双峰各 50%』量化模型与 EXPERIMENTS.md E-S2 记载的裁决（稳态占 98.2%）不符，沿用会给投放决策提供失真依据 — 按两场景重推（S3b）；E-S2 结论本身未经本席复现，重推时保留该 caveat
+- **tianfu** · Risk: 草稿『保留 37.97 在榜』表述已过时（FACTS.md F2.1s① 记载同提交回溯重算为 37.02 且持续漂移，未验证） — 分数引用一律带日期戳，提交后以 API 实时拉取为准
+- **tianfu** · Risk: cannjudge CLI 拉取 /api/submissions 404 的历史失败模式（会话记忆记载，非本轮验证） — 404 时改用免登录 ranking API 兜底
+- **tianfu** · Risk: S1 按草稿执行会重复劳动——E-v118 与方法论节已分别落盘于 EXPERIMENTS.md L229/L266（读取核实） — S1 收窄为交叉引用核对：F2.1p/q/r 引用完整性 + FACTS.md L610-612 旧双峰注记补 E-S2 裁决引用
+- **tianfu** · Risk: 本席上一轮把文档读取发现报成 verified 属于宣称过强——所有性能数字与根因结论均为他人落盘记录，无本席运行的验证 — 已撤回：evidenceStatus 改为 unverified，所有非读取核实结论改写为『文档记载、未经本席验证』
+- **tianxuan** · 文档状态收敛：把 E-S2 结论同步进 FACTS.md，修正失效前提 — EXPERIMENTS.md L305 起的 E-S2 节（三假设裁决、DVFS 根因、98.2% 稳态）已是完成态，但 FACTS.md F2.1s④ L706 仍写『慢峰机制未查明（S2 未执行）』。需：① 修正 F2.1s④ 为引用 E-S2 结论（慢峰=降频态伪影，不可消除，代码层无手段）；② 重算 ⑤ 的期望值——『双峰各 50%』口径被 98.2% 稳态占比推翻，若 OJ 多迭代采样则 v118 Case5 预期≈快峰口径 6.24μs 而非 50/50 混合；③ HANDOFF.md 一句话现状段（L11-18）同步『S2 已完成、双峰根因=DVFS』。全部改动是文档同步，不产出新实验数据。
+- **tianxuan** · S4 前置阻塞显式化：通道自检 + A1 离线编译裁决 — HANDOFF.md L58 明确记录『实机通道 SSH 20022 不可达，make binary 离线裁决做不了——通道恢复后先跑 A1 再打包』。草稿 S4 的步骤①（远端 make package）直接依赖该通道。需在 S4 前插入：① npu.py inst / SSH 20022 通道自检；② 通道死了按 session-handoff.md 恢复流程走；③ 通道活了先跑 A1（source set_env.sh && cd build && cmake ../code && make binary，参照迭代优化记录 L1601 已验证命令）再做打包。
+- **tianxuan** · S4 提交后 TX1 反推升级为双口径侦察 — 原 TX1（逐 case 时间反推采样峰）在 E-S2 后有了更明确的判据：若 OJ 多迭代采样，v118 Case5 应落在 ~6.24μs 快峰口径（稳态 98.2%）；若单次冷启动，则被 P0 拖累（aiv 12~15μs，icache miss ~5.8μs 贡献）。提交回收的逐 case 时间本身就是对 OJ 评测口径的一次实验测量——无论分数涨跌都有信息收益，写进迭代记录时按此框架归档。
+- **tianxuan** · Risk: 草稿 S1/S2 按待做执行会重复已完成的工作，浪费 1-2 个执行轮次 — 编译计划时将 S1 降为『核验已完成，仅补缺口』、S2 降为『结论同步落盘』（即 T1）；EXPERIMENTS.md L229/L263/L305 三个锚点节已存在，执行者先读再写
+- **tianxuan** · Risk: F2.1s④ 的失效前提（『S2 未执行』）若不同步修正，S4 提交后反推采样峰时引用的期望值依据是错的 — T1 必须排在 S4 提交之前完成——文档收敛是提交决策的前置，不是事后整理
+- **tianxuan** · Risk: SSH 20022 通道不可达会直接卡死 S4 步骤①（远端 make package），草稿无恢复预案 — T2 把通道自检插为 S4 第一子步骤；通道死则本轮只做 T1+T3 文档收敛，S4 顺延，不空转
+- **tianxuan** · Risk: 『双峰各 50%』期望口径已被 E-S2 的 98.2% 稳态占比推翻，据此做的投放决策（40±8）量级可能偏保守 — T1 重算 ⑤ 时分『OJ 多迭代』与『OJ 单次冷启动』两档给出，不再用 50/50 单一口径
+- **tianxuan** · Risk: OJ 有速率限制（迭代优化记录 L60：频繁提交返回 429，需等 30 秒到 5 分钟） — S4 提交与成绩拉取之间留足间隔，429 时退避重试而非换姿势
+
+### 拒绝
+- **tianquan** ·  — undefined
+- **tianquan** ·  — undefined
+- **tianfu** ·  — undefined
+- **tianfu** ·  — undefined
+- **tianxuan** ·  — undefined
+- **tianxuan** ·  — undefined
+
+### 暂缓
+- **tianquan** · Challenge: 【A 类】S1 与磁盘现状冲突：EXPERIMENTS.md L229-321 已含全部内容，计划疑似基于过时仓库快照起草，建议编译前重新对齐 HANDOFF  — 【A 类】S1 与磁盘现状冲突：EXPERIMENTS.md L229-321 已含全部内容，计划疑似基于过时仓库快照起草，建议编译前重新对齐 HANDOFF L147-149 下一步清单。
+- **tianquan** · Challenge: 【B 类疑点】task_time.csv 若仅在远端 /tmp，S2 假设③『离线可做』不成立，直接改变 S2 波次编排——执行者先核实 CSV 本地可读性。 — 【B 类疑点】task_time.csv 若仅在远端 /tmp，S2 假设③『离线可做』不成立，直接改变 S2 波次编排——执行者先核实 CSV 本地可读性。
+- **tianquan** · Challenge: 【A 类引用+B 类数值】期望分数量级 40±8 系 F2.1s 落盘的量级估计（公式未知），S3 应显式写明『用户已授权、期望≥0、跌分不覆盖在榜最优』三要素 — 【A 类引用+B 类数值】期望分数量级 40±8 系 F2.1s 落盘的量级估计（公式未知），S3 应显式写明『用户已授权、期望≥0、跌分不覆盖在榜最优』三要素避免决策悬空。
+- **tianquan** · Challenge: 【证据闸门自省】上一轮 evidenceStatus 报 verified 是越级宣称：文档观察（read_file/grep，可复核）≠ 运行时状态复现（未做 — 【证据闸门自省】上一轮 evidenceStatus 报 verified 是越级宣称：文档观察（read_file/grep，可复核）≠ 运行时状态复现（未做）。本报告已按 A/B 类重标，后续消费方引用时 A 类可直接采信，B 类须自行复现。
+- **tianfu** · Challenge: E-S2 的 DVFS 根因裁决虽逻辑自洽（cycles 不变量 + 频率比吻合），但属他人落盘记录——后续若以其为投放决策依据，建议由可运行验证的席位抽验一次 — E-S2 的 DVFS 根因裁决虽逻辑自洽（cycles 不变量 + 频率比吻合），但属他人落盘记录——后续若以其为投放决策依据，建议由可运行验证的席位抽验一次 msprof 原始 CSV（.rivet/scratch/s2_*.csv）后再升级为已验证
+- **tianfu** · Challenge: OJ 评测是否预热本地不可解，v118 投放期望落在快峰还是冷启动口径完全取决于此——S4 步骤④的 TX1 反推应作为强制收尾 — OJ 评测是否预热本地不可解，v118 投放期望落在快峰还是冷启动口径完全取决于此——S4 步骤④的 TX1 反推应作为强制收尾
+- **tianfu** · Challenge: S4 的 make package 与提交属不可逆外部动作，执行时须逐条向用户回显版本与预期，确认后推进 — S4 的 make package 与提交属不可逆外部动作，执行时须逐条向用户回显版本与预期，确认后推进
+- **tianxuan** · Challenge: 草稿 S1 与磁盘现实冲突：EXPERIMENTS.md 已含 E-v118 条目（L229）与三级探针阶梯法节（L263），FACTS.md L650 已交叉 — 草稿 S1 与磁盘现实冲突：EXPERIMENTS.md 已含 E-v118 条目（L229）与三级探针阶梯法节（L263），FACTS.md L650 已交叉引用——S1 的『补条目』还剩什么实际工作？建议执行者以『diff 检查缺什么』替代『重写条目』
+- **tianxuan** · Challenge: 草稿 S2 的三个假设已被 E-S2 节全部裁决（频率坐实/缓存排除/队列排除），S2 作为『探测实验』已死，剩余价值仅是把结论从 EXPERIMENTS.md — 草稿 S2 的三个假设已被 E-S2 节全部裁决（频率坐实/缓存排除/队列排除），S2 作为『探测实验』已死，剩余价值仅是把结论从 EXPERIMENTS.md 同步到 FACTS.md（即 T1）——计划应显式承认这一点，避免执行者重新采样一轮
+- **tianxuan** · Challenge: 若 OJ 是单次冷启动计时，P0 的 icache miss（~5.8μs，仅前 ~5 次调用）成为 Case5 新的最后障碍。提交前是否值得评估廉价的 ica — 若 OJ 是单次冷启动计时，P0 的 icache miss（~5.8μs，仅前 ~5 次调用）成为 Case5 新的最后障碍。提交前是否值得评估廉价的 icache 预热手段（首调用触发指令路径覆盖）？开放问题，不阻塞本轮——建议作为 TX1 反推出 OJ 是冷启动口径后的下一轮候选
+- **tianxuan** · Challenge: T1 完成的验收：FACTS.md 中不再存在『S2 未执行』字样（grep 'S2 未执行' 返回 0），且 F2.1s④/⑤ 引用 E-S2 的三阶段数据（ — T1 完成的验收：FACTS.md 中不再存在『S2 未执行』字样（grep 'S2 未执行' 返回 0），且 F2.1s④/⑤ 引用 E-S2 的三阶段数据（P0/P1/P2、98.2%）
+
+## 冲突
+
+_（无席位间冲突）_
+
+## 最终任务表
+
+| id | 标题 | 说明 |
+|----|------|------|
+| S1 | 沉淀上轮结论与方法论 | EXPERIMENTS.md 补 E-v118 条目（gate 向量化、8/8 PASS、快峰 13.97→6.24μs）；把'三级探针阶梯法'（掏计算→掏访存→掏同步，每级一个 msprof 对照，先探针后实现）写入方法论节；FACTS.md 已有 F2.1p/q/r 只补交叉引用。全部数字指到已有验证记录。 |
+| S2 | mte2 双峰机制探测（根因诊断） | 同一二进制连续 8 次 msprof 采样呈稳定双峰：快峰 mte2≈0.85μs/aiv≈6.3μs，慢峰 mte2≈3.5μs/aiv≈13μs。假设：① NPU 频率状态——npu-smi 频率轮询与采样峰对齐验证；② GM 缓存/TLB 效应；③ mte2 队列排队——查 task_time.csv 相邻任务间隔。产出根因结论；若可消除验证消除手段，不能则量化对 OJ 投放影响。 |
+| S3 | 结论落盘与 OJ 投放评估 | S2 结论落 FACTS.md（F2.1s）；估算 Case5 消除后可达值与榜首 4.52μs 对照；量化 v118 双峰各 50% 下的期望成绩 vs 当前 37.97，为 OJ 投放提供决策依据。 |
+| S4 | v118 打包提交 OJ 并回收成绩 | 用户已授权 OJ 提交。v118（含 v117 TinyH4 向量化叠加）本地 8/8 PASS、误差位级一致、aiv 快峰减半，是当前最强候选。步骤：① 远端 make package 出 custom_opp run 包；② 拉回本地；③ 用 cannjudge CLI（Ascend/cann-learing-hub/skills/cannjudge-submit-plaintext/cannjudge_cli.py，历史提交流程）提交；④ 拉取评分与逐 case 时间，与本地预测对照；⑤ 无论涨跌都记录到 FACTS.md（新条目）与迭代记录。风险已评估：最坏情况分数不涨，保留当前 37.97 在榜成绩的提交仍在。 |
+| A1 | S1 改写为『核对补差』而非『新写』 | EXPERIMENTS.md L229-321 已含 S1 声称要写的全部两项内容，FACTS.md L650 已有交叉引用。S1 应只补缺失引用行，不新建条目——遵守 EXPERIMENTS.md L272-274『不重复维护同一数字』纪律。 |
+| A2 | S2 内部排序：离线假设③先行，实机假设①②挂通道条件 | HANDOFF L64-66 已注明假设③（task_time.csv 间隔分析）不依赖通道且优先做。疑点：task_time.csv 若仅在远端 /tmp，假设③也被阻塞——执行者应先核实 CSV 本地可读性。 |
+| A3 | S4 增加通道探测前置与成绩拉取降级路径 | 打包前插入 SSH 20022 可达性探测；成绩拉取存在历史 404 失败模式，降级用 F2.1i 同源免登录 ranking API（FACTS.md L661 记载）。 |
+| S3a | 机制结论落盘用新编号并消除文档矛盾 | E-S2 的 DVFS 裁决（根因结论本身未经本席验证）落 FACTS.md 新条目（建议 F2.1t），同步修正现存 F2.1s 开头『S2 未执行、不落机制结论』的表述与 HANDOFF.md P1 段『机制未查明』，避免单一事实源自相矛盾。 |
+| S3b | 期望值量化按 E-S2 记载结论分场景重推 | 替换草稿的『双峰各 50%』模型，按『OJ 是否预热』两场景（多迭代摊薄 vs 单次冷启动）重推期望区间；在榜分数引用必须带日期戳并注明『随 tbest 漂移』（依据 FACTS.md F2.1s① 记载，未经本席复现）。 |
+| S4a | S4 增补通道自检前置与拉分兜底 | 步骤⓪实机通道自检（npu.py inst / SSH 20022，依据 HANDOFF.md L58/L151-152 记载，当前可达性未验证）；步骤④拉分遇 404 时用免登录 ranking API 兜底（GET /api/problems/{pid}/ranking，F2.1i 同源）；全程不落盘 cannjudge 凭据明文。 |
+| T1 | 文档状态收敛：把 E-S2 结论同步进 FACTS.md，修正失效前提 | EXPERIMENTS.md L305 起的 E-S2 节（三假设裁决、DVFS 根因、98.2% 稳态）已是完成态，但 FACTS.md F2.1s④ L706 仍写『慢峰机制未查明（S2 未执行）』。需：① 修正 F2.1s④ 为引用 E-S2 结论（慢峰=降频态伪影，不可消除，代码层无手段）；② 重算 ⑤ 的期望值——『双峰各 50%』口径被 98.2% 稳态占比推翻，若 OJ 多迭代采样则 v118 Case5 预期≈快峰口径 6.24μs 而非 50/50 混合；③ HANDOFF.md 一句话现状段（L11-18）同步『S2 已完成、双峰根因=DVFS』。全部改动是文档同步，不产出新实验数据。 |
+| T2 | S4 前置阻塞显式化：通道自检 + A1 离线编译裁决 | HANDOFF.md L58 明确记录『实机通道 SSH 20022 不可达，make binary 离线裁决做不了——通道恢复后先跑 A1 再打包』。草稿 S4 的步骤①（远端 make package）直接依赖该通道。需在 S4 前插入：① npu.py inst / SSH 20022 通道自检；② 通道死了按 session-handoff.md 恢复流程走；③ 通道活了先跑 A1（source set_env.sh && cd build && cmake ../code && make binary，参照迭代优化记录 L1601 已验证命令）再做打包。 |
+| T3 | S4 提交后 TX1 反推升级为双口径侦察 | 原 TX1（逐 case 时间反推采样峰）在 E-S2 后有了更明确的判据：若 OJ 多迭代采样，v118 Case5 应落在 ~6.24μs 快峰口径（稳态 98.2%）；若单次冷启动，则被 P0 拖累（aiv 12~15μs，icache miss ~5.8μs 贡献）。提交回收的逐 case 时间本身就是对 OJ 评测口径的一次实验测量——无论分数涨跌都有信息收益，写进迭代记录时按此框架归档。 |
+
+
+```council-plan-json
+{"version":1,"objective":"MhcHeadCollapse 优化第三轮：沉淀上轮结论（v118 gate 向量化、探针阶梯方法论），诊断 mte2 双峰根因（快峰 0.85/慢峰 3.5μs 差4倍，Case5 逼近榜首 4.52μs 的最后已知障碍），落盘结论后打包 v118 提交 OJ 争取高分。","tasks":[{"id":"S1","title":"沉淀上轮结论与方法论","objective":"EXPERIMENTS.md 补 E-v118 条目（gate 向量化、8/8 PASS、快峰 13.97→6.24μs）；把'三级探针阶梯法'（掏计算→掏访存→掏同步，每级一个 msprof 对照，先探针后实现）写入方法论节；FACTS.md 已有 F2.1p/q/r 只补交叉引用。全部数字指到已有验证记录。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md"],"dependsOn":[],"riskTier":"high","metadata":{"proposedBy":"draft"}},{"id":"S2","title":"mte2 双峰机制探测（根因诊断）","objective":"同一二进制连续 8 次 msprof 采样呈稳定双峰：快峰 mte2≈0.85μs/aiv≈6.3μs，慢峰 mte2≈3.5μs/aiv≈13μs。假设：① NPU 频率状态——npu-smi 频率轮询与采样峰对齐验证；② GM 缓存/TLB 效应；③ mte2 队列排队——查 task_time.csv 相邻任务间隔。产出根因结论；若可消除验证消除手段，不能则量化对 OJ 投放影响。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md"],"dependsOn":["S1"],"riskTier":"medium","metadata":{"proposedBy":"draft"}},{"id":"S3","title":"结论落盘与 OJ 投放评估","objective":"S2 结论落 FACTS.md（F2.1s）；估算 Case5 消除后可达值与榜首 4.52μs 对照；量化 v118 双峰各 50% 下的期望成绩 vs 当前 37.97，为 OJ 投放提供决策依据。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md"],"dependsOn":["S1"],"riskTier":"high","verification":["grep -c 'S2 未执行' FACTS.md 返回 0"],"metadata":{"proposedBy":"draft"}},{"id":"S4","title":"v118 打包提交 OJ 并回收成绩","objective":"用户已授权 OJ 提交。v118（含 v117 TinyH4 向量化叠加）本地 8/8 PASS、误差位级一致、aiv 快峰减半，是当前最强候选。步骤：① 远端 make package 出 custom_opp run 包；② 拉回本地；③ 用 cannjudge CLI（Ascend/cann-learing-hub/skills/cannjudge-submit-plaintext/cannjudge_cli.py，历史提交流程）提交；④ 拉取评分与逐 case 时间，与本地预测对照；⑤ 无论涨跌都记录到 FACTS.md（新条目）与迭代记录。风险已评估：最坏情况分数不涨，保留当前 37.97 在榜成绩的提交仍在。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md"],"dependsOn":["S1","S3"],"riskTier":"high","metadata":{"proposedBy":"draft"}},{"id":"A1","title":"S1 改写为『核对补差』而非『新写』","objective":"EXPERIMENTS.md L229-321 已含 S1 声称要写的全部两项内容，FACTS.md L650 已有交叉引用。S1 应只补缺失引用行，不新建条目——遵守 EXPERIMENTS.md L272-274『不重复维护同一数字』纪律。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md"],"dependsOn":["S1","S2"],"riskTier":"medium","metadata":{"proposedBy":"tianquan"}},{"id":"A2","title":"S2 内部排序：离线假设③先行，实机假设①②挂通道条件","objective":"HANDOFF L64-66 已注明假设③（task_time.csv 间隔分析）不依赖通道且优先做。疑点：task_time.csv 若仅在远端 /tmp，假设③也被阻塞——执行者应先核实 CSV 本地可读性。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/EXPERIMENTS.md"],"dependsOn":["S1","S2","A1"],"riskTier":"medium","metadata":{"proposedBy":"tianquan"}},{"id":"A3","title":"S4 增加通道探测前置与成绩拉取降级路径","objective":"打包前插入 SSH 20022 可达性探测；成绩拉取存在历史 404 失败模式，降级用 F2.1i 同源免登录 ranking API（FACTS.md L661 记载）。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md"],"dependsOn":["S1","S3","S4"],"riskTier":"medium","metadata":{"proposedBy":"tianquan"}},{"id":"S3a","title":"机制结论落盘用新编号并消除文档矛盾","objective":"E-S2 的 DVFS 裁决（根因结论本身未经本席验证）落 FACTS.md 新条目（建议 F2.1t），同步修正现存 F2.1s 开头『S2 未执行、不落机制结论』的表述与 HANDOFF.md P1 段『机制未查明』，避免单一事实源自相矛盾。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md"],"dependsOn":["S1","S3","S4","A3"],"riskTier":"medium","metadata":{"proposedBy":"tianfu"}},{"id":"S3b","title":"期望值量化按 E-S2 记载结论分场景重推","objective":"替换草稿的『双峰各 50%』模型，按『OJ 是否预热』两场景（多迭代摊薄 vs 单次冷启动）重推期望区间；在榜分数引用必须带日期戳并注明『随 tbest 漂移』（依据 FACTS.md F2.1s① 记载，未经本席复现）。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md"],"dependsOn":["S1","S3","S4","A3","S3a"],"riskTier":"medium","metadata":{"proposedBy":"tianfu"}},{"id":"S4a","title":"S4 增补通道自检前置与拉分兜底","objective":"步骤⓪实机通道自检（npu.py inst / SSH 20022，依据 HANDOFF.md L58/L151-152 记载，当前可达性未验证）；步骤④拉分遇 404 时用免登录 ranking API 兜底（GET /api/problems/{pid}/ranking，F2.1i 同源）；全程不落盘 cannjudge 凭据明文。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md"],"dependsOn":["S4","A3"],"riskTier":"medium","metadata":{"proposedBy":"tianfu"}},{"id":"T1","title":"文档状态收敛：把 E-S2 结论同步进 FACTS.md，修正失效前提","objective":"EXPERIMENTS.md L305 起的 E-S2 节（三假设裁决、DVFS 根因、98.2% 稳态）已是完成态，但 FACTS.md F2.1s④ L706 仍写『慢峰机制未查明（S2 未执行）』。需：① 修正 F2.1s④ 为引用 E-S2 结论（慢峰=降频态伪影，不可消除，代码层无手段）；② 重算 ⑤ 的期望值——『双峰各 50%』口径被 98.2% 稳态占比推翻，若 OJ 多迭代采样则 v118 Case5 预期≈快峰口径 6.24μs 而非 50/50 混合；③ HANDOFF.md 一句话现状段（L11-18）同步『S2 已完成、双峰根因=DVFS』。全部改动是文档同步，不产出新实验数据。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md","Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md"],"dependsOn":["S1","S3","S4","A3","S3a","S3b"],"riskTier":"medium","metadata":{"proposedBy":"tianxuan"}},{"id":"T2","title":"S4 前置阻塞显式化：通道自检 + A1 离线编译裁决","objective":"HANDOFF.md L58 明确记录『实机通道 SSH 20022 不可达，make binary 离线裁决做不了——通道恢复后先跑 A1 再打包』。草稿 S4 的步骤①（远端 make package）直接依赖该通道。需在 S4 前插入：① npu.py inst / SSH 20022 通道自检；② 通道死了按 session-handoff.md 恢复流程走；③ 通道活了先跑 A1（source set_env.sh && cd build && cmake ../code && make binary，参照迭代优化记录 L1601 已验证命令）再做打包。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md"],"dependsOn":["S3","S3a","T1"],"riskTier":"medium","metadata":{"proposedBy":"tianxuan"}},{"id":"T3","title":"S4 提交后 TX1 反推升级为双口径侦察","objective":"原 TX1（逐 case 时间反推采样峰）在 E-S2 后有了更明确的判据：若 OJ 多迭代采样，v118 Case5 应落在 ~6.24μs 快峰口径（稳态 98.2%）；若单次冷启动，则被 P0 拖累（aiv 12~15μs，icache miss ~5.8μs 贡献）。提交回收的逐 case 时间本身就是对 OJ 评测口径的一次实验测量——无论分数涨跌都有信息收益，写进迭代记录时按此框架归档。","profile":"patcher","kind":"patch_proposal","files":["Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md"],"dependsOn":["S4","A3","S4a"],"riskTier":"medium","metadata":{"proposedBy":"tianxuan"}}],"source":"manual","createdAt":1789189024033,"nonGoals":["","","","","",""],"obligations":[{"id":"deferred_decision:0","kind":"deferred_decision","text":"暂缓项「Challenge: 【A 类】S1 与磁盘现状冲突：EXPERIMENTS.md L229-321 已含全部内容，计划疑似基于过时仓库快照起草，建议编译前重新对齐 HANDOFF 」（【A 类】S1 与磁盘现状冲突：EXPERIMENTS.md L229-321 已含全部内容，计划疑似基于过时仓库快照起草，建议编译前重新对齐 HANDOFF L147-149 下一步清单。）——交付前需有着落：采纳或明确放弃","source":"tianquan"},{"id":"deferred_decision:1","kind":"deferred_decision","text":"暂缓项「Challenge: 【B 类疑点】task_time.csv 若仅在远端 /tmp，S2 假设③『离线可做』不成立，直接改变 S2 波次编排——执行者先核实 CSV 本地可读性。」（【B 类疑点】task_time.csv 若仅在远端 /tmp，S2 假设③『离线可做』不成立，直接改变 S2 波次编排——执行者先核实 CSV 本地可读性。）——交付前需有着落：采纳或明确放弃","source":"tianquan"},{"id":"deferred_decision:2","kind":"deferred_decision","text":"暂缓项「Challenge: 【A 类引用+B 类数值】期望分数量级 40±8 系 F2.1s 落盘的量级估计（公式未知），S3 应显式写明『用户已授权、期望≥0、跌分不覆盖在榜最优』三要素」（【A 类引用+B 类数值】期望分数量级 40±8 系 F2.1s 落盘的量级估计（公式未知），S3 应显式写明『用户已授权、期望≥0、跌分不覆盖在榜最优』三要素避免决策悬空。）——交付前需有着落：采纳或明确放弃","source":"tianquan"},{"id":"deferred_decision:3","kind":"deferred_decision","text":"暂缓项「Challenge: 【证据闸门自省】上一轮 evidenceStatus 报 verified 是越级宣称：文档观察（read_file/grep，可复核）≠ 运行时状态复现（未做」（【证据闸门自省】上一轮 evidenceStatus 报 verified 是越级宣称：文档观察（read_file/grep，可复核）≠ 运行时状态复现（未做）。本报告已按 A/B 类重标，后续消费方引用时 A 类可直接采信，B 类须自行复现。）——交付前需有着落：采纳或明确放弃","source":"tianquan"},{"id":"deferred_decision:4","kind":"deferred_decision","text":"暂缓项「Challenge: E-S2 的 DVFS 根因裁决虽逻辑自洽（cycles 不变量 + 频率比吻合），但属他人落盘记录——后续若以其为投放决策依据，建议由可运行验证的席位抽验一次」（E-S2 的 DVFS 根因裁决虽逻辑自洽（cycles 不变量 + 频率比吻合），但属他人落盘记录——后续若以其为投放决策依据，建议由可运行验证的席位抽验一次 msprof 原始 CSV（.rivet/scratch/s2_*.csv）后再升级为已验证）——交付前需有着落：采纳或明确放弃","source":"tianfu"},{"id":"deferred_decision:5","kind":"deferred_decision","text":"暂缓项「Challenge: OJ 评测是否预热本地不可解，v118 投放期望落在快峰还是冷启动口径完全取决于此——S4 步骤④的 TX1 反推应作为强制收尾」（OJ 评测是否预热本地不可解，v118 投放期望落在快峰还是冷启动口径完全取决于此——S4 步骤④的 TX1 反推应作为强制收尾）——交付前需有着落：采纳或明确放弃","source":"tianfu"},{"id":"deferred_decision:6","kind":"deferred_decision","text":"暂缓项「Challenge: S4 的 make package 与提交属不可逆外部动作，执行时须逐条向用户回显版本与预期，确认后推进」（S4 的 make package 与提交属不可逆外部动作，执行时须逐条向用户回显版本与预期，确认后推进）——交付前需有着落：采纳或明确放弃","source":"tianfu"},{"id":"deferred_decision:7","kind":"deferred_decision","text":"暂缓项「Challenge: 草稿 S1 与磁盘现实冲突：EXPERIMENTS.md 已含 E-v118 条目（L229）与三级探针阶梯法节（L263），FACTS.md L650 已交叉」（草稿 S1 与磁盘现实冲突：EXPERIMENTS.md 已含 E-v118 条目（L229）与三级探针阶梯法节（L263），FACTS.md L650 已交叉引用——S1 的『补条目』还剩什么实际工作？建议执行者以『diff 检查缺什么』替代『重写条目』）——交付前需有着落：采纳或明确放弃","source":"tianxuan"},{"id":"deferred_decision:8","kind":"deferred_decision","text":"暂缓项「Challenge: 草稿 S2 的三个假设已被 E-S2 节全部裁决（频率坐实/缓存排除/队列排除），S2 作为『探测实验』已死，剩余价值仅是把结论从 EXPERIMENTS.md」（草稿 S2 的三个假设已被 E-S2 节全部裁决（频率坐实/缓存排除/队列排除），S2 作为『探测实验』已死，剩余价值仅是把结论从 EXPERIMENTS.md 同步到 FACTS.md（即 T1）——计划应显式承认这一点，避免执行者重新采样一轮）——交付前需有着落：采纳或明确放弃","source":"tianxuan"},{"id":"deferred_decision:9","kind":"deferred_decision","text":"暂缓项「Challenge: 若 OJ 是单次冷启动计时，P0 的 icache miss（~5.8μs，仅前 ~5 次调用）成为 Case5 新的最后障碍。提交前是否值得评估廉价的 ica」（若 OJ 是单次冷启动计时，P0 的 icache miss（~5.8μs，仅前 ~5 次调用）成为 Case5 新的最后障碍。提交前是否值得评估廉价的 icache 预热手段（首调用触发指令路径覆盖）？开放问题，不阻塞本轮——建议作为 TX1 反推出 OJ 是冷启动口径后的下一轮候选）——交付前需有着落：采纳或明确放弃","source":"tianxuan"},{"id":"deferred_decision:10","kind":"deferred_decision","text":"暂缓项「Challenge: T1 完成的验收：FACTS.md 中不再存在『S2 未执行』字样（grep 'S2 未执行' 返回 0），且 F2.1s④/⑤ 引用 E-S2 的三阶段数据（」（T1 完成的验收：FACTS.md 中不再存在『S2 未执行』字样（grep 'S2 未执行' 返回 0），且 F2.1s④/⑤ 引用 E-S2 的三阶段数据（P0/P1/P2、98.2%））——交付前需有着落：采纳或明确放弃","source":"tianxuan"},{"id":"high_risk_mitigation:11","kind":"high_risk_mitigation","text":"高危风险「S1 按原文执行会重复创建已存在的 E-v118 条目与方法论节，违反 EXPERIMENTS.md L272-274 既有纪律」的缓解承诺：改为核对补差，只补交叉引用缺口","source":"tianquan"},{"id":"high_risk_mitigation:12","kind":"high_risk_mitigation","text":"高危风险「F2.1s 编号已被占用（FACTS.md L652-690），S2 结论写入该编号会覆盖既有 OJ 决策事实」的缓解承诺：S2 结论改用下一可用编号（如 F2.1t）并在 F2.1s 末尾补指回","source":"tianquan"},{"id":"high_risk_mitigation:13","kind":"high_risk_mitigation","text":"高危风险「S4 步骤①远端 make package 依赖实机通道 SSH 20022，按 HANDOFF.md L58 记载此前不可达（当前状态未验证）」的缓解承诺：S4 执行前先做通道自检，不可达则 S4 挂起，先做 S3a/S3b 离线文档修订","source":"tianfu"},{"id":"high_risk_mitigation:14","kind":"high_risk_mitigation","text":"高危风险「F2.1s④ 的失效前提（『S2 未执行』）若不同步修正，S4 提交后反推采样峰时引用的期望值依据是错的」的缓解承诺：T1 必须排在 S4 提交之前完成——文档收敛是提交决策的前置，不是事后整理","source":"tianxuan"},{"id":"high_risk_mitigation:15","kind":"high_risk_mitigation","text":"高危风险「SSH 20022 通道不可达会直接卡死 S4 步骤①（远端 make package），草稿无恢复预案」的缓解承诺：T2 把通道自检插为 S4 第一子步骤；通道死则本轮只做 T1+T3 文档收敛，S4 顺延，不空转","source":"tianxuan"},{"id":"advisory_gate:16","kind":"advisory_gate","text":"T1 完成的验收：FACTS.md 中不再存在『S2 未执行』字样（grep 'S2 未执行' 返回 0），且 F2.1s④/⑤ 引用 E-S2 的三阶段数据（P0/P1/P2、98.2%）","source":"tianxuan","gate":"grep -c 'S2 未执行' FACTS.md 返回 0"}],"seal":{"version":1,"digest":"e845413025192c98","sealedAt":1789189458711,"exemptions":[]}}
+```
+
+✅ 计划已存入会话 — 用户确认后直接调用 `team_orchestrate({ objective })` 即可执行（不要传 planJson/planMarkdown，存储的计划会被自动消费）。上方 JSON 块仅作可读审计。
+
+[Pro] 议事会第 2 轮（反驳轮）是 Pro 功能——本次已按单轮执行。升级 Pro 解锁多轮辩论。

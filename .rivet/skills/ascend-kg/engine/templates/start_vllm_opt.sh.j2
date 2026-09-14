@@ -1,0 +1,12 @@
+#!/bin/bash
+# 主服务启动模板（由 orchestrator 按 current_params 渲染）。占位符 @KEY@ 由 machine.render() 替换。
+# 隐含契约显式化（L3）：引擎须从 ascend-dev conda 环境启动（Popen 继承父 env，本模板不 activate）。
+command -v vllm >/dev/null 2>&1 || { echo "FATAL: vllm 不在 PATH——引擎须从 ascend-dev conda 环境启动"; exit 1; }
+source /home/z60124773/Ascend/nnal/atb/set_env.sh
+export ASCEND_RT_VISIBLE_DEVICES=@DEVICE@
+export ASCEND_LAUNCH_BLOCKING=0
+export OMP_PROC_BIND=false
+export OMP_NUM_THREADS=10
+@VLLM_ENV@
+exec vllm serve @MODEL@ \
+  @VLLM_ARGS@

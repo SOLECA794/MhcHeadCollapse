@@ -1,0 +1,82 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   32│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   33│ | Case | n | h | nH | outer | 路径 | 备注 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   34│ |------|---|---|-----|-------|------|------|
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  35│ | Case 1 | 4 | 4 | 16 | 1/2 | PATH3 TinyH4 | 极小 shape |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  36│ | Case 2 | 4 | 4 | 16 | 4 | PATH3 TinyH4 | 极小 shape |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  37│ | Case 3 | 8 | 64 | 512 | 1/2 | PATH2 向量路径 | 中等规模 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  38│ | Case 4 | 8 | 64 | 512 | 2 | PATH2 向量路径 | 中等规模 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  39│ | Case 5 | 8 | 128 | 1024 | 8 | PATH2 向量路径 | 最大规模，决定排名 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   40│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   41│ 所有 case 均为 fp16 输入输出，weight/base/scale 保持 fp32。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   42│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   49│ 平台 CLI 打印的时间标签显示为 "ms"，但经过与排行榜数据对比和多次实验验证，**实际计时单位是微秒（μs）**。这是一个非常容易误导优化的关键点。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   50│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   51│ 例如 v111 提交后显示：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  52│ - Case1: 4.30
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  53│ - Case2: 5.14  
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  54│ - Case3: 4.42
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  55│ - Case4: 4.28
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  56│ - Case5: 8.20
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   57│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   58│ 这些数字的单位是 μs，不是 ms。如果误以为是 ms，会对性能模型产生数量级误判。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   59│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   89│ 设计了三组 WA 探针，故意让算子语义错误但能部分执行，通过返回的时间差定位各阶段开销：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   90│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   91│ **P1 floor_probe**：ProcessVectorRow 置空，只保留 weight DMA 和 launch
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  92│ - Case3: 2.2μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  93│ - Case4: 2.2μs  
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  94│ - Case5: 3.38μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   95│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:   96│ **P2 gateconst_probe**：去掉 8 个 gate 点积+sigmoid，gate 用常数替代
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  97│ - Case3: 2.88μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  98│ - Case4: 3.06μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:>  99│ - Case5: 5.30μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  100│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  101│ 由此推算 gate 点积+sigmoid 开销：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 102│ - Case3: 2.88 - 2.2 = 0.68μs（但 v111 实际为 4.42，这里 floor 估计偏低）
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 103│ - Case5: 5.30 - 3.38 = 1.92μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  104│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  105│ 更准确的加性归因：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 106│ - Case5 8.2μs ≈ floor 3.38 + gate 点积 2.9 + 其余（x DMA+cast+rms+per-row）1.4 + fold/store 0.5
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  107│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  108│ **P3 nofold_probe**：去掉 h 长 fold+Cast+store，改为标量 GM 写
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 109│ - Case3: 4.12μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 110│ - Case4: 4.10μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 111│ - Case5: 7.7μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  112│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  113│ fold+store 开销：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 114│ - Case3: 4.42 - 4.12 = 0.3μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 115│ - Case4: 4.28 - 4.10 = 0.18μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 116│ - Case5: 8.2 - 7.7 = 0.5μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  117│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  118│ ### 2.4 榜首分析
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  119│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  120│ 榜首 lix123（75.75 分）的时间：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 121│ - Case1: 3.96μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 122│ - Case2: 2.80μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 123│ - Case3: 2.84μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 124│ - Case4: 2.92μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 125│ - Case5: 4.64μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  126│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  127│ 关键观察：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 128│ - 榜首 Case1-4 的时间几乎等于我们测得的 floor（2.2-3.38μs）
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  129│ - 这说明**冠军把大部分 kernel 执行隐藏到了 per-call floor 之下**，或者大幅优化了可见 kernel
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 130│ - Case5 4.64μs 对比我们的 floor 3.38μs，冠军可见 kernel 仅约 1.26μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 131│ - 我们 v111 Case5 8.2μs 中可见 kernel 约 4.82μs，是冠军的 3.8 倍
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  132│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  133│ 这个发现指明了优化方向：**减少可见 kernel 时间，特别是 gate 点积阶段**。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  134│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  158│ - 每行流程：x DMA → cast → rms Mul/ReduceSum → 8×gate Mul/ReduceSum → 标量 sigmoid → fold → cast → y DMA
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  159│ - 代码 487 行，ProcessVectorRow 在 319-383 行
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  160│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:> 161│ v100 性能：约 41.71 分，Case5 约 8.2μs
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  162│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  163│ ### 3.3 v106：barrier 移除实验（证伪）
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  164│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/MhcHeadCollapse_优化全记录_2026-09-08.md:  192│ - 使用 parity work/tmp 缓冲
+── 寻迹（grep）

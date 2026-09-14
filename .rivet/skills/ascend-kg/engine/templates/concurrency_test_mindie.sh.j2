@@ -1,0 +1,13 @@
+#!/bin/bash
+# MindIE 流式首 token 并发压测（@CONC@）。@PORT@/@MODEL@/@OUTPUT_MAX@/@TIMEOUT@/@CONC@/@PROBE@ 由 verify 渲染。
+# MindIE 非流式首字节=整响应（缓冲），TTFT 会测成全响应时间（解码主导，调度参数不可见）。
+# 流式首内容 chunk 才是真 TTFT。输出契约与 parse_benchmark 兼容：reqN: ttft=Xs total=Ys。
+for i in $(seq 1 @CONC@); do
+  case $(( (i - 1) % 3 )) in
+    0) P='请写一段200字的关于机器学习基础概念介绍。' ;;
+    1) P='请解释什么是深度学习，并给出一个简单的例子。' ;;
+    2) P='用中文简要说明计算机的五个主要组成部分。' ;;
+  esac
+  python3 @PROBE@ @PORT@ @MODEL@ @OUTPUT_MAX@ @TIMEOUT@ "$P" "req$i" &
+done
+wait

@@ -1,0 +1,156 @@
+Ascend/cann-learing-hub/blogs/inference/deepseek_v4_npu_inference_optimization/images/mhc_hyperconnection_structure.png
+Ascend/cann-learing-hub/blogs/inference/deepseek_v4_npu_inference_optimization/images/mhc_pre_post_fusion_scope.png
+Ascend/cannbot-skills/plugins-community/collaborative-agent-kernel-evolution/skills/ascendc-op-debug/scripts/mhc_post_fusion_diagnose.sh
+Ascend/code/op_host/mhc_head_collapse.cpp
+Ascend/code/op_kernel/mhc_head_collapse.cpp
+Ascend/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/code_v056/op_host/mhc_head_collapse.cpp
+Ascend/code_v056/op_kernel/mhc_head_collapse.cpp
+Ascend/code_v056/op_kernel/mhc_head_collapse_tiling.h
+Ascend/code_v056/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/pypto/python/tests/ut/interpreter/_ops/mhc_sinkhorn_golden.py
+Ascend/pypto/python/tests/ut/interpreter/test_mhc_sinkhorn.py
+Ascend/xingchen-operators/A组赛题/【A组困难题】mHcPre 算子/code/op_host/mhc_pre.cpp
+Ascend/xingchen-operators/A组赛题/【A组困难题】mHcPre 算子/code/op_kernel/mhc_pre.cpp
+Ascend/xingchen-operators/A组赛题/【A组困难题】mHcPre 算子/code/op_kernel/mhc_pre_tiling.h
+Ascend/xingchen-operators/A组赛题/【A组困难题】mHcPre 算子/code/op_kernel/tiling_key_mhc_pre.h
+Ascend/xingchen-operators/B组赛题/【B组中等题】mHC-Sinkhorn 算子/code/op_host/mhc_sinkhorn.cpp
+Ascend/xingchen-operators/B组赛题/【B组中等题】mHC-Sinkhorn 算子/code/op_kernel/mhc_sinkhorn.cpp
+Ascend/xingchen-operators/B组赛题/【B组中等题】mHC-Sinkhorn 算子/code/op_kernel/mhc_sinkhorn_tiling.h
+Ascend/xingchen-operators/B组赛题/【B组中等题】mHC-Sinkhorn 算子/code/op_kernel/tiling_key_mhc_sinkhorn.h
+Ascend/xingchen-operators/B组赛题/【B组简单题】mHC-expand 算子（前向与反向）/code/op_host/mhc_expand.cpp
+Ascend/xingchen-operators/B组赛题/【B组简单题】mHC-expand 算子（前向与反向）/code/op_kernel/mhc_expand.cpp
+Ascend/xingchen-operators/B组赛题/【B组简单题】mHC-expand 算子（前向与反向）/code/op_kernel/mhc_expand_tiling.h
+Ascend/xingchen-operators/B组赛题/【B组简单题】mHC-expand 算子（前向与反向）/code/op_kernel/tiling_key_mhc_expand.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/mhc_head_collapse_torch.py
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p1_floor_probe/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p1_floor_probe/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p1_floor_probe/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p1_floor_probe/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p2_gateconst_probe/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p2_gateconst_probe/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p2_gateconst_probe/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p2_gateconst_probe/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p3_nofold_probe/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p3_nofold_probe/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p3_nofold_probe/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/p3_nofold_probe/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v000_empty/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v000_empty/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v000_empty/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v000_empty/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v001_baseline/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v001_baseline/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v001_baseline/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v001_baseline/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v002_cann85_shape_fix/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v002_cann85_shape_fix/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v002_cann85_shape_fix/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v002_cann85_shape_fix/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v003_cann852_opdef_config/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v003_cann852_opdef_config/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v003_cann852_opdef_config/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v003_cann852_opdef_config/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v004_cann852_unknown_shape_format/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v004_cann852_unknown_shape_format/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v004_cann852_unknown_shape_format/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v004_cann852_unknown_shape_format/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v005_fp16_fp32_opdef_probe/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v005_fp16_fp32_opdef_probe/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v005_fp16_fp32_opdef_probe/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v005_fp16_fp32_opdef_probe/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v006_dtype_variant_alignment/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v006_dtype_variant_alignment/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v006_dtype_variant_alignment/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v006_dtype_variant_alignment/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v007_device_scalar_compat/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v007_device_scalar_compat/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v007_device_scalar_compat/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v007_device_scalar_compat/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v008_bf16_scalar_convert/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v008_bf16_scalar_convert/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v008_bf16_scalar_convert/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v008_bf16_scalar_convert/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v009_single_block_runtime_fix/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v009_single_block_runtime_fix/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v009_single_block_runtime_fix/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v009_single_block_runtime_fix/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v010_gate_cache_ub_accum/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v010_gate_cache_ub_accum/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v010_gate_cache_ub_accum/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v010_gate_cache_ub_accum/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v011_runtime_block_stride/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v011_runtime_block_stride/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v011_runtime_block_stride/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v011_runtime_block_stride/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v012_small_n_scalar_gates/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v012_small_n_scalar_gates/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v012_small_n_scalar_gates/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v012_small_n_scalar_gates/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v013_hybrid_small_shape/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v013_hybrid_small_shape/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v013_hybrid_small_shape/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v013_hybrid_small_shape/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v014_compile_time_path/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v014_compile_time_path/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v014_compile_time_path/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v014_compile_time_path/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v015_vector_ub_small_shape/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v015_vector_ub_small_shape/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v015_vector_ub_small_shape/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v015_vector_ub_small_shape/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v015_vector_ub_small_shape/tests/mhc_head_collapse_benchmark.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v015_vector_ub_small_shape/tests/mhc_head_collapse_runner_typed_timing.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v016_tiny_h4_unrolled/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v016_tiny_h4_unrolled/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v016_tiny_h4_unrolled/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v016_tiny_h4_unrolled/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v016_tiny_h4_unrolled/tests/mhc_head_collapse_benchmark.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v016_tiny_h4_unrolled/tests/mhc_head_collapse_runner_typed_timing.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v017_tiny_h4_plus_vector/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v017_tiny_h4_plus_vector/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v017_tiny_h4_plus_vector/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v017_tiny_h4_plus_vector/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v017_tiny_h4_plus_vector/tests/mhc_head_collapse_benchmark.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v017_tiny_h4_plus_vector/tests/mhc_head_collapse_runner_typed_timing.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v018_tiny_h4_ub_bulk_load/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v018_tiny_h4_ub_bulk_load/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v018_tiny_h4_ub_bulk_load/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v018_tiny_h4_ub_bulk_load/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v018_tiny_h4_ub_bulk_load/tests/mhc_head_collapse_benchmark.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v018_tiny_h4_ub_bulk_load/tests/mhc_head_collapse_runner_typed_timing.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v019_tiny_h4_zero_scale_fast/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v019_tiny_h4_zero_scale_fast/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v019_tiny_h4_zero_scale_fast/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v019_tiny_h4_zero_scale_fast/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v019_tiny_h4_zero_scale_fast/tests/mhc_head_collapse_benchmark.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v019_tiny_h4_zero_scale_fast/tests/mhc_head_collapse_runner_typed_timing.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v020_tiny_h4_reg_weight_fastmath/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v020_tiny_h4_reg_weight_fastmath/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v020_tiny_h4_reg_weight_fastmath/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v020_tiny_h4_reg_weight_fastmath/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v020_tiny_h4_reg_weight_fastmath/tests/mhc_head_collapse_benchmark.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v020_tiny_h4_reg_weight_fastmath/tests/mhc_head_collapse_runner_typed_timing.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v021_tiny_h4_monolithic_zero_spill/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v021_tiny_h4_monolithic_zero_spill/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v021_tiny_h4_monolithic_zero_spill/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v021_tiny_h4_monolithic_zero_spill/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v021_tiny_h4_monolithic_zero_spill/tests/mhc_head_collapse_benchmark.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v021_tiny_h4_monolithic_zero_spill/tests/mhc_head_collapse_runner_typed_timing.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v022_single_tpl_key_minimal_launch/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v022_single_tpl_key_minimal_launch/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v022_single_tpl_key_minimal_launch/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v022_single_tpl_key_minimal_launch/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v022_single_tpl_key_minimal_launch/tests/mhc_head_collapse_benchmark.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v022_single_tpl_key_minimal_launch/tests/mhc_head_collapse_runner_typed_timing.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v023_direct_ub_vector_nosync/code/op_host/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v023_direct_ub_vector_nosync/code/op_kernel/mhc_head_collapse.cpp
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v023_direct_ub_vector_nosync/code/op_kernel/mhc_head_collapse_tiling.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v023_direct_ub_vector_nosync/code/op_kernel/tiling_key_mhc_head_collapse.h
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mH
+... [truncated: 16488 tokens → 5000 token budget for glob]

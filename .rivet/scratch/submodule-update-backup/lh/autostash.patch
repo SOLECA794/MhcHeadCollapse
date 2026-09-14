@@ -1,0 +1,409 @@
+diff --git a/skills/cannjudge-submit/README.md b/skills/cannjudge-submit/README.md
+index 8638e7e..19bc560 100644
+--- a/skills/cannjudge-submit/README.md
++++ b/skills/cannjudge-submit/README.md
+@@ -10,10 +10,8 @@
+ - ✅ 提交算子实现
+ - ✅ 查询提交结果
+ - ✅ 查看排行榜
++- ✅ 显式候选清单与源码哈希校验
+ 
+-## 安全登录机制
+-
+-**禁止在对话中直接输入明文密码！** 使用 RSA 非对称加密保护密码。
+ 
+ ### 首次设置
+ 
+@@ -42,14 +40,16 @@ python3 encrypt_password.py --public-key public.pem
+ # 推荐：密文登录
+ python cannjudge_cli.py login --email "your@email.com" --ciphertext "RSA密文"
+ 
+-# 不推荐：明文登录（仅调试用）
+-python cannjudge_cli.py login --email "your@email.com" --password "明文密码"
++# 交互式登录（密码不回显）
++python cannjudge_cli.py login --email "your@email.com"
+ 
+ # 下载工程
+ python cannjudge_cli.py download --problem-id "题目ID" --output "./output"
+ 
+ # 提交代码
+-python cannjudge_cli.py submit --problem-id "题目ID" --project-dir "./output/project"
++python cannjudge_cli.py inspect --candidate-dir "./experiments/v30-legacy-compatible" --problem-id "题目ID" --manifest-out "./candidate.manifest.json"
++python cannjudge_cli.py submit --problem-id "题目ID" --manifest "./candidate.manifest.json"
++python cannjudge_cli.py submit --problem-id "题目ID" --manifest "./candidate.manifest.json" --confirm-submit --record-out "./submission.json"
+ 
+ # 查询结果
+ python cannjudge_cli.py query --submission-id "提交ID"
+@@ -72,8 +72,8 @@ user_info = client.login_with_ciphertext(
+     private_key_path="private.pem"
+ )
+ 
+-# 不推荐：明文登录
+-# user_info = client.login("email@example.com", "明文密码")
++# client.login may be used by an embedding application only when the password
++# stays in memory and is never logged or persisted.
+ 
+ # 获取题目信息
+ problem = client.get_problem("题目ID")
+@@ -160,7 +160,6 @@ GET /api/submissions/problem/{problemId}/latest
+ 
+ ## 注意事项
+ 
+-1. **密码安全**: 禁止在对话中直接输入明文密码，使用 RSA 加密密文
+ 2. **私钥保护**: private.pem 仅保留在服务器，绝不外传
+ 3. **Cookie**: 登录后会自动管理 Cookie
+ 4. **轮询**: 查询结果时默认 3 秒间隔
+@@ -193,6 +192,7 @@ cannjudge-submit/
+ ├── SKILL.md              # 技能详细说明文档
+ ├── README.md             # 使用说明
+ ├── cannjudge_cli.py      # 命令行工具（支持 RSA 密文登录）
++├── candidate_manifest.py  # 候选源码选择与哈希校验
+ ├── generate_key.py       # RSA 密钥对生成脚本（服务器端运行）
+ ├── encrypt_password.py   # RSA 密码加密脚本（PC 端运行）
+ └── example.py            # 使用示例
+diff --git a/skills/cannjudge-submit/SKILL.md b/skills/cannjudge-submit/SKILL.md
+index 51fc63a..3c54a43 100644
+--- a/skills/cannjudge-submit/SKILL.md
++++ b/skills/cannjudge-submit/SKILL.md
+@@ -360,8 +360,8 @@ user_info = client.login_with_ciphertext(
+     private_key_path="private.pem"  # 服务器上的私钥路径
+ )
+ 
+-# 方式 B：直接用明文密码登录（不推荐，仅调试用）
+-# user_info = client.login("用户邮箱", "明文密码")
++# CLI without ciphertext prompts for the password without echoing it.
++# Do not put a plaintext password in a command, environment variable, or file.
+ ```
+ 
+ **命令行方式**：
+@@ -370,8 +370,8 @@ user_info = client.login_with_ciphertext(
+ # 推荐：密文登录
+ python cannjudge_cli.py login --email "your@email.com" --ciphertext "RSA密文"
+ 
+-# 不推荐：明文登录
+-python cannjudge_cli.py login --email "your@email.com" --password "明文密码"
++# 交互式登录（密码不回显）
++python cannjudge_cli.py login --email "your@email.com"
+ ```
+ 
+ **安全铁律**：登录成功后只输出"登录成功"和用户 ID，**绝不输出解密后的密码**。
+@@ -494,7 +494,27 @@ cd project/code
+ bash build.sh
+ ```
+ 
+-### 步骤 7: 提交代码
++### 步骤 7: 显式选择候选并提交代码
++
++提交工具不再扫描工程目录后取第一个匹配文件。候选目录必须由调用方
++明确指定；推荐先生成清单，再在清单哈希未变化时提交：
++
++    python cannjudge_cli.py inspect --candidate-dir ./experiments/v30-legacy-compatible --problem-id 298 --manifest-out ./v30.manifest.json
++    python cannjudge_cli.py submit --problem-id 298 --manifest ./v30.manifest.json
++
++第二条命令默认只预览四个文件和 SHA-256，不会提交。确认源码后才追加
++--confirm-submit；提交后用 --record-out 保存 submission ID 与哈希。未提供
++--wait 时立即返回 ID，避免把异步评测和本地命令混在一起。
++
++候选目录也可以直接传给 submit，但仍会执行唯一文件检查：
++
++    python cannjudge_cli.py submit --problem-id 298 --candidate-dir ./experiments/v30-legacy-compatible --confirm-submit --record-out ./v30-submission.json
++
++不得把生产 code/ 目录和 experiments 下的候选混用；每次提交前必须在输出中
++核对 candidate_dir、四个文件路径和哈希前缀。
++
++下面的 requests 示例仅用于说明 API 字段，不是推荐的自动化入口。实际工作
++必须先生成并校验 manifest，避免重新引入目录扫描和错候选提交。
+ 
+ ```python
+ # 读取实现的代码文件
+diff --git a/skills/cannjudge-submit/cannjudge_cli.py b/skills/cannjudge-submit/cannjudge_cli.py
+index a7b1b93..f4c467e 100644
+--- a/skills/cannjudge-submit/cannjudge_cli.py
++++ b/skills/cannjudge-submit/cannjudge_cli.py
+@@ -13,7 +13,24 @@ import os
+ import zipfile
+ import tempfile
+ import base64
++from getpass import getpass
+ from pathlib import Path
++from typing import Union
++
++try:
++    from .candidate_manifest import (
++        CandidateError,
++        discover_candidate,
++        load_manifest,
++        write_manifest,
++    )
++except ImportError:
++    from candidate_manifest import (
++        CandidateError,
++        discover_candidate,
++        load_manifest,
++        write_manifest,
++    )
+ 
+ try:
+     from Crypto.PublicKey import RSA
+@@ -176,6 +193,40 @@ def print_submission_result(result: dict):
+             print(f"           precision: {precision}, time: {time_ms}ms")
+ 
+ 
++def print_candidate_sources(sources, problem_id: str = "") -> dict:
++    """Print and return an auditable source manifest without source contents."""
++    manifest = sources.manifest(problem_id)
++    print(f"候选目录: {manifest['candidate_dir']}")
++    print(f"代码目录: {manifest['code_dir']}")
++    for key in ("tiling_h", "tiling_key_h", "host_cpp", "kernel_cpp"):
++        relative = manifest["files"].get(key, "")
++        digest = manifest["sha256"].get(key, "")
++        if not relative:
++            print(f"{key}: <empty>")
++        else:
++            print(f"{key}: {relative} sha256={digest[:16]}")
++    return manifest
++
++
++def write_submission_record(
++    output_path: Union[str, Path], submission_id: str, manifest: dict
++) -> None:
++    record = {
++        "submission_id": submission_id,
++        "problem_id": manifest.get("problem_id", ""),
++        "candidate_dir": manifest.get("candidate_dir", ""),
++        "files": manifest.get("files", {}),
++        "sha256": manifest.get("sha256", {}),
++        "created_at": int(time.time()),
++    }
++    destination = Path(output_path).expanduser().resolve()
++    destination.parent.mkdir(parents=True, exist_ok=True)
++    destination.write_text(
++        json.dumps(record, ensure_ascii=False, indent=2) + "\n",
++        encoding="utf-8",
++    )
++
++
+ def main():
+     parser = argparse.ArgumentParser(
+         description="CANNJudge 算子提交辅助工具"
+@@ -186,7 +237,6 @@ def main():
+     # 登录命令
+     login_parser = subparsers.add_parser("login", help="登录 CANNJudge")
+     login_parser.add_argument("--email", required=True, help="登录邮箱")
+-    login_parser.add_argument("--password", help="明文密码（不推荐，优先使用 --ciphertext）")
+     login_parser.add_argument("--ciphertext", help="RSA 加密后的密码密文（推荐）")
+     login_parser.add_argument("--private-key", default="private.pem", help="RSA 私钥路径")
+     
+@@ -195,10 +245,37 @@ def main():
+     download_parser.add_argument("--problem-id", required=True, help="题目ID")
+     download_parser.add_argument("--output", help="输出目录")
+     
++    # 候选检查命令
++    inspect_parser = subparsers.add_parser(
++        "inspect", help="检查候选源码并生成哈希清单（不提交）"
++    )
++    inspect_parser.add_argument("--candidate-dir", required=True, help="明确的候选目录")
++    inspect_parser.add_argument("--problem-id", default="", help="题目ID")
++    inspect_parser.add_argument("--manifest-out", help="清单输出路径")
++
+     # 提交命令
+     submit_parser = subparsers.add_parser("submit", help="提交代码")
+     submit_parser.add_argument("--problem-id", required=True, help="题目ID")
+-    submit_parser.add_argument("--project-dir", required=True, help="工程目录")
++    source_group = submit_parser.add_mutually_exclusive_group(required=True)
++    source_group.add_argument(
++        "--candidate-dir", "--project-dir", dest="candidate_dir",
++        help="明确的候选目录；不会自动选择其他目录"
++    )
++    source_group.add_argument("--manifest", help="inspect 生成的哈希清单")
++    submit_parser.add_argument(
++        "--manifest-out", help="提交前保存或更新候选清单"
++    )
++    submit_parser.add_argument(
++        "--confirm-submit", action="store_true",
++        help="确认向 CANNJudge 发起真实提交；缺省仅预览"
++    )
++    submit_parser.add_argument(
++        "--record-out", help="提交后保存 submission ID 与源码哈希"
++    )
++    submit_parser.add_argument(
++        "--wait", action="store_true",
++        help="提交后等待异步评测结束；缺省立即返回 submission ID"
++    )
+     
+     # 查询命令
+     query_parser = subparsers.add_parser("query", help="查询提交结果")
+@@ -209,26 +286,39 @@ def main():
+     rank_parser.add_argument("--problem-id", required=True, help="题目ID")
+     
+     args = parser.parse_args()
+-    
++
++    if args.command == "inspect":
++        try:
++            sources = discover_candidate(args.candidate_dir)
++            manifest = print_candidate_sources(sources, args.problem_id)
++            if args.manifest_out:
++                write_manifest(args.candidate_dir, args.manifest_out, args.problem_id)
++                print(f"清单已写入: {Path(args.manifest_out).expanduser().resolve()}")
++        except CandidateError as exc:
++            print(f"候选检查失败: {exc}")
++            return 2
++        return 0
++
+     # 创建客户端
+     client = CANNJudgeClient()
+-    
+-    # 从环境变量或配置文件读取登录信息
++
++    # 仅接受加密密文环境变量；明文密码不进入命令行或环境变量。
+     email = os.environ.get("CANNJUDGE_EMAIL", "")
+-    password = os.environ.get("CANNJUDGE_PASSWORD", "")
+-    
+-    if email and password:
+-        print("使用环境变量中的登录信息...")
+-        client.login(email, password)
++    ciphertext = os.environ.get("CANNJUDGE_CIPHERTEXT", "")
++    private_key = os.environ.get("CANNJUDGE_PRIVATE_KEY", "private.pem")
++
++    if email and ciphertext:
++        client.login_with_ciphertext(email, ciphertext, private_key)
+     
+     if args.command == "login":
+         if args.ciphertext:
+             result = client.login_with_ciphertext(args.email, args.ciphertext, args.private_key)
+-        elif args.password:
+-            result = client.login(args.email, args.password)
+         else:
+-            print("错误: 请提供 --ciphertext（推荐）或 --password")
+-            return
++            password = getpass("CANNJudge password: ")
++            try:
++                result = client.login(args.email, password)
++            finally:
++                password = None
+         print(f"登录成功!")
+         print(f"用户ID: {result['_id']}")
+         print(f"昵称: {result.get('nickname', 'N/A')}")
+@@ -236,55 +326,60 @@ def main():
+     elif args.command == "download":
+         if not client.user_id:
+             print("错误: 请先登录")
+-            return
++            return 2
+         
+         print(f"下载题目 {args.problem_id} 的工程模板...")
+         extract_dir = client.download_package(args.problem_id, args.output)
+         print(f"工程已解压到: {extract_dir}")
+         
+     elif args.command == "submit":
+-        if not client.user_id:
+-            print("错误: 请先登录")
+-            return
+-        
+-        # 读取代码文件
+-        project_dir = Path(args.project_dir)
+-        
+-        # 查找 op_kernel 和 op_host 目录
+-        code_dir = project_dir / "code" if (project_dir / "code").exists() else project_dir
+-        
+-        tiling_h_path = list(code_dir.glob("op_kernel/*_tiling.h"))
+-        tiling_key_h_path = list(code_dir.glob("op_kernel/tiling_key_*.h"))
+-        host_cpp_path = list(code_dir.glob("op_host/*.cpp"))
+-        kernel_cpp_path = list(code_dir.glob("op_kernel/*.cpp"))
+-        
+-        # 过滤掉 tiling 相关的 cpp
+-        kernel_cpp_path = [p for p in kernel_cpp_path if "_tiling" not in p.name]
+-        
+-        if not all([tiling_h_path, host_cpp_path, kernel_cpp_path]):
+-            print("错误: 找不到必要的代码文件")
++        try:
++            sources = (
++                load_manifest(args.manifest)
++                if args.manifest
++                else discover_candidate(args.candidate_dir)
++            )
++        except CandidateError as exc:
++            print(f"候选检查失败: {exc}")
++            return 2
++
++        manifest = print_candidate_sources(sources, args.problem_id)
++        if args.manifest_out:
++            write_manifest(sources.candidate_dir, args.manifest_out, args.problem_id)
++            print(f"清单已写入: {Path(args.manifest_out).expanduser().resolve()}")
++
++        if not args.confirm_submit:
++            print("仅完成源码预览，未向 CANNJudge 提交。需要真实提交时加 --confirm-submit。")
+             return
+-        
+-        # 读取文件内容
+-        tiling_h = tiling_h_path[0].read_text()
+-        tiling_key_h = tiling_key_h_path[0].read_text() if tiling_key_h_path else ""
+-        host_cpp = host_cpp_path[0].read_text()
+-        kernel_cpp = kernel_cpp_path[0].read_text()
+-        
++
++        if not client.user_id:
++            print("错误: 请先使用密文登录")
++            return 2
++
++        payload = sources.read()
+         print(f"提交代码到题目 {args.problem_id}...")
+         submission_id = client.submit(
+-            args.problem_id, tiling_h, tiling_key_h, host_cpp, kernel_cpp
++            args.problem_id,
++            payload["tiling_h"],
++            payload["tiling_key_h"],
++            payload["host_cpp"],
++            payload["kernel_cpp"],
+         )
+         print(f"提交成功! Submission ID: {submission_id}")
+-        
+-        print("\n等待结果...")
+-        result = client.wait_for_result(submission_id)
+-        print_submission_result(result)
++
++        if args.record_out:
++            write_submission_record(args.record_out, submission_id, manifest)
++            print(f"提交记录已写入: {Path(args.record_out).expanduser().resolve()}")
++
++        if args.wait:
++            print("\n等待结果...")
++            result = client.wait_for_result(submission_id)
++            print_submission_result(result)
+         
+     elif args.command == "query":
+         if not client.user_id:
+             print("错误: 请先登录")
+-            return
++            return 2
+         
+         result = client.get_submission(args.submission_id)
+         print_submission_result(result)
+@@ -292,7 +387,7 @@ def main():
+     elif args.command == "rank":
+         if not client.user_id:
+             print("错误: 请先登录")
+-            return
++            return 2
+         
+         rankings = client.get_rankings(args.problem_id)
+         
+@@ -317,4 +412,4 @@ def main():
+ 
+ 
+ if __name__ == "__main__":
+-    main()
++    raise SystemExit(main() or 0)
+diff --git a/tutorials/ascendc_operator_development/05_fused_operator_development/README.md b/tutorials/ascendc_operator_development/05_fused_operator_development/README.md
+index 125b99e..3a7a0a8 100644
+--- a/tutorials/ascendc_operator_development/05_fused_operator_development/README.md
++++ b/tutorials/ascendc_operator_development/05_fused_operator_development/README.md
+@@ -10,4 +10,5 @@
+ | 5.2 融合算子概念介绍 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ascendc_operator_development&scanFilePath=tutorials/ascendc_operator_development/05_fused_operator_development/05.02_fused_operator_concept_intro.ipynb) | ✅ 已发布 |
+ | 5.3 VV融合算子开发 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ascendc_operator_development&scanFilePath=tutorials/ascendc_operator_development/05_fused_operator_development/05.03_vv_fused_operator_development.ipynb) | ✅ 已发布 |
+ | 5.4 CV融合算子开发 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ascendc_operator_development&scanFilePath=tutorials/ascendc_operator_development/05_fused_operator_development/05.04_cv_fused_operator_development.ipynb) | ✅ 已发布 |
+-| 5.5 章节实践 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ascendc_operator_development&scanFilePath=tutorials/ascendc_operator_development/05_fused_operator_development/05.05_chapter_practice.ipynb) | ✅ 已发布 |
+\ No newline at end of file
++| 5.5 章节实践 | [在线体验](https://ai.gitcode.com/user/username/notebookcann?repoUrl=https://gitcode.com/cann/cann-learning-hub.git&ttl=120&diskSize=40Gi&path=tutorials/ascendc_operator_development&scanFilePath=tutorials/ascendc_operator_development/05_fused_operator_development/05.05_chapter_practice.ipynb) | ✅ 已发布 |
++

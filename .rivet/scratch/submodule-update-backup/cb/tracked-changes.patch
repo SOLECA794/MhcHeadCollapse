@@ -1,0 +1,143 @@
+diff --git a/ops/ops-profiling/scripts/msprof_perf_summary.py b/ops/ops-profiling/scripts/msprof_perf_summary.py
+index 266374ed..cece9bee 100755
+--- a/ops/ops-profiling/scripts/msprof_perf_summary.py
++++ b/ops/ops-profiling/scripts/msprof_perf_summary.py
+@@ -165,33 +165,44 @@ def merge_metric_rows(group_dir: str, target_name: Optional[str]) -> Dict[str, A
+ 
+ 
+ def load_per_core_cycles(group_dir: str) -> List[Tuple[int, int]]:
+-    candidates = glob.glob(os.path.join(group_dir, "PROF_Sample", "PROF_*", "device_0", "sqlite", "aicore.db"))
++    candidates = glob.glob(os.path.join(group_dir, "PROF_Sample", "PROF_*", "device_0", "sqlite", "*.db"))
+     if not candidates:
+         return []
+-    db = sorted(candidates)[-1]
+-    try:
+-        conn = sqlite3.connect(db)
+-        cur = conn.cursor()
+-        rows = list(cur.execute(
+-            "SELECT coreid, SUM(task_cyc) FROM AICoreOriginalData WHERE task_cyc>0 GROUP BY coreid ORDER BY coreid"
+-        ))
+-        conn.close()
+-        return [(int(cid), int(cyc)) for cid, cyc in rows if cid is not None]
+-    except sqlite3.Error:
+-        return []
++    best_rows: List[Tuple[int, int]] = []
++    best_total = 0
++    for db in sorted(candidates):
++        try:
++            conn = sqlite3.connect(db)
++            rows = list(conn.execute(
++                "SELECT coreid, SUM(CAST(task_cyc AS INTEGER)) "
++                "FROM AICoreOriginalData WHERE CAST(task_cyc AS INTEGER)>0 "
++                "GROUP BY coreid ORDER BY coreid"
++            ))
++            conn.close()
++        except sqlite3.Error:
++            continue
++        normalized = [(int(cid), int(cyc)) for cid, cyc in rows if cid is not None]
++        total = sum(cyc for _, cyc in normalized)
++        if total > best_total:
++            best_rows = normalized
++            best_total = total
++    return best_rows
+ 
+ 
+ def per_core_balance_section(merged: Dict[str, Any], group_dir: str) -> List[str]:
+     core_rows = load_per_core_cycles(group_dir)
+     if not core_rows:
+         return []
+-    aicore_time_us = safe_float(merged.get("aicore_time(us)"))
+-    if aicore_time_us <= 0:
++    core_time_us = max(
++        safe_float(merged.get("aicore_time(us)")),
++        safe_float(merged.get("aiv_time(us)")),
++    )
++    if core_time_us <= 0:
+         return []
+     max_cyc = max(c for _, c in core_rows)
+     if max_cyc <= 0:
+         return []
+-    ns_per_cyc = aicore_time_us * 1000.0 / max_cyc
++    ns_per_cyc = core_time_us * 1000.0 / max_cyc
+     freq_ghz = 1.0 / ns_per_cyc
+     times = [(cid, cyc * ns_per_cyc / 1000.0) for cid, cyc in core_rows]
+     t_values = [t for _, t in times]
+@@ -207,7 +218,7 @@ def per_core_balance_section(merged: Dict[str, Any], group_dir: str) -> List[str
+     else:
+         verdict = "严重问题 (>30%)"
+ 
+-    lines = ["", "--- 逐核负载均衡 (sample-based aicore.db) ---"]
++    lines = ["", "--- 逐核负载均衡 (sample-based core database) ---"]
+     lines.append(f"  有效核数: {len(times)}  | 主频推算: {freq_ghz:.3f} GHz ({ns_per_cyc:.4f} ns/cycle)")
+     lines.append(f"  min={t_min:.3f}us  avg={t_avg:.3f}us  max={t_max:.3f}us")
+     lines.append(f"  (max-min)/max = {spread_pct:.2f}%  ->  {verdict}")
+@@ -452,8 +463,8 @@ def _add_basic_info(lines: List[str], merged: Dict[str, Any]) -> Tuple[float, fl
+     op_type = merged.get("OP Type", "unknown")
+     task_type = merged.get("Task Type", "")
+     duration = safe_float(merged.get("Task Duration(us)"))
+-    block_dim = safe_int(merged.get("Block Num", 0))
+-    mix_block = safe_int(merged.get("Mix Block Num", 0))
++    block_dim = safe_int(merged.get("Block Dim", merged.get("Block Num", 0)))
++    mix_block = safe_int(merged.get("Mix Block Dim", merged.get("Mix Block Num", 0)))
+     aicore_time = safe_float(merged.get("aicore_time(us)"))
+     aiv_time = safe_float(merged.get("aiv_time(us)"))
+ 
+@@ -467,7 +478,7 @@ def _add_basic_info(lines: List[str], merged: Dict[str, Any]) -> Tuple[float, fl
+         lines.append(f"[WARN] 缺失指标: {', '.join(merged['_missing_metrics'])}")
+     lines.append("")
+     lines.append("[注] msprerror: open("plugins-official/ops-direct-invoke-flash/.claude/CLAUDE.md"): Function not implemented
+fatal: cannot hash plugins-official/ops-direct-invoke-flash/.claude/CLAUDE.md
+of 的 op_summary 是 per-op 聚合值（不含逐核 min/avg/max）；")
+-    lines.append("     如需逐核数据请改用 msprof op (需要 msopprof 二进制)。")
++    lines.append("     逐核数据优先读取 PROF_Sample 的 core 数据库；若采集版本不提供则跳过。")
+     return duration, aicore_time, aiv_time
+ 
+ 
+diff --git a/ops/ops-profiling/scripts/msprof_profile_run.sh b/ops/ops-profiling/scripts/msprof_profile_run.sh
+index 09edb9c4..6a87f369 100755
+--- a/ops/ops-profiling/scripts/msprof_profile_run.sh
++++ b/ops/ops-profiling/scripts/msprof_profile_run.sh
+@@ -49,6 +49,7 @@
+ # ----------------------------------------------------------------------------------------------------------
+ 
+ set -euo pipefail
++umask 077
+ 
+ SCRIPT_START_TIME=$(date +%s%N)
+ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+@@ -179,9 +180,11 @@ run_standard() {
+ 
+     mkdir -p "$OUTPUT_DIR"
+     OUTPUT_DIR="$(cd "$OUTPUT_DIR" && pwd)"
++    chmod 700 "$OUTPUT_DIR"
+     TS="$(date +%Y%m%d_%H%M%S)"
+     GROUP_DIR="${OUTPUT_DIR}/PROF_GROUP_${TS}"
+     mkdir -p "$GROUP_DIR"
++    chmod 700 "$GROUP_DIR"
+ 
+     echo "=== msprof profiling ==="
+     echo "App      : ${APP_CMD[*]}"
+@@ -201,6 +204,7 @@ run_standard() {
+     for M in "${METRICS[@]}"; do
+         SUB="${GROUP_DIR}/PROF_${M}"
+         mkdir -p "$SUB"
++        chmod 700 "$SUB"
+         echo "--- aic-metrics=${M} -> ${SUB} ---"
+         msprof --output="$SUB" \
+                --ai-core=on \
+@@ -217,6 +221,7 @@ run_standard() {
+     # 追加 sample-based 采集一份，用于逐核负载均衡分析
+     SAMPLE_SUB="${GROUP_DIR}/PROF_Sample"
+     mkdir -p "$SAMPLE_SUB"
++    chmod 700 "$SAMPLE_SUB"
+     echo "--- sample-based (per-core load balance) -> ${SAMPLE_SUB} ---"
+     msprof --output="$SAMPLE_SUB" \
+            --ai-core=on \
+diff --git a/plugins-community/ops-qa-suite/.opencode/skills/gitcode-toolkit b/plugins-community/ops-qa-suite/.opencode/skills/gitcode-toolkit
+deleted file mode 120000
+index 7ff370d7..00000000
+--- a/plugins-community/ops-qa-suite/.opencode/skills/gitcode-toolkit
++++ /dev/null
+@@ -1 +0,0 @@
+-../../../../infra/gitcode-toolkit
+\ No newline at end of file

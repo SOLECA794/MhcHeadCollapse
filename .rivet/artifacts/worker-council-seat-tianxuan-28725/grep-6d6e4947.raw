@@ -1,0 +1,102 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:   95│ | 2 | wangyue | 69.56 | |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:   96│ | 3 | 阿梓莫哇阿达西哇 | 69.13 | |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:>  97│ | **11** | **kkio-（本项目）** | **37.97** | 合计 26.62 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:   98│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:   99│ ⚠ **旧文档记录的排名数据已严重过时**：`迭代优化记录.md:97` 记 lix123 43.16 分第 4 名、
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 100│ 榜首 wangyue 69.04 —— 实际榜首已换人（XiuPang 78.69），本队从"第5名 41.53"变为"第11名 37.97"。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  101│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  102│ ### F2.1c ★★ 优化重心判定：Case1 是最大缺口，不是 Case5（推翻历史方向）
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  260│ | 项 | Case5 时间 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  261│ |---|---|
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 262│ | 榜首 wangyue（OJ，80.97 分） | **4.52** |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  263│ | 我的本地实机（v116） | **4.481** |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  264│ | 差 | **−0.04 μs** |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  290│ | rank | user | score | C1 | C2 | C3 | C4 | C5 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  291│ |---|---|---|---|---|---|---|---|
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 292│ | 1 | wangyue | 80.97 | 2.14 | 2.92 | 2.76 | 2.74 | **4.52** |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  293│ | 2 | XiuPang | 78.69 | 2.12 | 2.12 | 3.02 | 3.04 | 5.74 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  294│ | 3 | 阿梓莫哇阿达西哇 | 69.13 | 2.50 | 2.38 | 3.10 | 2.94 | 5.60 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  303│ | 12 | zy02 | 41.92 | 4.82 | 4.88 | 3.80 | 4.06 | 6.54 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  304│ | 13 | qq_51183872 | 39.48 | 5.78 | 6.02 | 3.92 | 3.88 | 7.00 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 305│ | **14** | **kkio-（本队）** | **37.97** | **5.72** | **4.56** | **4.28** | **4.32** | **7.74** |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  306│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  307│ **全榜逐 case 最优**（可作为理论目标）：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  313│ | Case3 | **2.76** | 4.28 | +1.52 | 1.55× |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  314│ | Case4 | **2.74** | 4.32 | +1.58 | 1.58× |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 315│ | Case5 | **4.52** | 7.74 | +3.22 | 1.71× |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  316│ | **合计** | **14.26** | **26.62** | **+12.36** | **1.87×** |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  317│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  346│    → **Case1 完全由固定开销主导，与数据量无关**。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  347│    → 这解释了为什么 Case1 的全榜最优（2.12）与最差（5.94）差 2.8 倍，
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 348│      而 Case5 的最优（4.52）与最差（7.74）只差 1.7 倍。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  349│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  350│ 3. **两个 case 的 scalar 占比都最高（46% / 39%），与 shape 无关**
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  603│    PATH2 的 ProcessVectorRow 仍是标量 sigmoid——改造点在
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  604│    `op_kernel:471-475` 的 gates[] 循环）。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 605│ 3. **榜首互证**：Case5 榜首 4.52μs ≈ 4μs 框架地板 + 0.5 数据搬运——
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  606│    榜首在 Case5 上已把 scalar 削到只剩地板。我们的 7.74 与榜首的差
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  607│    （3.22μs）中，**约 1.5μs 来自 gate 标量段（可削），其余在 mte2**。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  617│ 3. mte2 优化（PATH2 双峰驱动，机制待查）
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  618│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 619│ ### F2.1r ★★★ v118 PATH2 gate 向量化 —— 探针预测兑现，aiv 快峰减半（2026-09-12）
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  620│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  621│ 按 F2.1q 的 ROI 排序实施：v117 手法移植到 PATH2 的 `ProcessVectorGroup`
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  623│ 每行 1 rms 读 + 全向量 sigmoid + n gate 回读）。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  624│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 625│ 实现：`versions/v118_path2vecz/`（在 v117 基础上叠加，含 TinyH4 向量化）。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  626│ 新增 `base_pat_buf_`（kGroupRows×(n+1)×32 floats，Init 期一次填充）。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  627│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  634│ | v116 基线 | ~5.47 | — | 13.97 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  635│ | 探针A（gate 段掏空） | 4.00 | 5.2~5.5 | 6.4 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 636│ | **v118（完整实现）** | **3.76** | 5.3~5.6 | **6.24** |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  637│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 638│ 1. **v118 快峰 3.76μs 达到并略超探针预测的地板**（连 base 读也消了）
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  639│ 2. **aiv 快峰 13.97 → 6.24μs，减半**——这是 Case5 的实质改进
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  640│ 3. 慢峰未动（5.3~5.6）——**mte2 驱动的双峰是独立问题**（快峰 mte2 0.85
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  641│    vs 慢峰 3.5，差 4 倍），下一步攻它
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  642│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 643│ **OJ 投放预期（未验证）**：v118 在 OJ 上的成绩取决于 OJ 采样落在快峰还是
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  644│ 慢峰——若 OJ 取最优/多次最小值，Case5 有望从 7.74 显著下降；
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:> 645│ 若取平均则收益打折。**本地快峰 6.24μs vs OJ 榜首 4.52μs**——
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  646│ 剩余差距主要在 mte2 慢峰机制。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/FACTS.md:  647│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md:    9│ ## 一、一句话现状
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md:   10│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md:>  11│ 算子功能正确（5/5 Pass），在 OJ 排 **第 14 名 / 60 人，37.97 分**。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md:   12│ 榜首 wangyue **80.97 分**。**全榜最优 14.26μs vs 我们 26.62μs（1.87×）**。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/HANDOFF.md:   13│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  273│     AscendC::GlobalTensor<uint64_t> y_u64_;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  274│     AscendC::TPipe pipe_;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:> 275│     AscendC::TBuf<AscendC::TPosition::VECCALC> base_pat_buf_;  // v118: stride-32 base pattern
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  276│     AscendC::TBuf<AscendC::TPosition::VECCALC> ub_buf_;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  277│     uint32_t outer_ = 0;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  320│             pipe_.InitBuffer(x_queue_, 1, AlignBytes(nH_ * sizeof(DT_X)));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  321│             pipe_.InitBuffer(y_queue_, 1, AlignBytes(h_ * sizeof(DT_X)));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:> 322│             // v118: base pattern buffer sized for kGroupRows x (n+1)*32 floats
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  323│             pipe_.InitBuffer(base_pat_buf_, static_cast<uint32_t>(kGroupRows * (n_ + 1U) * 32U * sizeof(float)));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  324│             if (group_) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  350│             AscendC::SetFlag<AscendC::HardEvent::MTE2_V>(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  351│             AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(0);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:> 352│             // v118: build the stride-(n+1)*32 base pattern for the vectorized gate
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  353│             // phase: pattern[j][32*(i+1)] = base[i] for j in [0, kGroupRows).
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  354│             {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  439│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  440│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:> 441│         // 3) v118: vectorized gate + sigmoid for the whole group, in place on the
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  442│         // ReduceSum strided layout (red rows of stride (n+1)*32, gates at +32*(i+1)).
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  443│         // Old scalar phase: per row, 1 rms GetValue + n gate GetValue + n base
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions/v118_path2vecz/code/op_kernel/mhc_head_collapse.cpp:  ...
+── 寻迹（grep）

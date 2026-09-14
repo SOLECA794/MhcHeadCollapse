@@ -1,0 +1,62 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   53│ | 项目 | 值 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   54│ |------|-----|
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   55│ | Problem ID | `6a7c23a6a52e0f540a8a1779` |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:>  56│ | 5个测试用例ID | 8213, 8214, 8215, 8216, 8217 |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   57│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   58│ ### 注意事项
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   59│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   72│ | 题目描述 | 见赛题.md；5 个测试用例，score_mode=0（按性能加权），ranking_submission_mode=latest |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   73│ | 测试用例 | ID | Shape (x) | dtype | n | h | nH | PATH | 冠军耗时 | 我的耗时(v093) |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   74│ |---------|-----|-----------|-------|---|---|----|------|---------|---------|
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:>  75│ | Case1 | 8213 | `[1, 1, 16]` | FP16 | 4 | 4 | 16 | PATH3 | 2.94ms | 4.48ms |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   76│ | Case2 | 8214 | `[1, 2, 16]` | FP16 | 4 | 4 | 16 | PATH3 | 2.44ms | 5.32ms |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   77│ | Case3 | 8215 | `[1, 3, 16]` | FP16 | 4 | 4 | 16 | PATH3 | 3.24ms | 4.38ms |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   78│ | Case4 | 8216 | `[1, 4, 16]` | FP16 | 4 | 4 | 16 | PATH3 | 3.30ms | 4.18ms |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:>  79│ | Case5 | 8217 | `[1, 8, 16]` | FP16 | 4 | 4 | 16 | PATH3 | 5.46ms | 7.98ms |
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   80│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   81│ > **Case数据反推依据**：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   82│ > - **v039探针**（断言触发 Runtime Error）确认：`rank==3`、`Batch==1`、`nH==16`、`n==4`（故h=4）、**dtype不是FP32**（被v040修正为FP16）；探针仅验证了seq=1和seq=2（对应Case1/Case2的outer维度），证明探针框架有效
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   83│ > - **v040探针**（2/2 Pass）确认：dtype == `ge::DT_FLOAT16`，shape为标准3D张量 `[1, seq, 16]`
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:>  84│ > - **PATH路由**：v058 Host中 `use_tiny_h4 = (n==4 && h==4)`，5个Case的n/h完全相同（n=4, h=4, nH=16），全部命中PATH3。Case5虽然outer=8，但由于n=4且h=4，use_tiny_h4条件为真，仍路由至PATH3而非PATH1
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   85│ > - **Case3/4反推**：v039仅覆盖seq=1和seq=2两种情况，5个Case的性能差异表明Case3/4的seq值更大；根据相邻Case性能趋势（4.98ms→4.50ms→4.30ms），推断Case3 seq=3，Case4 seq=4
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:>  86│ > - **Case5反推**：11.56ms相较Case1-4的4-5ms差距悬殊（约2.12倍于冠军5.46ms），按单row耗时~2.3ms推算，outer=8时8rows约11.5ms，与实测吻合；v056的5/5 Pass证明算法正确，Case5的慢速源于PATH3内多行展开的开销而非路由错误
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   87│ > - **3D张量约束验证**：题目要求 `(S, B, nH)` 格式，其中nH=16固定，batch维度Batch=B，序列维度S；5个Case的Batch=1固定，差异仅在S维度（序列长度）
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   88│ > - **性能差距归因**：我的PATH3实现与冠军的PATH3实现存在~1.7-2.1倍性能差距，源于DMA调度策略、UB缓冲区布局或指令级并行度的差异，非算法路径差异
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   89│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  318│ - 修改：每个 row 先计算一次 RMS 逆和全部 `n` 个 gate，将 gate 保存到 UB；输出按 256 元素分块，在 UB 的 float32 累加器中跨 stream 求和后一次写回。没有落盘中间张量，且 FP16/BF16 不参与中间累加。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  319│ - 编译验证：CANN 8.5.2 上 Host、FP16/BF16/FP32 Kernel、`binary`、`package` 全部成功。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  320│ - 端到端验证：零权重测试中 FP32 最大误差 `1.90735e-06`，FP16/BF16 最大误差均为 `7.24792e-05`；非零 `weight/hc_base/hc_scale` FP32 参考测试最大误差 `8.34465e-07`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 321│ - 性能基准：同一服务器、非零门控、`outer=2, n=4, H=1024`、200 次设备事件平均，v009 为 `293382us`，v010 为 `587.042us`，约 `500x`。该 Shape 并非平台公开测试点，只可用于证明相对优化；最终成绩以平台重测为准。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  322│ - 当前上传候选：`versions/v010_gate_cache_ub_accum/code/`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  323│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  324│ ## v011_runtime_block_stride
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  340│ - 来源：完整复制 `versions/v012_small_n_scalar_gates/` 后修改；v010/v011/v012 均保持不变。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  341│ - 修改：仅当 `n<=8` 且 `8<=H<=256` 时选择标量 gate 路径；`H<8` 和 `H>256` 使用 v010 的 UB gate 缓存和 FP32 分块累加路径。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  342│ - 编译和正确性：CANN 8.5.2 上 FP16/BF16/FP32 Kernel、打包均通过；零权重三类型测试通过，非零门控 FP32 参考最大误差 `8.34465e-07`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 343│ - 分流基准：同一服务器、`outer=2,n=4` 的设备事件平均为 `H=4: 5.1543us`、`H=16: 6.8445us`、`H=1024: 585.347us`。其中中等 H 使用标量路径，大 H 使用 UB 路径。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  344│ - 平台结果：两个测试点均通过、错误占比 0；耗时分别为 `7.36us` 和 `6.92us`，最优为 `5.76us` 和 `5.90us`。相较 v010 的 `6.20us/7.14us`，测试点 1 回退 `1.16us`，测试点 2 改善 `0.22us`，总耗时回退，因此不再作为首选。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  345│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  346│ ## v014_compile_time_path
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  352│ - 环境状态：实验前后 `Health=OK`、`Error Code=NA`、无 NPU 进程、HBM 单/双比特错误为 0。PCIe 累计 `LCRC=8/Retry=4`，实验前后没有增长。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  353│ - 构建：CANN 8.5.1 上 Host、FP16/BF16/FP32 Kernel、`binary`、`package` 均成功；生成 x86_64 安装包并完成隔离安装。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  354│ - 正确性：H=16 scalar 路径 FP32/FP16/BF16 均通过；非零门控 FP32 H=16 主机参考最大误差 `1.11759e-07`。H 扫描非零门控最大误差均不超过 `1.90735e-06`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 355│ - 性能：同机 `outer=2,n=4` 下，H=`4/8/16/32/64/128/256/1024` 分别约为 `4.10/4.41/6.75/11.49/20.92/39.72/99.02/586.02us`。编译期 scalar 路径相较 v013 的运行时路径继续降低固定开销，H=4/1024 保持 UB 路径性能。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  356│ - 平台结果：两个测试点均通过、错误占比 0；耗时分别为 `7.26us` 和 `6.74us`，最优为 `5.76us` 和 `5.90us`。相较 v013 仅改善 `0.10us/0.18us`，证明消除一次运行时分支不是主要性能瓶颈。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  357│ - 结论：v014 保留为编译期分流稳定版本，但不再作为首选上传版本。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  358│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  364│ - 算法修改：每个 row 仅将 x 搬入 UB 一次；FP16/BF16 只转换一次 FP32；RMS 和每个 gate 点积使用 `Mul+ReduceSum`；输出折叠使用 `Muls+Add`；weight 按 gate 成行搬入 UB，消除重复标量 GM 读取和串行累加链。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  365│ - 构建：模力方舟 910B2C、CANN 8.5.1 上 Host、三种 dtype 的 9 个 Kernel 入口、`binary`、`package` 和隔离安装均成功。每种 dtype 对象约 `38632` 字节。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  366│ - 正确性：`n=2/4/8,H=16` 非零门控 FP32 最大误差分别不超过 `2.38419e-07`；`n=4,H=4..1024` FP32 扫描最大误差 `2.02656e-06`；H=16 三类型通过；H=1024 FP16/BF16 与按输出 dtype 量化后的参考结果误差均为 0。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 367│ - H=16 三类型性能：同一 `outer=2,n=4` runner 下，FP32/FP16/BF16 约为 `4.58/4.46/4.44us`；v014 对应约为 `6.84/7.33/9.44us`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  368│ - FP32 H 扫描：H=`4/8/16/32/64/128/256/1024` 分别约为 `4.14/4.57/4.57/4.62/4.70/4.91/5.24/7.29us`。H=4 使用回退路径；H=1024 相较 v014 的 `586.02us` 约提升 `80x`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 369│ - 其他 n：`n=2,H=16` 为 `3.38us`，最大误差 `1.49012e-07`；`n=8,H=16` 为 `7.02us`，最大误差 `2.38419e-07`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  370│ - 环境状态：实验后 NPU `Health=OK`、`Error Code=NA`，HBM 单/双比特错误均为 0。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  371│ - 已知问题：仍固定 `block_dim=1`，outer 多行尚未并行；超出 UB 预算的大 Shape 仍走旧通用路径；平台 CANN 8.5.0 兼容性和隐藏测试成绩需要上传确认。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  372│ - 历史稳定候选：`versions/v015_vector_ub_small_shape/code/`；后续由 v016/v017 分别作为 H=4 冲分版和稳健组合版。
+── 寻迹（grep）

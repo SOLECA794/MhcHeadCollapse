@@ -1,0 +1,65 @@
+{
+  "skill_name": "ascend-kg",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我查一下 AscendC ReduceSum 接口的参数和用法",
+      "expected_output": "Agent 应调用 POST /search (file_type: code) 查找 ReduceSum 接口，返回 id、source_file、score，并用自然语言总结参数和用法",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "vLLM-Ascend 部署模型时如何配置 tensor-parallel-size？",
+      "expected_output": "Agent 应调用 POST /search (file_type: configuration) 查找 tensor-parallel-size 配置参数，并检查 CONFIGURES 边找到使用该配置的代码",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "帮我找一个做 AscendC 算子 Tiling 开发的 Skill",
+      "expected_output": "Agent 应调用 POST /skill/search 或加载 kg-skill-index-master，找到一个匹配的 Skill 并返回其名称和描述",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "帮我把 KG 规则导出给其他 Agent 用",
+      "expected_output": "Agent 应进入 export 模式，输出完整的系统规则文本（包含服务地址、API 端点、决策路径表格）",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "帮我开发一个中等难度的 AscendC BinCount 算子，请先规划这个任务",
+      "expected_output": "Agent 应识别为长任务并采用分层抗遗忘结构：① 层1——主会话只编排，把 KG 检索子任务派给 ascend-kg-worker subagent（并发≤5，要求返回 id/score，收结论不收原始 dump）；② 层2——用 TaskList 外化计划，每个阶段 description 内置'本阶段开始前是否需要先查 KG'自检，强制查点（写码前/设计前）与按需查点（出问题时）分别标记；③ 层3——阶段边界重申准则。且设计前先查 KG（查相似算子/API 约束），而非凭记忆规划",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "帮我把一个 GPU 上的 PyTorch 模型迁移到 NPU 上跑",
+      "expected_output": "Agent 应识别为执行型任务并主动加载对应 Skill（npu-adapter-reviewer 或 npu-model-migration，通过 /source 加载 SKILL.md 全文），按 Skill 工作流执行，而非仅用 /search 检索迁移文档后凭记忆给通用建议；可先 /search 锚定参考实现，但必须有'加载 Skill'这一步",
+      "files": []
+    },
+    {
+      "id": 7,
+      "prompt": "帮我优化 vllm 服务的 TTFT 延迟",
+      "expected_output": "Agent 应识别为执行型任务且命中 flow，调用编排引擎唯一入口 `python <skill>/engine/agent_loop.py --flow vllm-serve-optimize`（可带 --port/--device/--max-rounds 等），而非手动一步步调参；round 0 会强制把主服务重启为 defaults 基线（无需预启动）",
+      "files": []
+    },
+    {
+      "id": 8,
+      "prompt": "查一下 AscendC DataCopy 接口的参数和用法",
+      "expected_output": "Agent 应识别为检索型任务，走 /search（file_type: code）检索 DataCopy 接口并返回 id/source_file/score，不进编排引擎（不调 engine/agent_loop.py），也不加载执行型 Skill",
+      "files": []
+    },
+    {
+      "id": 9,
+      "prompt": "（引擎以退出码 2 暂停后）帮我完成这个诊断任务",
+      "expected_output": "Agent 应识别引擎 pending 非失败（退出码 2），读 engine/state/agent_task.json，按 skill_refs 加载对应 SKILL.md 推理，按 expected_output_schema 写 engine/state/agent_result.json（status=done），再 --resume 续跑，而非报错或忽略",
+      "files": []
+    },
+    {
+      "id": 10,
+      "prompt": "用 LLM 自主方式帮我优化 vllm 服务的 TTFT 延迟",
+      "expected_output": "Agent 应识别为执行型任务且命中 flow，可走 LLM 自主双循环入口 `python <skill>/engine/agent_loop.py --flow vllm-serve-optimize`；每轮决策以退出码 2 暂停，agent 读 engine/state/agent_task.json 按 context（动作空间/信号/历史/规则）决策并写 agent_result.json 再 --resume；决策不依赖 ANTHROPIC_* 环境变量；外层决策 + 内层确定性原子操作（apply→verify→is_kept→变差自动回滚）",
+      "files": []
+    }
+  ]
+}

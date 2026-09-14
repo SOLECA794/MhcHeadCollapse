@@ -1,0 +1,170 @@
+{
+  "flow_id": "sglang-serve-optimize",
+  "name": "SGLang-NPU 服务延迟优化闭环",
+  "backend": "sglang",
+  "mode": "auto",
+  "target": "ttft",
+  "max_rounds": 50,
+  "profiling": {
+    "enabled": false
+  },
+  "paths": {
+    "model_default": "/home/z60124773/models/Qwen2.5-7B/",
+    "conda_sh": "/home/z60124773/miniconda3/etc/profile.d/conda.sh",
+    "sglang_env_name": "sglang-dev"
+  },
+  "model_dims": {
+    "n_layers": 28,
+    "hidden": 3584,
+    "inter": 18944,
+    "head_dim": 128,
+    "n_heads": 28,
+    "n_kv": 4
+  },
+  "perf": {
+    "mfu_peak_tflops": 294.91,
+    "hyst": 0.003,
+    "ttot_room": 1.1
+  },
+  "decision": {
+    "consec_no_improve_stop": 3,
+    "high_risk_requires_signals": false,
+    "goal": "SGLang-NPU 服务延迟优化：从动作空间里选「下一轮要试的一个参数改动」，或判断「该停止」。基于历史轮次与风险等级，优先低风险动作，勿重复已试参数。只把最终决策写进 agent_result.json 的 result 字段。",
+    "rules": [
+      "每轮只改一个参数，param 名须与动作空间完全一致",
+      "动作空间每个参数标了风险等级（低/中/高）：优先低风险",
+      "布尔开关 value 用 true/false；数值只能在 min..max 内且是 step 的倍数",
+      "910B3 NPU 官方默认：chunked-prefill-size 8192、decode 图 max_bs 64（tp<4）——所有动作以这些默认为对照基准",
+      "TASK_QUEUE_ENABLE 与 NPU 图捕获相互干扰：默认图开启时 decode 路径建议保持 0/不动（动它算中风险）",
+      "cuda-graph-max-bs-decode 过大占 NPU 显存（起不来白费一轮），过小图不命中退回 eager 反而变慢",
+      "mem-fraction-static ≥0.9 有 OOM 风险，谨慎加",
+      "context-length 默认=模型 max_position_embeddings(131072) 预留巨大 KV cache；调小（如 8192/16384）可释放 KV cache、提并发槽数与吞吐，但须 ≥ 压测最大输入+输出 token（~392），过低截断请求",
+      "disable-overlap-schedule=true 关闭 overlap 调度（默认开，重叠 CPU 调度与 GPU 计算提吞吐）；仅极低并发单流才值得关，吞吐目标默认保持 false",
+      "disable-radix-cache=true 关 RadixAttention 前缀缓存；共享前缀负载应保持 false（缓存命中率高），纯随机负载可试 true 减 radix 树维护开销",
+      "避免无意义地重复已试参数（见 history）",
+      "停止时机：动作空间已穷尽、连续多轮无改善、或已有明显最优且无更优可试"
+    ]
+  },
+  "params": {
+    "defaults": {},
+    "domain": {
+      "chunked-prefill-size": {
+        "min": -1,
+        "max": 65536,
+        "step": 1024,
+        "risk": "low"
+      },
+      "cuda-graph-max-bs-decode": {
+        "min": 8,
+        "max": 512,
+        "step": 8,
+        "risk": "mid"
+      },
+      "schedule-policy": {
+        "values": [
+          "fcfs",
+          "lpm",
+          "random",
+          "dfs-weight",
+          "lof",
+          "priority"
+        ],
+        "risk": "low"
+      },
+      "mem-fraction-static": {
+        "min": 0.5,
+        "max": 0.95,
+        "step": 0.01,
+        "risk": "mid"
+      },
+      "max-running-requests": {
+        "min": 8,
+        "max": 512,
+        "step": 8,
+        "risk": "mid"
+      },
+      "max-prefill-tokens": {
+        "min": 2048,
+        "max": 65536,
+        "step": 1024,
+        "risk": "mid"
+      },
+      "context-length": {
+        "min": 1024,
+        "max": 131072,
+        "step": 1024,
+        "risk": "mid"
+      },
+      "disable-overlap-schedule": {
+        "flag": true,
+        "risk": "low"
+      },
+      "disable-radix-cache": {
+        "flag": true,
+        "risk": "low"
+      },
+      "TASK_QUEUE_ENABLE": {
+        "kind": "env",
+        "min": 0,
+        "max": 2,
+        "step": 1,
+        "risk": "mid"
+      }
+    },
+    "blocked": {
+      "enable-torch-compile": "无 NPU 官方支持背书，排除（KG 核实）",
+      "enable-dp-attention": "需 dp_size>1（多卡数据并行），本机单卡 TP=1 无效果",
+      "max-total-tokens": "与 context-length 同源冗余（单模型 serving 下二者重复），不单列",
+      "cuda-graph-backend-prefill": "prefill 侧图开关与 NPU 图捕获（TASK_QUEUE_ENABLE）相互干扰，缺 NPU 收益证据，动它中高风险易白费一轮",
+      "quantization": "w8a8/w8a8c8 需预量化权重文件，非纯配置运行时搜索项",
+      "speculative-algorithm": "EAGLE/MTP 需 draft 模型，非纯配置运行时搜索项",
+      "HCCL_BUFFSIZE": "HCCL 通信 buffer 仅多卡 TP all-reduce 生效，本机单卡无通信",
+      "SGLANG_CHUNKED_PREFIX_CACHE_THRESHOLD": "chunked 前缀缓存阈值，KG 无 SourceText 范围未核实，暂不纳入"
+    },
+    "max_changes_per_round": 1
+  },
+  "stages": [
+    {
+      "id": "capture",
+      "module": "engine.stages.capture"
+    },
+    {
+      "id": "validate",
+      "module": "engine.stages.validate"
+    },
+    {
+      "id": "analyze",
+      "module": "engine.stages.analyze"
+    },
+    {
+      "id": "apply",
+      "module": "engine.stages.apply"
+    },
+    {
+      "id": "verify",
+      "module": "engine.stages.verify"
+    },
+    {
+      "id": "decide",
+      "module": "engine.stages.decide"
+    },
+    {
+      "id": "orchestrate",
+      "module": "engine.stages.orchestrate"
+    }
+  ],
+  "interaction_priors": [
+    [
+      "chunked-prefill-size",
+      "max-prefill-tokens"
+    ],
+    [
+      "max-running-requests",
+      "cuda-graph-max-bs-decode"
+    ],
+    [
+      "schedule-policy",
+      "disable-overlap-schedule"
+    ]
+  ]
+}

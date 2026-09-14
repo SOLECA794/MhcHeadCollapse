@@ -1,0 +1,62 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   81│ > **Case数据反推依据**：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:>  82│ > - **v039探针**（断言触发 Runtime Error）确认：`rank==3`、`Batch==1`、`nH==16`、`n==4`（故h=4）、**dtype不是FP32**（被v040修正为FP16）；探针仅验证了seq=1和seq=2（对应Case1/Case2的outer维度），证明探针框架有效
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:>  83│ > - **v040探针**（2/2 Pass）确认：dtype == `ge::DT_FLOAT16`，shape为标准3D张量 `[1, seq, 16]`
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:   84│ > - **PATH路由**：v058 Host中 `use_tiny_h4 = (n==4 && h==4)`，5个Case的n/h完全相同（n=4, h=4, nH=16），全部命中PATH3。Case5虽然outer=8，但由于n=4且h=4，use_tiny_h4条件为真，仍路由至PATH3而非PATH1
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  426│ - 来源：完整复制 `versions/v017_tiny_h4_plus_vector/` 后优化；历史版本保持不变。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 427│ - 优化目标：针对平台榜首最新纪录 **4.32μs** 发起极限冲刺，全面消除循环内 GM 寻址开销与多余数学依赖指令。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  428│ - 修改文件：`versions/v020_tiny_h4_reg_weight_fastmath/code/op_kernel/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  439│   2. **测试点 1 出现回退（6.20us vs v017 的 5.28us）**：由于 `Process()` 将 64 个 weight、4 个 base、1 个 scale 共 69 个 float 参数通过函数参数列表传递给 `ProcessRow`，引发了严重的**寄存器溢出（Register Spilling）到栈内存**，且 Host Tiling 中解析 `PlatformAscendC` 增加了约 0.5us 的 Host 侧 CPU 开销。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 440│   3. **榜首最优（2.66us / 2.82us）技术对齐目标**：榜首耗时已进入 2.x 微秒级（接近裸 Kernel Launch 的硬件物理下限），必须彻底剥离 Host 侧非必要 API、消除寄存器溢出、精简二进制对象体积并做极致内联。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  441│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  444│ - 来源：完整复制 `versions/v020_tiny_h4_reg_weight_fastmath/` 后重构；历史版本保持不变。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 445│ - 优化目标：针对平台最新榜首纪录 **2.66μs / 2.82μs**，彻底消除寄存器栈溢出与 Host 侧冗余开销。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  446│ - 修改文件：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  460│ - 来源：基于 `versions/v016_tiny_h4_unrolled/` 与官方原生模板规范重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 461│ - 优化目标：将驱动下发开销（Launch Overhead）从 4.7μs 压缩至 2.5μs，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  462│ - 修改文件：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  474│ - 来源：基于 `versions/v022_single_tpl_key_minimal_launch/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 475│ - 优化目标：将 89 次标量 GM 访存彻底替换为 2 次 32 字节对齐向量 DMA，消除 3.5μs 访存延迟，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  476│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  528│ - 来源：基于 `versions/v025_vector_ub_hard_sync/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 529│ - 优化目标：将全部行（`outer * 16` 元素）的输入 $x$ 与权重 $W$ 在算子入口**一次性全量 DMA 预载入 UB**，使行循环内部实现 **0 次 DMA、0 次 MTE2 等待**，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  530│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  546│ - 来源：基于 `versions/v026_vector_ub_bulk_preload/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 547│ - 优化目标：将行内 5 次流水线屏障合并为 **1 次融合向量发射与单次同步屏障**，消除 80% 同步停顿，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  548│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  565│ - 来源：基于 `versions/v027_vector_ub_fused_stream_single_sync/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 566│ - 优化目标：实现 **并发 DMA 发射 + 硬件隐藏标量加载延迟 + 向量 UB 硬件输出折叠**，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  567│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  600│ - 来源：基于 `versions/v029_vector_ub_dual_event_unrolled/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 601│ - 优化目标：实现 **全算子全生命周期仅 1 次 V_S 硬件屏障 + 独立 ReduceSum 临时空间（0 RAW/WAR 冲突）+ 寄存器突发预取**，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  602│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  620│ - 来源：基于 `versions/v030_vector_ub_global_single_sync/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 621│ - 优化目标：实现 **全输入（W, base, scale, x）100% DMA 批量预载入 UB + 标量单元 0 GM 访问 + 4阶 Horner 极速数学内核 + GCC O3 指令级优化**，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  622│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`、`op_host/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  635│ - 归因分析：
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 636│   1. 测试点 1 从 4.94us 骤降至 **4.18us**（距离榜首仅 1.52us），验证了全量 DMA 消除标量 Global Memory 访存延迟与 4 阶 Horner Exp 的巨大收益。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  637│   2. 但内核内部仍通过运行时 `for (row = 0; row < outer_; ++row)` 计算动态偏移量，产生循环跳转指令与动态基址计算开销；且 Host 侧 TilingFunc 仍存在冗余检验。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  641│ - 来源：基于 `versions/v031_all_dma_ub_zero_scalar_gm/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 642│ - 优化目标：实现 **`outer == 1` 与 `outer == 2` 静态平铺展开（0 运行时循环/跳转开销）+ 编译期常量 UB 偏移量 + 极速 Host Tiling**，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  643│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`、`op_host/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  663│ - 来源：基于 `versions/v031_all_dma_ub_zero_scalar_gm/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 664│ - 优化目标：保留 **v031（4.18us）验证最佳的 UB 64 对齐内存拓扑与 GlobalTensor 输出**，进一步**消灭 Host 侧 `GetRequiredInputTensor` 引起的 Host-Device 同步标记**，全力冲刺 **2.66μs / 2.82μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  665│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`、`op_host/mhc_head_collapse.cpp`。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  ...
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  686│ - 来源：基于知识库《MhcHeadCollapse优化知识参考.md》与 `versions/v031_all_dma_ub_zero_scalar_gm/` 重构。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:> 687│ - 优化目标：使能 **`KERNEL_TASK_TYPE_DEFAULT(KERNEL_TYPE_AIV_ONLY)`（消除 Cube 核启动头开销）+ `TPipe` 外置（激活毕昇编译器标量常量折叠）+ v031 验证最佳的全量 DMA 与 5 向量融合流**，全力冲刺 **2.18μs / 2.62μs** 榜首。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/迭代优化记录.md:  688│ - 修改文件：`op_kernel/mhc_head_collapse.cpp`、`op_host/mhc_head_collapse.cpp`。
+── 寻迹（grep）

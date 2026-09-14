@@ -1,0 +1,37 @@
+docs: 更新提交工具记录 + 发现平台 best_time 字段
+
+【工具记录更正】
+- 实际可用工具是明文版 cannjudge-submit-plaintext
+- 实测 login 成功（用户 kkio-），.env 凭据有效
+- 仅依赖 requests；problem/rank/query/download 四个命令免登录
+- 更正 PITFALLS.md P18 此前"凭据不在本仓库"的错误记录
+
+【定位时间单位混乱的确切根因】
+CLI 的 ms 后缀是硬编码的，不是平台返回：
+  cannjudge_cli.py:224-225
+    time_ms = tc.get("time", "N/A")
+    print(f"  Case {idx+1}: {tc_status} | precision: {precision} | time: {time_ms}ms")
+API 原始返回是裸数字（"time": 2.12），无单位字段。
+→ 这就是 ms/μs 争议的根源，此前无人定位。
+
+【重大发现：平台公开 best_time（每 case 理论下限）】
+API 每个测试点带 best_time 字段，全榜完全一致：
+  Case1-5 best_time = 2.12 / 2.12 / 2.48 / 2.48 / 4.36（合计 13.56）
+  本队 kkio-       = 5.72 / 4.56 / 4.28 / 4.32 / 7.74（合计 26.62，1.96x）
+
+关键结构洞察：
+  Case1(outer=1) 与 Case2(outer=4)，best 都是 2.12
+  Case3(outer=1) 与 Case4(outer=2)，best 都是 2.48
+→ Case1-4 由固定 floor 主导，与数据量无关
+→ 直接回答了"A1 冠军是否把 kernel 藏进 floor"
+
+【排名数据已严重过时】
+旧文档记 lix123 43.16 第4名 / 榜首 wangyue 69.04
+实际 2026-09-11：榜首 XiuPang 78.69，本队 kkio- 37.97 第11名
+
+【NPU 环境三条路记录】
+P19b: AtomGit Dev Space（需手动启动实例）
+      GitCode Notebook（临时 2h，依赖 mcp__node_repl__js 运行时，当前不可用）
+      OJ 在线评测（已验证可用，无需 NPU）
+
+校验：check-facts.sh exit=0，无失效引用

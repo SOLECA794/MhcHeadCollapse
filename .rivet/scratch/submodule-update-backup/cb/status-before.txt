@@ -1,0 +1,11 @@
+ M ops/ops-profiling/scripts/msprof_perf_summary.py
+ M ops/ops-profiling/scripts/msprof_profile_run.sh
+ D plugins-community/ops-qa-suite/.opencode/skills/gitcode-toolkit
+ M plugins-official/ops-direct-invoke-flash/.claude/CLAUDE.md
+ M plugins-official/ops-direct-invoke-flash/.claude/agents
+ M plugins-official/ops-direct-invoke-flash/.claude/skills
+ M plugins-official/ops-direct-invoke-flash/.opencode/agents
+ M plugins-official/ops-direct-invoke-flash/.opencode/skills
+ M plugins-official/ops-direct-invoke-flash/ops-direct-invoke-flash
+ D plugins-official/ops-direct-invoke-flash/skills/ascendc-st-design
+ D plugins-official/ops-direct-invoke-flash/skills/ascendc-whitebox-design

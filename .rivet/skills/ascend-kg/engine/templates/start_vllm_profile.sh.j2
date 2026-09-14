@@ -1,0 +1,15 @@
+#!/bin/bash
+# Profiling 实例模板：与主服务同模型同配置，额外挂 profiler-config。卡@DEVICE@ 端口@PORT@。
+# 隐含契约显式化（L3）：引擎须从 ascend-dev conda 环境启动（Popen 继承父 env，本模板不 activate）。
+command -v vllm >/dev/null 2>&1 || { echo "FATAL: vllm 不在 PATH——引擎须从 ascend-dev conda 环境启动"; exit 1; }
+source /home/z60124773/Ascend/nnal/atb/set_env.sh
+export ASCEND_RT_VISIBLE_DEVICES=@DEVICE@
+export ASCEND_LAUNCH_BLOCKING=0
+export OMP_PROC_BIND=false
+export OMP_NUM_THREADS=10
+@VLLM_ENV@
+exec vllm serve @MODEL@ \
+  @VLLM_ARGS@ \
+  --profiler-config.profiler torch \
+  --profiler-config.torch_profiler_dir @PROF_DIR@ \
+  --profiler-config.torch_profiler_with_stack false

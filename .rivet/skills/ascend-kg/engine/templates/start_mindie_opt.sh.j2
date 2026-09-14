@@ -1,0 +1,50 @@
+#!/bin/bash
+# MindIE 重启模板（DESIGN Phase 3）：宿主网络长驻容器内 停 daemon → 换 config → 起 daemon。
+# 由 orchestrator 按 current_params 渲染；@CONTAINER@/@PORT@/@CFG@/@ROUND@ 占位符替换。
+# 红线：docker exec 只作用于本 flow 的容器 @CONTAINER@（作用域比端口更窄），绝不触碰他人容器。
+# 实测结论（3.0.0-800I-A2 真机）：daemon 就绪判据 = 管理口 /v2/health/ready（引擎侧
+#   wait_port.sh 已按 backend.health_url 打 127.0.0.2:<management_port>）；日志侧判据
+#   = "Daemon start success!"；业务口就绪比管理口晚数十秒（权重加载+图编译）。
+#
+# 2026-08-19 加固（真机血泪：重启累积环境恶化导致候选轮全面退化 + daemon 自 fork 风暴）：
+#  a) 仅 pkill daemon 会让 mindie_llm_backend 变孤儿进程（PPID=1、99% CPU 自旋），
+#     继续持有 ~48GB NPU HBM 与 /dev/shm 通道 → 新 daemon 在内存/共享内存压力下运行，
+#     全指标均匀退化（TTFT 43→82ms）。必须同时杀 backend。
+#  b) 单次 pkill 在 daemon 自 respawn 场景杀不净（实测 1 个 daemon fork 出 8 个子 daemon）。
+#     改为循环 pkill 直到容器内确认 0 个存活进程。
+#  c) 旧 daemon 的 /dev/shm 通道文件（*_0_*）在 15s 关停清理期间与新的并存，容器 shm
+#     仅 1G、单 daemon 需 ~977MB → 过渡期分配失败（std::bad_alloc）。确认进程死净后
+#     主动 rm 容器 /dev/shm 残留，避免挤占。
+set -u
+CONTAINER=@CONTAINER@
+PORT=@PORT@
+CFG=@CFG@
+
+# 1) 停旧 daemon + 其 backend 子进程，循环杀到确认净（防 respawn 风暴 / orphan 抢 NPU）
+for i in $(seq 1 5); do
+  docker exec "$CONTAINER" bash -c "pkill -9 -f mindieservice_daemon" 2>/dev/null || true
+  docker exec "$CONTAINER" bash -c "pkill -9 -f mindie_llm_backend" 2>/dev/null || true
+  sleep 1
+  REMAIN=$(docker exec "$CONTAINER" bash -c "ps -ef | grep -E 'mindieservice_daemon|mindie_llm_backend' | grep -v grep | grep -v defunct | wc -l" 2>/dev/null | tr -d ' ')
+  [ "$REMAIN" = "0" ] && break
+done
+
+# 2) 等业务口释放（宿主机视角；容器为宿主网络）
+for i in $(seq 1 30); do
+  ss -ltn 2>/dev/null | grep -q ":${PORT} " || break
+  sleep 1
+done
+
+# 3) 清容器 /dev/shm 残留通道（进程已确认死净，此时删除安全；防新 daemon 分配失败）
+docker exec "$CONTAINER" bash -c "rm -f /dev/shm/*_0_* /dev/shm/sem.* 2>/dev/null" || true
+
+# 4) 换 config（每轮版本化文件 cp 进容器；改配置必须重启 daemon，无热更）。
+#    实测安全校验：daemon 以 root 跑，config 属主必须 root:root 且 other 无读权限（640），
+#    docker cp 带入的 1013 属主/644 会被拒（ConfigManager: Get config path failed）。
+docker cp "$CFG" "$CONTAINER":/usr/local/Ascend/mindie/latest/mindie-service/conf/config.json
+docker exec "$CONTAINER" bash -c "chown root:root /usr/local/Ascend/mindie/latest/mindie-service/conf/config.json && chmod 640 /usr/local/Ascend/mindie/latest/mindie-service/conf/config.json"
+
+# 5) 起 daemon（quick_start 官方流程：4+1 set_env + nohup；atb-models 在
+#    /usr/local/Ascend/atb-models，不在 mindie/latest 下——3.0.0 实测）
+docker exec -d "$CONTAINER" bash -c "cd /usr/local/Ascend/mindie/latest/mindie-service && source /usr/local/Ascend/ascend-toolkit/set_env.sh && source /usr/local/Ascend/nnal/atb/set_env.sh && source /usr/local/Ascend/atb-models/set_env.sh && source /usr/local/Ascend/mindie/latest/mindie-llm/set_env.sh && source /usr/local/Ascend/mindie/latest/mindie-service/set_env.sh && export MINDIE_LOG_TO_STDOUT=true && nohup ./bin/mindieservice_daemon > /tmp/mindie_daemon_@ROUND@.log 2>&1 &"
+echo "mindie restart issued: round=@ROUND@ port=$PORT container=$CONTAINER cfg=$CFG"

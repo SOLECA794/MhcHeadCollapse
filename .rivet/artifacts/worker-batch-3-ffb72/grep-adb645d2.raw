@@ -1,0 +1,102 @@
+[grep] 未找到 ripgrep (rg) 或其执行失败；已使用慢速回退。
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:    1│ import re, sys
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:    2│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:>   3│ src = open(sys.argv[1], encoding='utf-8').read()
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:>   4│ s = re.sub(r'//[^\n]*', '', src)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:    5│ s = re.sub(r'/\*.*?\*/', '', s, flags=re.S)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:    6│ s = re.sub(r'"(?:\\.|[^"\\])*"', '""', s)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:    7│ s = re.sub(r"'(?:\\.|[^'\\])*'", "''", s)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:    8│ ok = True
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:>   9│ for a, b in [('{', '}'), ('(', ')'), ('[', ']')]:
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:>  10│     ca, cb = s.count(a), s.count(b)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:>  11│     print(a + b, ca, cb, 'OK' if ca == cb else 'MISMATCH')
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:>  12│     ok = ok and ca == cb
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:>  13│ print('lines', len(src.splitlines()))
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/balance_check.py:   14│ sys.exit(0 if ok else 1)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>   1│ # Generate WA timing probes from v100 (PATH2 kernel only). Each probe removes one
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>   2│ # stage while keeping the rest identical, so per-case times attribute cost by subtraction.
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>   3│ # Probe results are WRONG ANSWER by design; we only read the reported time.
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:    4│ import re, sys, io
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:    5│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>   6│ BASE = r"D:/Desktop/OP-Learning/Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/versions"
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>   7│ SRC = BASE + "/v100_v095_nosv/code/op_kernel/mhc_head_collapse.cpp"
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:    8│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>   9│ src = open(SRC, encoding="utf-8").read()
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  10│ assert src.count("__aicore__ inline void ProcessVectorRow(uint32_t row) {") == 1
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   11│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  12│ # ---------- P1 floor: empty per-row body (cadence/launch floor for PATH2) ----------
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  13│ p1, n1 = re.subn(
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  14│     r"(    __aicore__ inline void ProcessVectorRow\(uint32_t row\) \{.*?\n    \}\n)(\n    __aicore__ static inline uint32_t AlignBytes)",
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  15│     r"    __aicore__ inline void ProcessVectorRow(uint32_t row) {\n"
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  16│     r"        // P1 floor probe: per-row body emptied. Times Case3-5 = cadence+launch floor.\n"
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  17│     r"    }\n\2",
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  18│     src, count=1, flags=re.S)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  19│ assert n1 == 1, n1
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   20│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  21│ # ---------- P2 gateconst: drop the 8 gate dot-products + scalar sigmoid ----------
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  22│ P2_OLD = """        const float hc_scale = cst_buf_.Get<float>().GetValue(8);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   23│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  24│         // v086: gates from UB-cached weight rows; n ReduceSums issued back-to-back.
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  25│         // Gate results go to reduce_buf_ blocks 1..n (block 0 holds rms); cst_buf_ holds base/scale.
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  26│         AscendC::LocalTensor<float> w_cache = weight_cache_buf_.Get<float>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  27│         AscendC::LocalTensor<float> cst = cst_buf_.Get<float>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  28│         for (uint32_t i = 0; i < n_; ++i) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  29│             AscendC::Mul(work, x_float, w_cache[i * nH_], static_cast<int32_t>(nH_));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  30│             AscendC::ReduceSum(reduced[32U * (i + 1U)], work, reduce_tmp, static_cast<int32_t>(nH_));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   31│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   32│         float gates[kSmallN];
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  33│         for (uint32_t i = 0; i < n_; ++i) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  34│             const float gate = reduced[32U * (i + 1U)].GetValue(0) * rms_inv * hc_scale + cst.GetValue(i);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   35│             gates[i] = ScalarSigmoid(gate) + eps_hc_;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   36│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   37│ """
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  38│ P2_NEW = """        // P2 gateconst probe: 8 gate dots + sigmoid -> constants. rms path and the
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  39│         // h-long fold/store stay identical; gates[0] keeps rms_inv live.
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   40│         float gates[kSmallN];
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  41│         gates[0] = 0.5f * rms_inv + eps_hc_;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  42│         for (uint32_t i = 1; i < n_; ++i) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   43│             gates[i] = 0.5f + eps_hc_;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   44│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   45│ """
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  46│ assert src.count(P2_OLD) == 1
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   47│ p2 = src.replace(P2_OLD, P2_NEW, 1)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   48│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  49│ # ---------- P3 nofold: keep dots+sigmoid, replace h-length fold/store with a scalar GM write ----------
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  50│ P3_OLD = """        AscendC::LocalTensor<DT_X> y_local = y_queue_.AllocTensor<DT_X>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  51│         AscendC::LocalTensor<float> output;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  52│         if constexpr (sizeof(DT_X) == sizeof(float)) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  53│             output = y_local.template ReinterpretCast<float>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   54│         } else {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   55│             output = output_buf_.Get<float>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   56│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   57│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  58│         AscendC::Muls(output, x_float, gates[0], static_cast<int32_t>(h_));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  59│         for (uint32_t i = 1; i < n_; ++i) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  60│             const uint32_t stream_offset = i * h_;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  61│             AscendC::Muls(work, x_float[stream_offset], gates[i], static_cast<int32_t>(h_));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  62│             AscendC::Add(output, output, work, static_cast<int32_t>(h_));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   63│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   64│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  65│         if constexpr (sizeof(DT_X) != sizeof(float)) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  66│             AscendC::Cast(y_local, output, AscendC::RoundMode::CAST_RINT, h_);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   67│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  68│         y_queue_.EnQue(y_local);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   69│         y_local = y_queue_.DeQue<DT_X>();
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  70│         AscendC::DataCopy(y_gm_[y_offset], y_local, h_);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  71│         y_queue_.FreeTensor(y_local);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  72│         x_queue_.FreeTensor(x_local);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   73│ """
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  74│ P3_NEW = """        // P3 nofold probe: scalar sink keeps the whole gate chain live; the h-long
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   75│         // Muls/Adds/Cast/DataCopy fold+store path is removed.
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   76│         float acc = 0.0f;
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  77│         for (uint32_t i = 0; i < n_; ++i) {
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   78│             acc += gates[i];
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   79│         }
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   80│         y_gm_.SetValue(y_offset, ScalarFromFloat<DT_X>(acc));
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  81│         x_queue_.FreeTensor(x_local);
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   82│ """
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  83│ assert src.count(P3_OLD) == 1
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   84│ p3 = src.replace(P3_OLD, P3_NEW, 1)
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:   85│ 
+Ascend/xingchen-operators/C组赛题/【C组中等题】MhcHeadCollapse 算子（mHC四路归一）/scripts/make_probes.py:>  86│ for name, body in [("p1_floor_probe", p1), ("p2_gateconst_probe", p2), ("p3_nofold_probe", p3)]:
+── 寻迹（grep）
