@@ -5,7 +5,7 @@
 > 格式：`[状态] 事项 —— 关键事实/下一步动作`
 > 状态枚举：`▶ 进行中` `○ 待办` `✅ 完成` `⛔ 阻塞`
 
-**最后更新**：2026-09-14（会话：环境迁移 + 8.5 双环境 + 观测基础设施建成）
+**最后更新**：2026-09-14（会话：8.5 双环境 + 观测设施 + v119 修复 + shape 矩阵 + NOP 标定）
 
 ---
 
@@ -29,7 +29,7 @@
 1. ~~修 h=1024 MTE 越界 bug~~ ✅ 已修（v119-fix，F3.6，16/16 PASS）
 2. ~~建 ACL-event 计时 harness~~ ✅ 已建成（F3.7：mhc_shape_bench 双口径，17 shape 矩阵，**outer=4 发现单核瓶颈**）
 3. **shape 对拍分析**：矩阵数据已有（shape_scan_v119_8.5.tsv），待 NOP 标定锁口径系数后拟合 OJ 逐 case 时间
-4. **NOP 标定五连提交**：搞清 OJ 计时口径（方法论见 `docs/METHODOLOGY.md` §三）
+4. ~~NOP 标定五连提交~~ ✅ 已完成（F3.8：Case3/4/5 口径=纯 kernel 时间 R²≈1，Case1/2 盲区待 TinyH4 补标）
 5. Group sigmoid 精度 bug：先换硬件 Exp 原语 A/B（差分对照法，`docs/METHODOLOGY.md` §二）
 
 ### ⛔ 已知 bug：v117 在 nH=1024 稳定崩溃
