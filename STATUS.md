@@ -5,7 +5,7 @@
 > 格式：`[状态] 事项 —— 关键事实/下一步动作`
 > 状态枚举：`▶ 进行中` `○ 待办` `✅ 完成` `⛔ 阻塞`
 
-**最后更新**：2026-09-14（shape 钉死 + v121 上榜：Case5 8.58→7.94μs）
+**最后更新**：2026-09-14 会话收官（shape 钉死 + v121 上榜 7.94μs + 全量落盘 bb60f48 已推送）
 
 ---
 
@@ -27,7 +27,13 @@
 - 观测基础设施：`docs/METHODOLOGY.md` + `scripts/msprof_report.py`（已实测）
 - OJ 提交工具入仓：`cannjudge-submit-plaintext/`（含凭据，链路待首次实测）
 
-### ○ 下一步（按优先级，shape 已知后的精准优化）
+### ○ 下一步（handoff 后接续，按优先级）
+
+1. **Case5 mte2 搬运优化**（39.9% 新第一瓶颈，方向：对齐/双缓冲/蹭 L2）
+   —— v121 后 Case5=7.94μs vs best 4.36μs（1.82×），剩余空间仍最大
+2. TinyH4 补 NOP 标定（Case1/2 盲区，低优先）
+3. Group sigmoid 精度 bug（3.203e-03，Tangefly 参考在手）
+
 
 1. ~~修 h=1024 MTE 越界 bug~~ ✅ 已修（v119-fix，F3.6，16/16 PASS）
 2. ~~建 ACL-event 计时 harness~~ ✅ 已建成（F3.7：mhc_shape_bench 双口径，17 shape 矩阵，**outer=4 发现单核瓶颈**）
