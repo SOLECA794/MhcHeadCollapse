@@ -98,17 +98,22 @@ MhcHeadCollapse/（本 NPU 机器工作区，非旧 Windows 工作区）
 
 ---
 
-## 🔢 5 个测试用例（权威版，见 `FACTS.md F2.2`）
+## 🔢 5 个测试用例（★ 权威版：F3.9 实测钉死，2026-09-14 TilingFunc 断言探测）
 
-| case | n | h | nH | outer | 执行路径 |
-|---|---|---|---|---|---|
-| Case1 | 4 | 4 | 16 | 1 | PATH3 (TinyH4) |
-| Case2 | 4 | 4 | 16 | 4 | PATH3 (TinyH4) |
-| Case3 | 8 | 64 | 512 | 1 | PATH2 (向量) |
-| Case4 | 8 | 64 | 512 | 2 | PATH2 (向量) |
-| Case5 | 8 | 128 | 1024 | 8 | PATH2 (向量) ← 决定排名 |
+| case | n | h | nH | outer | 执行路径 | v119 OJ 时间 |
+|---|---|---|---|---|---|---|
+| Case1 | 4 | 4 | 16 | **2** | PATH3 (TinyH4) | 4.86μs |
+| Case2 | 4 | 4 | 16 | **2** | PATH3 (TinyH4) | 5.68μs |
+| Case3 | 8 | 64 | 512 | **8** | PATH2 (group) | 4.46μs |
+| Case4 | 8 | 64 | 512 | **8** | PATH2 (group) | 4.34μs |
+| Case5 | 8 | 128 | 1024 | **32** | PATH2 (group) ← 决定排名 | 8.58μs |
 
 dtype 全 fp16；`weight`/`base`/`scale` 保持 fp32。
+
+> ⚠ 本表 outer 列 2026-09-14 起以 F3.9 实测为准。旧记载（Case1=1、Case2=4、
+> Case3=1、Case4=2、Case5=8）是历史推断值，已被 8 发 TilingFunc 断言探测推翻
+> （outer=2→C1/C2 Pass；outer=8→C3/C4 Pass；outer=32→C5 Pass）。
+> Case1/Case2 完全同 shape——其 OJ 时间差纯属评测噪声。
 
 ---
 

@@ -80,10 +80,12 @@ requests.get('https://cannjudge.cn/api/submissions/{submission_id}').json()['dat
 | **合计** | **13.56** | **26.62** | **+13.06** | **1.96x** |
 
 **关键结构洞察**：
-- Case1 outer=1 与 Case2 outer=4，best 都是 2.12（**outer 4 倍，时间不变**）
-- Case3 outer=1 与 Case4 outer=2，best 都是 2.48（**outer 2 倍，时间不变**）
-- → **Case1-4 由固定 floor 主导，与数据量无关**
-- Case5 (outer=8) 才涨到 4.36
+- ~~Case1 outer=1 与 Case2 outer=4，best 都是 2.12（**outer 4 倍，时间不变**）~~
+- ~~Case3 outer=1 与 Case4 outer=2，best 都是 2.48（**outer 2 倍，时间不变**）~~
+- ⚠ **2026-09-14 F3.9 修正**：上述 outer 假设是旧推断值，实测为 C1/C2=2、C3/C4=8、C5=32。
+  "Case1/2 时间不变"的观察仍成立（它们完全同 shape），但"outer 4 倍不变"的归因**不成立**。
+- Case1-4 由固定 floor 主导，与数据量无关——**结论方向不变**（C1/C2 同 shape 同 best 确证）
+- Case5 (~~outer=8~~ **outer=32**) 才涨到 4.36
 
 这回答了核心问题"A1: 冠军是否把 kernel 藏进了 floor"：
 **Case1-4 的时间下限就是 floor 本身。榜首 XiuPang 的 Case1/2 已等于 best(2.12)，Case3/4 也接近。**
@@ -132,7 +134,10 @@ requests.get('https://cannjudge.cn/api/submissions/{submission_id}').json()['dat
 
 **硬件实测**（`npu-smi info`）：
 - 型号 **910B4**，设备 `/dev/davinci6`
-- **AI Core 数 = 20** ← **与 `op_host:32` 的 `kMaxCores = 20` 完全吻合**，该常量确为硬件规格
+- **AI Core 数 = 20** ← ~~与 `op_host:32` 的 `kMaxCores = 20` 完全吻合，该常量确为硬件规格~~
+  ⚠ **2026-09-14 F3.10 修正**：kMaxCores=20 **不是硬件上限**——实验版 kMaxCores=32 可正常
+  运行（block_dim=32 有效，正确性 PASS），只是 Case5 shape 下性能更差（12.70 vs 11.13μs）。
+  npu-smi 显示的 20 可能是 AIC 数或资源视图口径；AIV 可用数 >20（910B4 常见 40+）。
 - AI Core 频率 1650 MHz，HBM 32768 MB
 
 **正确性：5/5 PASS**（真实 NPU，非模拟）
@@ -144,6 +149,11 @@ requests.get('https://cannjudge.cn/api/submissions/{submission_id}').json()['dat
 | Case3 | n=8 h=64 outer=1 | 1.817e-04 |
 | Case4 | n=8 h=64 outer=2 | 2.449e-04 |
 | Case5 | n=8 h=128 outer=8 | 2.331e-04 |
+
+> ⚠ **2026-09-14 F3.9 修正**：本表 outer 列是**本地测试用的假设值**（非 OJ 真实 shape）。
+> OJ 真实 outer（TilingFunc 断言实测）：Case1/2=**2**、Case3/4=**8**、Case5=**32**。
+> 上表仅证明"这些 shape 下正确性 PASS"，shape 本身不代表 OJ case。
+> 权威 shape 表见 §N F3.9。
 
 → **独立实证 F2.2**：测试程序接受 `8 64 1/2`、`8 128 8` 并全部 PASS，
 再次推翻 `迭代优化记录.md:75-79` 的 `n=4/h=4` 记载。

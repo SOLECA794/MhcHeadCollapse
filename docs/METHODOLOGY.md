@@ -106,3 +106,18 @@ Case1/2：斜率≈0——NOP 插入点漏了 TinyH4 独立 kernel 类，标定�
 - [ ] Group sigmoid：先换硬件 Exp 原语做 A/B（差分对照法第一步）
 - [ ] 精度语义卡片库（VecExp/VecSigmoid/ReduceSum 的 FP16 精度/周期/陷阱）——
       每踩一个坑记一张，攒 10 张即成"指令级直觉"
+
+## 四、TilingFunc 断言探测（OJ shape 黑盒反推，2026-09-14 实战定型）
+
+**原理**：op_host 的 `TilingFunc` 在每次 `aclnnGetWorkspaceSize` 都执行（host 侧）。
+注入 `if (field != V) return ge::GRAPH_FAILED;` → 断言不成立的 case 直接 RE。
+一次提交对 5 case 同时生效，Pass/RE 模式直接解出各 case 的 shape 字段。
+
+**关键教训（实测两发验证）**：
+- ⚠ **InferShape 注入无效**——平台评测不走 InferShape（outer=999 全 Pass 证明）。
+  v081 历史探针若注在 InferShape，其"实测"结论需复核。
+- ✅ **TilingFunc 注入有效**（outer=999 全 RE 对照验证机制）
+- 工具：`scripts/probe_oj_v2.py`（自动生成变体+提交+限流退避）
+
+**效率技巧**：断言值选择按二分/分组策略——一发同时测所有 case，Pass 的 case 集合
+即该值的命中集。5 个 case 的 outer 用 4 发（2/8/32 + 999 对照）钉死。

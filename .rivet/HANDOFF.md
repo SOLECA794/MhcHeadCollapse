@@ -35,7 +35,7 @@
 
 `$MHC/scripts/probe_oj.py`（134 行，commit 391e785）：`build <case> <field> <value>` 注入断言到 op_host InferShape 并提交；`poll <sid>` 轮询；`sweep <field> <case> <v1,v2,...>` 批量。注入点已对齐实际 InferShape（`versions/v118_path2vecz/code/op_host/mhc_head_collapse.cpp:74` 的 `return GRAPH_SUCCESS` 前，outer 用循环乘积非 GetDim(1)），干跑验证注入产物正确。**尚未做真实提交**——首次运行可能暴露提交/轮询解析的小问题。
 
-已知 shape 现状（FACTS.md F2.1l v2）：Case1 n=4/nH=16/outer∈{2,3,4}；Case2 n=4/nH=16/outer=2；Case3/4 n=8/nH=512；Case5 n=8/nH=1024；**Case3/4/5 的 outer 未探**（历史 v081 矩阵实测了 n/nH，outer 是唯一缺口）。
+已知 shape 现状（★ F3.9 实测钉死 2026-09-14）：Case1/2 n=4/nH=16/outer=2；Case3/4 n=8/nH=512/outer=8；Case5 n=8/nH=1024/outer=32。探测手段：TilingFunc 断言（InferShape 无效，F3.9 记录）。
 
 ### 4. 当前在榜代码
 
