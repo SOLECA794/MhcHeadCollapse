@@ -25,11 +25,9 @@ Thumbs.db
 
 # cannbot-skills 子模块（单独管理，不入本仓库）
 cannbot-skills/
-cannbot-skills-Copy1/
 
 # 本地构建产物
 .rivet/scratch/v117_stage/code/build/
-.rivet/scratch/v117_stage/code/build85/
 .rivet/scratch/v117_stage/tests_bin/
 .rivet/scratch/probe_acl_init
 .rivet/scratch/probe_acl_init.cpp
@@ -38,18 +36,9 @@ cannbot-skills-Copy1/
 .rivet/scratch/probe_dev_scan2
 .rivet/scratch/probe_dev_scan2.cpp
 
-# 大体积外部克隆（可重克隆，见 docs/PLAYBOOK.md §六）
-.rivet/scratch/cann-ops-competitions/
-
-# 杂项
-.ipynb_checkpoints/
-
 # runtime ephemeral（会话缓存，不入库）
 .rivet/meridian.db-shm
 .rivet/meridian.db-wal
 .rivet/meridian.db
 .rivet/tmp/
 .rivet/checkpoints/
-meridian.db*
-.rivet/tmp/
-.rivet/cache/

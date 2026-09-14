@@ -1,0 +1,18 @@
+Device_id,Level,API Name,Time(us),Count,Avg(us),Min(us),Max(us),Variance
+host,acl,aclnnMhcHeadCollapse,2723.85,225,12.106,7.69,725.88,2278.155
+host,acl,aclnnMhcHeadCollapseGetWorkspaceSize,18961.83,1,18961.83,18961.83,18961.83,0
+host,acl,aclnnMhcHeadCollapseTiling,7.37,1,7.37,7.37,7.37,0
+host,acl,aclrtBinaryLoadFromData,135.03,1,135.03,135.03,135.03,0
+host,acl,aclrtCreateEvent,8.17,2,4.085,3.05,5.12,1.071
+host,acl,aclrtCreateStream,472.27,1,472.27,472.27,472.27,0
+host,acl,aclrtCtxGetFloatOverflowAddr,2.09,1,2.09,2.09,2.09,0
+host,acl,aclrtCtxGetSysParamOpt,23.08,2,11.54,0.77,22.31,115.993
+host,acl,aclrtGetResInCurrentThread,5.35,4,1.338,0.42,3.09,1.19
+host,acl,aclrtGetStreamAttribute,96.55,225,0.429,0.39,2.25,0.015
+host,acl,aclrtLaunchKernelWithHostArgs,1241.01,225,5.516,2.67,485.1,1028.085
+host,acl,aclrtMalloc,23.02,5,4.604,2.24,13.68,20.603
+host,acl,aclrtMemcpy,67.23,4,16.808,11.01,28.36,48.134
+host,acl,aclrtRecordEvent,636.78,40,15.919,11.87,35.89,17.522
+host,acl,aclrtSynchronizeEvent,604.85,20,30.242,21.21,46.68,31.097
+host,acl,aclrtSynchronizeStream,38.78,1,38.78,38.78,38.78,0
+host,node,launch,1759.73,225,7.821,3.92,693.29,2099.348

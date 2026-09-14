@@ -1,0 +1,26 @@
+{
+  "componentGroups" : {},
+  "components" : {},
+  "errorOnAbsoluteInstallDestination" : false,
+  "formatVersionMajor" : 1,
+  "formatVersionMinor" : 0,
+  "installationTypes" : {},
+  "packageDescriptionFile" : "/usr/local/lib/python3.11/dist-packages/cmake/data/share/cmake-4.2/Templates/CPack.GenericDescription.txt",
+  "packageDescriptionSummary" : "CPack opp project",
+  "packageName" : "custom_project",
+  "packageVersion" : "0.1.1",
+  "projects" : 
+  [
+    {
+      "component" : "ALL",
+      "components" : [],
+      "directory" : "/workspace/notebook13/MhcHeadCollapse/.rivet/scratch/nop_variants/nop_1000/build",
+      "installationTypes" : [],
+      "projectName" : "custom_project",
+      "subDirectory" : "/"
+    }
+  ],
+  "setDestdir" : false,
+  "stripFiles" : false,
+  "warnOnAbsoluteInstallDestination" : false
+}

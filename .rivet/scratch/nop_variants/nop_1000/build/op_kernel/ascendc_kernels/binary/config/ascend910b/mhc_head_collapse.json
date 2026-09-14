@@ -1,0 +1,274 @@
+{
+  "binList": [
+    {
+      "implMode": "high_performance",
+      "int64Mode": false,
+      "simplifiedKeyMode": 0,
+      "simplifiedKey": [
+        "MhcHeadCollapse/d=0,p=1/27,2/0,2/0,2/0,2/27,2",
+        "MhcHeadCollapse/d=0,p=0/27,2/0,2/0,2/0,2/27,2",
+        "MhcHeadCollapse/d=1,p=1/27,2/0,2/0,2/0,2/27,2",
+        "MhcHeadCollapse/d=1,p=0/27,2/0,2/0,2/0,2/27,2"
+      ],
+      "staticKey": "db70370ee8d67c46c1a16b25f1f4c8203eaa5d6e82f874c2a39df953ed949933,d6fe64e90311ec58e8e8cb93b81caa1b607902bcb7bc2105c1693cc85b119b61",
+      "inputs": [
+        {
+          "name": "x",
+          "index": 0,
+          "dtype": "bfloat16",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "weight",
+          "index": 1,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "hc_base",
+          "index": 2,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "hc_scale",
+          "index": 3,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "y",
+          "index": 0,
+          "dtype": "bfloat16",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        }
+      ],
+      "attrs": [
+        {
+          "name": "eps_norm",
+          "dtype": "float",
+          "value": 0.0
+        },
+        {
+          "name": "eps_hc",
+          "dtype": "float",
+          "value": 0.0
+        }
+      ],
+      "opMode": "dynamic",
+      "optionalInputMode": "gen_placeholder",
+      "deterministic": "ignore",
+      "optionalOutputMode": "gen_placeholder",
+      "binInfo": {
+        "jsonFilePath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_78f67d6310b94612069055f440372d63.json"
+      }
+    },
+    {
+      "implMode": "high_performance",
+      "int64Mode": false,
+      "simplifiedKeyMode": 0,
+      "simplifiedKey": [
+        "MhcHeadCollapse/d=0,p=1/0,2/0,2/0,2/0,2/0,2",
+        "MhcHeadCollapse/d=0,p=0/0,2/0,2/0,2/0,2/0,2",
+        "MhcHeadCollapse/d=1,p=1/0,2/0,2/0,2/0,2/0,2",
+        "MhcHeadCollapse/d=1,p=0/0,2/0,2/0,2/0,2/0,2"
+      ],
+      "staticKey": "677380e074ed0d6c069ed297b18bb4767d5e52c0111d10a0127bd38b773829c1,caac80c7c28be725c1e2d2675da6f189d6abd1105fe8a8f5ac207c9b98e164b8",
+      "inputs": [
+        {
+          "name": "x",
+          "index": 0,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "weight",
+          "index": 1,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "hc_base",
+          "index": 2,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "hc_scale",
+          "index": 3,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "y",
+          "index": 0,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        }
+      ],
+      "attrs": [
+        {
+          "name": "eps_norm",
+          "dtype": "float",
+          "value": 0.0
+        },
+        {
+          "name": "eps_hc",
+          "dtype": "float",
+          "value": 0.0
+        }
+      ],
+      "opMode": "dynamic",
+      "optionalInputMode": "gen_placeholder",
+      "deterministic": "ignore",
+      "optionalOutputMode": "gen_placeholder",
+      "binInfo": {
+        "jsonFilePath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_8d20c9040bc098dfd3ec56fc7a7c5431.json"
+      }
+    },
+    {
+      "implMode": "high_performance",
+      "int64Mode": false,
+      "simplifiedKeyMode": 0,
+      "simplifiedKey": [
+        "MhcHeadCollapse/d=0,p=1/1,2/0,2/0,2/0,2/1,2",
+        "MhcHeadCollapse/d=0,p=0/1,2/0,2/0,2/0,2/1,2",
+        "MhcHeadCollapse/d=1,p=1/1,2/0,2/0,2/0,2/1,2",
+        "MhcHeadCollapse/d=1,p=0/1,2/0,2/0,2/0,2/1,2"
+      ],
+      "staticKey": "8090b2b04bea038c0ba222160d626e1804f4e8ac695707e6c7a811933dbaea0a,2d99fcd3f9d039ff8cfbe726835599042ad52111e335c24ff22776954f64fb38",
+      "inputs": [
+        {
+          "name": "x",
+          "index": 0,
+          "dtype": "float16",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "weight",
+          "index": 1,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "hc_base",
+          "index": 2,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        },
+        {
+          "name": "hc_scale",
+          "index": 3,
+          "dtype": "float32",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "y",
+          "index": 0,
+          "dtype": "float16",
+          "format": "ND",
+          "paramType": "required",
+          "shape": [
+            -2
+          ],
+          "format_match_mode": "FormatAgnostic"
+        }
+      ],
+      "attrs": [
+        {
+          "name": "eps_norm",
+          "dtype": "float",
+          "value": 0.0
+        },
+        {
+          "name": "eps_hc",
+          "dtype": "float",
+          "value": 0.0
+        }
+      ],
+      "opMode": "dynamic",
+      "optionalInputMode": "gen_placeholder",
+      "deterministic": "ignore",
+      "optionalOutputMode": "gen_placeholder",
+      "binInfo": {
+        "jsonFilePath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_e6342a7673a91da4d3c59577131c5961.json"
+      }
+    }
+  ]
+}

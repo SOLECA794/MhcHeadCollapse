@@ -1,0 +1,87 @@
+{
+  "MhcHeadCollapse": {
+    "dynamicRankSupport": true,
+    "simplifiedKeyMode": 0,
+    "optionalInputMode": "gen_placeholder",
+    "optionalOutputMode": "gen_placeholder",
+    "params": {
+      "inputs": [
+        {
+          "name": "x",
+          "index": 0,
+          "paramType": "required",
+          "formatMode": "static_nd_agnostic"
+        },
+        {
+          "name": "weight",
+          "index": 1,
+          "paramType": "required",
+          "formatMode": "static_nd_agnostic"
+        },
+        {
+          "name": "hc_base",
+          "index": 2,
+          "paramType": "required",
+          "formatMode": "static_nd_agnostic"
+        },
+        {
+          "name": "hc_scale",
+          "index": 3,
+          "paramType": "required",
+          "formatMode": "static_nd_agnostic"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "y",
+          "index": 0,
+          "paramType": "required",
+          "formatMode": "static_nd_agnostic"
+        }
+      ],
+      "attrs": [
+        {
+          "name": "eps_norm"
+        },
+        {
+          "name": "eps_hc"
+        }
+      ]
+    },
+    "binaryList": [
+      {
+        "coreType": 2,
+        "simplifiedKey": [
+          "MhcHeadCollapse/d=0,p=1/27,2/0,2/0,2/0,2/27,2",
+          "MhcHeadCollapse/d=0,p=0/27,2/0,2/0,2/0,2/27,2",
+          "MhcHeadCollapse/d=1,p=1/27,2/0,2/0,2/0,2/27,2",
+          "MhcHeadCollapse/d=1,p=0/27,2/0,2/0,2/0,2/27,2"
+        ],
+        "binPath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_78f67d6310b94612069055f440372d63.o",
+        "jsonPath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_78f67d6310b94612069055f440372d63.json"
+      },
+      {
+        "coreType": 2,
+        "simplifiedKey": [
+          "MhcHeadCollapse/d=0,p=1/0,2/0,2/0,2/0,2/0,2",
+          "MhcHeadCollapse/d=0,p=0/0,2/0,2/0,2/0,2/0,2",
+          "MhcHeadCollapse/d=1,p=1/0,2/0,2/0,2/0,2/0,2",
+          "MhcHeadCollapse/d=1,p=0/0,2/0,2/0,2/0,2/0,2"
+        ],
+        "binPath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_8d20c9040bc098dfd3ec56fc7a7c5431.o",
+        "jsonPath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_8d20c9040bc098dfd3ec56fc7a7c5431.json"
+      },
+      {
+        "coreType": 2,
+        "simplifiedKey": [
+          "MhcHeadCollapse/d=0,p=1/1,2/0,2/0,2/0,2/1,2",
+          "MhcHeadCollapse/d=0,p=0/1,2/0,2/0,2/0,2/1,2",
+          "MhcHeadCollapse/d=1,p=1/1,2/0,2/0,2/0,2/1,2",
+          "MhcHeadCollapse/d=1,p=0/1,2/0,2/0,2/0,2/1,2"
+        ],
+        "binPath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_e6342a7673a91da4d3c59577131c5961.o",
+        "jsonPath": "ascend910b/mhc_head_collapse/MhcHeadCollapse_e6342a7673a91da4d3c59577131c5961.json"
+      }
+    ]
+  }
+}

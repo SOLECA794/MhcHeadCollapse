@@ -1,0 +1,2 @@
+Device_id,OP Type,Core Type,Count,Total Time(us),Min Time(us),Avg Time(us),Max Time(us),Ratio(%)
+0,MhcHeadCollapse,AI_VECTOR_CORE,225,2129.72,8.64,9.465,22.201,100

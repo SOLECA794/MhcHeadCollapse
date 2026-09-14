@@ -1,0 +1,9 @@
+{
+	"InstallScripts" : 
+	[
+		"/workspace/notebook13/MhcHeadCollapse/.rivet/scratch/nop_variants/nop_1000/build/cmake_install.cmake",
+		"/workspace/notebook13/MhcHeadCollapse/.rivet/scratch/nop_variants/nop_1000/build/op_host/cmake_install.cmake",
+		"/workspace/notebook13/MhcHeadCollapse/.rivet/scratch/nop_variants/nop_1000/build/op_kernel/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -shared -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack -Wl,-soname,libcust_opapi.so -o libcust_opapi.so CMakeFiles/cust_opapi.dir/__/autogen/aclnn_mhc_head_collapse.cpp.o   -L/tmp/cann85/cann-8.5.0/lib64  -Wl,-rpath,/tmp/cann85/cann-8.5.0/lib64: -lascendcl -lnnopbase
