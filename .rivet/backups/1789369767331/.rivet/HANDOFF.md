@@ -47,11 +47,20 @@
 
 ## 当前卡点 — 卡在哪、已排除什么
 
-### 卡点 1：本地 NPU 环境已就绪，SSH 远端链路不再是核心依赖（本会话已切换到本地 NPU 环境）
+### 卡点 1：SSH 直连链路未打通（本会话最后在做的事）
 
-我们已直接在 `/dev/davinci2` 机器上工作，远端 SSH 跳板（`113.47.8.48:2234` → `root@199.98.55.200`）不再需要用于日常迭代。SSH 远端链路仍可用于：OJ 提交自动化、GitCode push 等场景，但当前最高优先改为本地编译验证循环。
+用户提供了跳板机 SSH 直连 NPU 服务器（比 notebook 链路强得多：标准 ssh/sftp、/workspace 300GB 高 IO）：
+- 跳板：`113.47.8.48:2234`，用户名 `jt_847D314397BDC0DD5D2D6742:B3F9034877D09406F640100B9009231F0A08BF24FA8065A805B1B4F04A3CD9F39940D2ABA56C49B789C34CBE6E3181B92F`，密码 `Sj9eim1bS0uf00BN`
+- NPU 主机：`root@199.98.55.200`，密码同上
+- 完整命令：`ssh -J jt_...:B3F9...@113.47.8.48:2234 root@199.98.55.200`
 
-**已排除**：无 NPU 环境（否，`/dev/davinci2` 存在）；CANN 工具链缺失（`npu-smi` CLI 在 `/usr/local/bin/npu-smi`，驱动在位）。
+已做：paramiko 5.0.0 已装；工具脚本 `D:\Desktop\OP-Learning\.rivet\scratch\mhc_ssh.py` 已写（run/push/pull 三命令，ProxyJump 逻辑）；TCP 层验证 113.47.8.48:2234 可达。
+
+**卡在哪**：paramiko 对跳板机密码认证报 `SSHException("No existing session")`（transport.py:1518 auth_password）——跳板机的 SSH 实现有非标准握手。banner 探测（read 100 字节）超时无输出，但 TCP 连接成功，说明协议层有怪异（可能是非标准 SSH 服务或需要特定 client banner）。
+
+已排除：TCP 不通（否，通）；paramiko 未装（否，已装）；凭据错误（未到验证阶段就断，无法判断）。
+
+怀疑对象：跳板机是某种 SSH 代理（如 Teleport/jumpserver 类），paramiko 的握手参数需调整（如 allow_agent=False/look_for_keys=False 强制密码、或 banner_timeout 加大、或需禁用特定 kex）。备选路径：Windows 原生 `ssh -J`（密码需交互，可试 sshpass 不存在则用 SSH_ASKPASS 环境变量技巧），或让用户在终端手动跑通一次确认凭据本身有效。
 
 ### 卡点 2：OJ 计时口径未完全确定
 
@@ -63,9 +72,11 @@ Group 路径（outer≥4 走的分支）向量 sigmoid 版误差恒定 3.203e-03
 
 ## 下一步 — 按优先级
 
-1. **本地编译验证循环（最高优先）**：我们在 NPU 本地环境，先跑通 `cd code && mkdir -p build && cd build && cmake .. && make -j` 验证 CANN 工具链正常。这是后续所有优化的基础。
-2. **本地 kernel 时间打点**：用 ACL event（`aclrtCreateEvent/RecordEvent/SynchronizeEvent`）在 NPU 上对已知 shape 逐个打点，建立本地性能基线。
-3. **OJ shape 探测首跑**：在确认本地环境可用后，跑 `python scripts/probe_oj.py sweep outer 3 1,2,4,8,16` 补完 Case3/4/5 的 outer 维度。
+1. **打通 SSH 链路**（最高优先，其他一切依赖它）：先让用户在其终端跑一次 `ssh -J 'jt_...:B3F9...@113.47.8.48:2234' root@199.98.55.200` 确认凭据可用；若可用，修 `mhc_ssh.py`（尝试 connect(..., allow_agent=False, look_for_keys=False, banner_timeout=60) 或换 Transport 层手动 auth）；若 paramiko 持续失败，改用 ssh 命令行 + SSH_ASKPASS 脚本方案。打通后第一件事：`npu-smi info` + `ls /workspace` + CANN 版本确认环境。
+2. **OJ shape 探测首跑**：`python $MHC/scripts/probe_oj.py sweep outer 3 1,2,4,8,16`（Case3 的 outer；注意 sweep 参数顺序 field case values——脚本签名 `sweep <field> <case> <v1,v2,...>`）。每次提交约 2 分钟评测。断言对 5 个 case 同时生效：Pass 的 case 集合会直接揭示各 case 的 outer（如断言 outer==4 时 Case3/4 Pass 而 Case5 RE → Case3/4 outer=4）。拿到 outer 后更新 $MHC/FACTS.md F2.1l 表。
+3. **本地复刻 OJ 计时器**（SSH 通后）：在 NPU 上用 ACL event（aclrtCreateEvent/aclrtRecordEvent/aclrtSynchronizeEvent + elapsed time）对 5 个已知 shape 逐个打点，与 OJ 的 4.70/5.84/5.10/4.94/8.64 对齐；对齐口径后写 `$MHC/tests/mhc_oj_timer.cpp`，此为"本地≈OJ"链路的核心件。
+4. **修 CANNJudge计时与得分规则.md**：把"15 个测试点"改为"实测 5 个 case 计分"（证据：公式验证差 0.05），并在 §4.2 补记与框架地板 4μs 实测的张力待计时复刻实验裁决。
+5. **（可选）Group 向量 sigmoid 根因**：v118 基础上加 UB dump（red 原始值写 y 头）对比 python 参考，一次定位错在哪一环。
 
 ## 坑 — 绝对不要再踩
 

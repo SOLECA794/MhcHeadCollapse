@@ -1,0 +1,144 @@
+分支：main
+变更：
+M .rivet/HANDOFF.md
+ M .rivet/meridian.db
+ M .rivet/meridian.db-shm
+ M .rivet/meridian.db-wal
+ M .rivet/tmp/theta-cache.json
+?? .rivet.md
+?? .rivet/ENVIRONMENT.md
+?? .rivet/backups/1789369709667/
+?? .rivet/backups/1789369739531/
+?? .rivet/backups/1789369767331/
+?? .rivet/backups/1789369786519/
+?? .rivet/backups/1789370756836/
+?? .rivet/backups/1789370819147/
+?? .rivet/scratch/probe_acl_init
+?? .rivet/scratch/probe_acl_init.cpp
+?? .rivet/scratch/probe_dev_scan2
+?? .rivet/scratch/probe_dev_scan2.cpp
+?? .rivet/scratch/probe_device_scan.cpp
+?? .rivet/scratch/v117_stage/code/build/
+?? .rivet/scratch/v117_stage/tests_bin/
+?? .rivet/skills/_drafts/我最想要的-是通过本地和oj数据的对拍-测出真实的case形状-这也是交接的下一步工作和换到这个.md
+?? AGENTS.md
+?? cannbot-skills/
+未跟踪：
+.rivet.md
+.rivet/ENVIRONMENT.md
+.rivet/backups/1789369709667/.rivet.md
+.rivet/backups/1789369739531/.rivet/HANDOFF.md
+.rivet/backups/1789369767331/.rivet/HANDOFF.md
+.rivet/backups/1789369786519/.rivet/HANDOFF.md
+.rivet/backups/1789370756836/.rivet/ENVIRONMENT.md
+.rivet/backups/1789370819147/.rivet.md
+.rivet/scratch/probe_acl_init
+.rivet/scratch/probe_acl_init.cpp
+.rivet/scratch/probe_dev_scan2
+.rivet/scratch/probe_dev_scan2.cpp
+.rivet/scratch/probe_device_scan.cpp
+.rivet/scratch/v117_stage/code/build/CMakeCache.txt
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CMakeCCompiler.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CMakeCXXCompiler.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CMakeDetermineCompilerABI_C.bin
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CMakeDetermineCompilerABI_CXX.bin
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CMakeSystem.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CompilerIdC/CMakeCCompilerId.c
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CompilerIdC/a.out
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CompilerIdCXX/CMakeCXXCompilerId.cpp
+.rivet/scratch/v117_stage/code/build/CMakeFiles/4.2.1/CompilerIdCXX/a.out
+.rivet/scratch/v117_stage/code/build/CMakeFiles/CMakeConfigureLog.yaml
+.rivet/scratch/v117_stage/code/build/CMakeFiles/CMakeDirectoryInformation.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/CMakeRuleHashes.txt
+.rivet/scratch/v117_stage/code/build/CMakeFiles/InstallScripts.json
+.rivet/scratch/v117_stage/code/build/CMakeFiles/Makefile.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/Makefile2
+.rivet/scratch/v117_stage/code/build/CMakeFiles/TargetDirectories.txt
+.rivet/scratch/v117_stage/code/build/CMakeFiles/cmake.check_cache
+.rivet/scratch/v117_stage/code/build/CMakeFiles/gen_version_info.dir/DependInfo.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/gen_version_info.dir/build.make
+.rivet/scratch/v117_stage/code/build/CMakeFiles/gen_version_info.dir/cmake_clean.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/gen_version_info.dir/compiler_depend.make
+.rivet/scratch/v117_stage/code/build/CMakeFiles/gen_version_info.dir/compiler_depend.ts
+.rivet/scratch/v117_stage/code/build/CMakeFiles/gen_version_info.dir/progress.make
+.rivet/scratch/v117_stage/code/build/CMakeFiles/modify_vendor.dir/DependInfo.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/modify_vendor.dir/build.make
+.rivet/scratch/v117_stage/code/build/CMakeFiles/modify_vendor.dir/cmake_clean.cmake
+.rivet/scratch/v117_stage/code/build/CMakeFiles/modify_vendor.dir/compiler_depend.make
+.rivet/scratch/v117_stage/code/build/CMakeFiles/modify_vendor.dir/compiler_depend.ts
+.rivet/scratch/v117_stage/code/build/CMakeFiles/modify_vendor.dir/progress.make
+.rivet/scratch/v117_stage/code/build/CMakeFiles/progress.marks
+.rivet/scratch/v117_stage/code/build/CPackConfig.cmake
+.rivet/scratch/v117_stage/code/build/CPackSourceConfig.cmake
+.rivet/scratch/v117_stage/code/build/Makefile
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run.json
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/custom_opp_ubuntu_aarch64.run
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/help.info
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/install.sh
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/framework/tensorflow/npu_supported_ops.json
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_api/include/aclnn_mhc_head_collapse.h
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_api/lib/libcust_opapi.so
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/config/ascend910b/aic-ascend910b-ops-info.json
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/custom_impl/dynamic/mhc_head_collapse.cpp
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/custom_impl/dynamic/mhc_head_collapse.py
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/custom_impl/dynamic/mhc_head_collapse_tiling.h
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/custom_impl/dynamic/tiling_key_mhc_head_collapse.h
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/kernel/ascend910b/mhc_head_collapse/MhcHeadCollapse_78f67d6310b94612069055f440372d63.json
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/kernel/ascend910b/mhc_head_collapse/MhcHeadCollapse_78f67d6310b94612069055f440372d63.o
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/kernel/ascend910b/mhc_head_collapse/MhcHeadCollapse_8d20c9040bc098dfd3ec56fc7a7c5431.json
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/kernel/ascend910b/mhc_head_collapse/MhcHeadCollapse_8d20c9040bc098dfd3ec56fc7a7c5431.o
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/kernel/ascend910b/mhc_head_collapse/MhcHeadCollapse_e6342a7673a91da4d3c59577131c5961.json
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/kernel/ascend910b/mhc_head_collapse/MhcHeadCollapse_e6342a7673a91da4d3c59577131c5961.o
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/kernel/config/ascend910b/binary_info_config.json
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/kernel/config/ascend910b/mhc_head_collapse.json
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/op_tiling/lib/linux/aarch64/libcust_opmaster_rt2.0.so
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/op_impl/ai_core/tbe/op_tiling/liboptiling.so
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/packages/vendors/custom/version.info
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/uninstall.sh
+.rivet/scratch/v117_stage/code/build/_CPack_Packages/Linux/External/custom_opp_ubuntu_aarch64.run/upgrade.sh
+.rivet/scratch/v117_stage/code/build/autogen/aclnn_mhc_head_collapse.cpp
+.rivet/scratch/v117_stage/code/build/autogen/aclnn_mhc_head_collapse.h
+.rivet/scratch/v117_stage/code/build/autogen/aic-ascend910b-ops-info.ini
+.rivet/scratch/v117_stage/code/build/autogen/ascendc_all_ops.make
+.rivet/scratch/v117_stage/code/build/autogen/ascendc_kernels_custom_source_files.ini
+.rivet/scratch/v117_stage/code/build/autogen/copy_kernel_src.timestamp
+.rivet/scratch/v117_stage/code/build/autogen/custom_compile_options.ini
+.rivet/scratch/v117_stage/code/build/autogen/custom_opc_options.ini
+.rivet/scratch/v117_stage/code/build/autogen/libascend_all_ops.so
+.rivet/scratch/v117_stage/code/build/autogen/op_proto.cc
+.rivet/scratch/v117_stage/code/build/autogen/op_proto.h
+.rivet/scratch/v117_stage/code/build/cmake_install.cmake
+.rivet/scratch/v117_stage/code/build/custom_opp_ubuntu_aarch64.run
+.rivet/scratch/v117_stage/code/build/custom_opp_ubuntu_aarch64.run.json
+.rivet/scratch/v117_stage/code/build/install_manifest.txt
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/CMakeDirectoryInformation.cmake
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/DependInfo.cmake
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_mhc_head_collapse.cpp.o
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/__/autogen/aclnn_mhc_head_collapse.cpp.o.d
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/build.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/cmake_clean.cmake
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/compiler_depend.internal
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/compiler_depend.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/compiler_depend.ts
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/depend.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/flags.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_opapi.dir/progress.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/DependInfo.cmake
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/build.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/cmake_clean.cmake
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/compiler_depend.internal
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/compiler_depend.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/compiler_depend.ts
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/depend.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/flags.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/mhc_head_collapse.cpp.o
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/mhc_head_collapse.cpp.o.d
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/cust_optiling.dir/progress.make
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/custom_ascendc_cust_opapi.dir/DependInfo.cmake
+.rivet/scratch/v117_stage/code/build/op_host/CMakeFiles/custom_ascendc_cust_opapi.dir/build.make
+... 87 lines omitted (per-call budget: 5000 tokens) ...
+.rivet/scratch/v117_stage/tests_bin/mhc_correctness
+.rivet/skills/_drafts/我最想要的-是通过本地和oj数据的对拍-测出真实的case形状-这也是交接的下一步工作和换到这个.md
+AGENTS.md
+cannbot-skills/
+── 史官（git）

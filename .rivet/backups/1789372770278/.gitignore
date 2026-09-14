@@ -42,3 +42,11 @@ cannbot-skills/
 .rivet/meridian.db
 .rivet/tmp/
 .rivet/checkpoints/
+
+# 凭据（硬性安全门禁，绝不入库）
+.rivet/secrets*
+.rivet/provider-keys*
+home/.rivet/secrets.json
+home/.rivet/provider-keys.json
+home/.rivet/checkpoint-*.json
+home/.rivet/sessions/

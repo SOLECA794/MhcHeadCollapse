@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "providers": {
+    "x5m5x-com": [
+      {
+        "id": "default",
+        "label": "default",
+        "keyRef": "x5m5x-com",
+        "models": [
+          {
+            "id": "MiniMax-M2.7-highspeed",
+            "contextWindow": 204800,
+            "maxTokens": 64000,
+            "pricing": {
+              "input": 0.3,
+              "output": 1.2,
+              "cacheRead": 0.03,
+              "cacheWrite": 0.3
+            },
+            "tier": "balanced",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "MiniMax-M3",
+            "contextWindow": 1000000,
+            "maxTokens": 64000,
+            "supportsVision": true,
+            "pricing": {
+              "input": 0.3,
+              "output": 1.2,
+              "cacheRead": 0.03,
+              "cacheWrite": 0.3
+            },
+            "tier": "strong",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "MiniMax-M2.7",
+            "contextWindow": 204800,
+            "maxTokens": 64000,
+            "pricing": {
+              "input": 0.3,
+              "output": 1.2,
+              "cacheRead": 0.03,
+              "cacheWrite": 0.3
+            },
+            "tier": "balanced",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "glm-5.2",
+            "contextWindow": 1000000,
+            "maxTokens": 131072,
+            "reasoningEffort": "max",
+            "supportsVision": true,
+            "pricing": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "tier": "strong",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "gpt-5.6",
+            "contextWindow": 200000,
+            "maxTokens": 128000,
+            "reasoningEffort": "max",
+            "tier": "strong",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "kimi-k2.6",
+            "contextWindow": 262144,
+            "maxTokens": 32768,
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "grok-4.6",
+            "contextWindow": 131072,
+            "maxTokens": 32768
+          },
+          {
+            "id": "glm-5.3",
+            "contextWindow": 1000000,
+            "maxTokens": 131072,
+            "reasoningEffort": "max",
+            "pricing": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "tier": "strong",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "glm-5.3-flash",
+            "contextWindow": 1000000,
+            "maxTokens": 131072,
+            "reasoningEffort": "max",
+            "supportsVision": true,
+            "pricing": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "tier": "strong",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "deepseek-v4.1-flash",
+            "contextWindow": 1000000,
+            "maxTokens": 384000,
+            "reasoningEffort": "medium",
+            "pricing": {
+              "input": 1,
+              "output": 2,
+              "cacheRead": 0.02,
+              "cacheWrite": 1
+            },
+            "tier": "cheap",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "deepseek-v4-pro-0813",
+            "contextWindow": 1000000,
+            "maxTokens": 384000,
+            "reasoningEffort": "high",
+            "pricing": {
+              "input": 3,
+              "output": 6,
+              "cacheRead": 0.025,
+              "cacheWrite": 3
+            },
+            "tier": "strong",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "kimi-k2.7-code",
+            "contextWindow": 262144,
+            "maxTokens": 131072,
+            "pricing": {
+              "input": 0.94,
+              "output": 4
+            },
+            "tier": "strong",
+            "capabilities": {
+              "reasoningSplit": true
+            }
+          },
+          {
+            "id": "Auto-Model",
+            "contextWindow": 131072,
+            "maxTokens": 32768
+          }
+        ]
+      }
+    ]
+  }
+}

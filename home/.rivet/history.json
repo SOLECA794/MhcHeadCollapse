@@ -1,0 +1,13 @@
+[
+  "先把仓库内容提交远程（除了cannbotskill）,并且把home根目录的.rivet也提交到远程，并命名为home/.rivet",
+  "对了，赛题是cann8.5，这对我们有影响吗",
+  "1、补充环境记录和说明信息 2、固化在该环境中算子调试使用流程并附上踩坑知识记录\n2、直接按照MhcHeadCollapse/cannbot-skills的教程技能编写算子 不要瞎猜 你怎么一直没进展？是你不会写吗？",
+  "我最想要的 是通过本地和oj数据的对拍 测出真实的case形状 这也是交接的下一步工作和换到这个有NPU的环境的原因，你先把notebook的环境配置相关的信息直接固化到.rivet/进行记录 防止下次再踩坑",
+  "1、这个环境的NPU和cann软件栈都是可用的 只是你自己用错了\n<system-reminder>\n[interrupted] The user stopped the previous reply at this point; any assistant text immediately above is the partial output produced before the stop. Do not resume or continue the interrupted task on your own — wait for and follow the user's next instruction.\n</system-reminder>\n读一下.rivet数据库里的历史记录和项目进展的记忆 知道在干什么",
+  "1、这个环境的NPU和cann软件栈都是可用的 只是你自己用错了",
+  "agents.md和.rivet.md我放进来了 你还需要读吗；目前我给这个项目换了个环境（我们当前这个有NPU的环境 你可以修改一下相关记录）",
+  "读一下这个工作区的.rivet/文件",
+  "重新读 刚才难道是我上传错了？",
+  "你读一下.rivet/这个文件夹",
+  "你读一下.rievt的历史数据"
+]

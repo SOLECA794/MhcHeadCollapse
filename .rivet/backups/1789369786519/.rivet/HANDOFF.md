@@ -63,9 +63,11 @@ Group 路径（outer≥4 走的分支）向量 sigmoid 版误差恒定 3.203e-03
 
 ## 下一步 — 按优先级
 
-1. **本地编译验证循环（最高优先）**：我们在 NPU 本地环境，先跑通 `cd code && mkdir -p build && cd build && cmake .. && make -j` 验证 CANN 工具链正常。这是后续所有优化的基础。
-2. **本地 kernel 时间打点**：用 ACL event（`aclrtCreateEvent/RecordEvent/SynchronizeEvent`）在 NPU 上对已知 shape 逐个打点，建立本地性能基线。
-3. **OJ shape 探测首跑**：在确认本地环境可用后，跑 `python scripts/probe_oj.py sweep outer 3 1,2,4,8,16` 补完 Case3/4/5 的 outer 维度。
+1. **打通 SSH 链路**（最高优先，其他一切依赖它）：先让用户在其终端跑一次 `ssh -J 'jt_...:B3F9...@113.47.8.48:2234' root@199.98.55.200` 确认凭据可用；若可用，修 `mhc_ssh.py`（尝试 connect(..., allow_agent=False, look_for_keys=False, banner_timeout=60) 或换 Transport 层手动 auth）；若 paramiko 持续失败，改用 ssh 命令行 + SSH_ASKPASS 脚本方案。打通后第一件事：`npu-smi info` + `ls /workspace` + CANN 版本确认环境。
+2. **OJ shape 探测首跑**：`python $MHC/scripts/probe_oj.py sweep outer 3 1,2,4,8,16`（Case3 的 outer；注意 sweep 参数顺序 field case values——脚本签名 `sweep <field> <case> <v1,v2,...>`）。每次提交约 2 分钟评测。断言对 5 个 case 同时生效：Pass 的 case 集合会直接揭示各 case 的 outer（如断言 outer==4 时 Case3/4 Pass 而 Case5 RE → Case3/4 outer=4）。拿到 outer 后更新 $MHC/FACTS.md F2.1l 表。
+3. **本地复刻 OJ 计时器**（SSH 通后）：在 NPU 上用 ACL event（aclrtCreateEvent/aclrtRecordEvent/aclrtSynchronizeEvent + elapsed time）对 5 个已知 shape 逐个打点，与 OJ 的 4.70/5.84/5.10/4.94/8.64 对齐；对齐口径后写 `$MHC/tests/mhc_oj_timer.cpp`，此为"本地≈OJ"链路的核心件。
+4. **修 CANNJudge计时与得分规则.md**：把"15 个测试点"改为"实测 5 个 case 计分"（证据：公式验证差 0.05），并在 §4.2 补记与框架地板 4μs 实测的张力待计时复刻实验裁决。
+5. **（可选）Group 向量 sigmoid 根因**：v118 基础上加 UB dump（red 原始值写 y 头）对比 python 参考，一次定位错在哪一环。
 
 ## 坑 — 绝对不要再踩
 
